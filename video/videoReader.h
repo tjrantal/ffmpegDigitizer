@@ -1,4 +1,20 @@
-/*Workaround libavformat bug with c++*/
+/*
+Copyright (C) 2013  Timo Rantalainen (tjrantal at gmail dot com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>.
+*/
+
+/*Workaround libavformat "bug" with c++*/
 #ifndef INT64_C
 #define INT64_C(c) (c ## LL)
 #define UINT64_C(c) (c ## ULL)
@@ -9,8 +25,8 @@ extern "C" {
 	#include <libavformat/avformat.h>
 	#include <libswscale/swscale.h>
 }
-//CLASS FOR VIDEO HANDLING 
 
+/*CLASS FOR VIDEO READING*/
 class videoReader
 {
 	private:
