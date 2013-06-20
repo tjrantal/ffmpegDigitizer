@@ -1,7 +1,8 @@
-ImagePanel::ImagePanel(wxFrame* parent, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size) :
-wxPanel(parent,pos,size)
+ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size) :
+wxPanel(parent,id,pos,size)
 {
     // load the file... ideally add a check to see if loading was successful
+    wxImage::AddHandler(new wxJPEGHandler);
     image.LoadFile(file, format);
 }
  

@@ -1,10 +1,11 @@
 #include <wx/wx.h> /*Include all wx headers*/
 #include <wx/sizer.h>
+#include <wx/image.h>
 
 class ImagePanel : public wxPanel{
 		wxBitmap image;
 	    public:
-        ImagePanel(wxFrame* parent, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size);
+        ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size);
         
         void paintEvent(wxPaintEvent & evt);
         void paintNow();
@@ -39,4 +40,4 @@ BEGIN_EVENT_TABLE(ImagePanel, wxPanel)
 	 */
 	EVT_PAINT(ImagePanel::paintEvent) // catch paint events
 END_EVENT_TABLE()
-#include <"ImagePanel.cpp">
+#include "ImagePanel.cpp"

@@ -5,7 +5,7 @@
 #include <wx/filedlg.h>		//For selecting a file to read
 #include <wx/file.h>		//For reading a file
 #include <wx/slider.h>		//For slider
-#include <"../imagePanel/ImagePanel.h">
+
 
 class DigitizerFrame: public wxFrame
 {
@@ -41,6 +41,7 @@ enum
 	ID_Reset,
 	ID_picker,
 	ID_slider,
+	ID_panel,
 };
 
 #include "DigitizerFrame.cpp"

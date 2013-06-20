@@ -29,6 +29,6 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
 	
-	imagePanel = new ImagePanel(this,_("DSC_0001.JPG"),wxPoint(200,10),wxSize(750,380));
+	imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
 	
 }

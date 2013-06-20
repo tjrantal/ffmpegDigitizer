@@ -7,6 +7,7 @@
 */
 
 #include <wx/wx.h>
+#include "imagePanel/ImagePanel.h"
 #include "guiImplementation/DigitizerFrame.h"
 
 class DigitizerApp: public wxApp
