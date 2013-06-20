@@ -7,12 +7,6 @@
 */
 
 #include <wx/wx.h>
-#include <wx/event.h>		//Listening to mouse events
-#include <wx/textctrl.h>	//Text field for displaying results
-#include <wx/button.h>		//For resetting the clock
-#include <wx/filedlg.h>		//For selecting a file to read
-#include <wx/file.h>		//For reading a file
-#include <wx/slider.h>		//For slider
 #include "guiImplementation/DigitizerFrame.h"
 
 class DigitizerApp: public wxApp
@@ -37,15 +31,4 @@ bool DigitizerApp::OnInit()
     SetTopWindow(frame);
     return true;
 }
-
-
-
-
-
-
-
-
-
-
-
 

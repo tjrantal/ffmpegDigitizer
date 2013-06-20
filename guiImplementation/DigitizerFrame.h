@@ -1,3 +1,12 @@
+#include <wx/wx.h>
+#include <wx/event.h>		//Listening to mouse events
+#include <wx/textctrl.h>	//Text field for displaying results
+#include <wx/button.h>		//For resetting the clock
+#include <wx/filedlg.h>		//For selecting a file to read
+#include <wx/file.h>		//For reading a file
+#include <wx/slider.h>		//For slider
+#include <"../imagePanel/ImagePanel.h">
+
 class DigitizerFrame: public wxFrame
 {
 public:
@@ -13,6 +22,7 @@ private:
 	wxButton 		*openMarkerFile;		//Pick a file to save to
 	wxFile 			*openFile;
 	wxSlider		*slider;				//Slider
+	ImagePanel		*imagePanel;			//ImagePanel
     void OnQuit(wxCommandEvent &event);
     void OnAbout(wxCommandEvent &event);
 	void LeftButtonDown(wxMouseEvent &event);
