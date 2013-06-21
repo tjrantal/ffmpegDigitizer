@@ -7,21 +7,16 @@
 */
 
 #include <wx/wx.h>
-#include "imagePanel/ImagePanel.h"
-#include "guiImplementation/DigitizerFrame.h"
-
+#ifndef IMAGEPANEL_H 
+	#include "imagePanel/ImagePanel.h"
+#endif
+#ifndef DIGITIZERFRAME_H
+	#include "digitizerFrame/DigitizerFrame.h"
+#endif
 class DigitizerApp: public wxApp
 {
     virtual bool OnInit();
 };
-
-
-
-BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
-    EVT_MENU(ID_Quit,  		DigitizerFrame::OnQuit)
-    EVT_MENU(ID_About, 		DigitizerFrame::OnAbout)
-	EVT_SCROLL(DigitizerFrame::ScrollVideo)	
-END_EVENT_TABLE()
 
 IMPLEMENT_APP(DigitizerApp)
 

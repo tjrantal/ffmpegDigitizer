@@ -1,3 +1,6 @@
+#ifndef IMAGEPANEL_H
+	#include "ImagePanel.h"
+#endif
 ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size) :
 wxPanel(parent,id,pos,size)
 {
