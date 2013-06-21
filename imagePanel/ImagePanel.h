@@ -25,8 +25,8 @@
 		     void keyPressed(wxKeyEvent& event);
 		     void keyReleased(wxKeyEvent& event);
 		     */
-		    
 		    DECLARE_EVENT_TABLE()
+		    
 	};
 	BEGIN_EVENT_TABLE(ImagePanel, wxPanel)
 		// some useful events
