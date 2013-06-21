@@ -55,14 +55,14 @@ void ImagePanel::render(wxDC&  dc)
 BEGIN_EVENT_TABLE(ImagePanel, wxPanel)
 	// some useful events
 	/*
-	 EVT_MOTION(wxImagePanel::mouseMoved)
-	 EVT_LEFT_DOWN(wxImagePanel::mouseDown)
-	 EVT_LEFT_UP(wxImagePanel::mouseReleased)
-	 EVT_RIGHT_DOWN(wxImagePanel::rightClick)
-	 EVT_LEAVE_WINDOW(wxImagePanel::mouseLeftWindow)
-	 EVT_KEY_DOWN(wxImagePanel::keyPressed)
-	 EVT_KEY_UP(wxImagePanel::keyReleased)
-	 EVT_MOUSEWHEEL(wxImagePanel::mouseWheelMoved)
+	 EVT_MOTION(ImagePanel::mouseMoved)
+	 EVT_LEFT_DOWN(ImagePanel::mouseDown)
+	 EVT_LEFT_UP(ImagePanel::mouseReleased)
+	 EVT_RIGHT_DOWN(ImagePanel::rightClick)
+	 EVT_LEAVE_WINDOW(ImagePanel::mouseLeftWindow)
+	 EVT_KEY_DOWN(ImagePanel::keyPressed)
+	 EVT_KEY_UP(ImagePanel::keyReleased)
+	 EVT_MOUSEWHEEL(ImagePanel::mouseWheelMoved)
 	 */
 	EVT_PAINT(ImagePanel::paintEvent) // catch paint events
 END_EVENT_TABLE()

@@ -42,7 +42,6 @@ The plan is to:
 	
 	Apply the distortion correction and use standard DLT to get marker 3D trajectories with Octave/Matlab
 
-Unlike the convention of having one class in a h and a cpp file, I broke the cpp -file into several files; one for each function. Also, I appended includes to the functions into the header file.
 	
 NOTES I made when I was settin up my developement environment on a Windows machine
 
