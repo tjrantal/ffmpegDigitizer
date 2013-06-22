@@ -7,7 +7,15 @@ wxPanel(parent,id,pos,size)
 	
     // load the file... ideally add a check to see if loading was successful
     wxImage::AddHandler(new wxJPEGHandler);
-    image.LoadFile(file, format);
+    imageOrig.LoadFile(file, format);
+    imageCopy = imageOrig.ConvertToImage();
+    scaleFactor = (double)imageOrig.GetWidth()/(double)size.GetWidth() > (double)imageOrig.GetHeight()/(double)size.GetHeight() ? (double)imageOrig.GetWidth()/(double)size.GetWidth() : (double)imageOrig.GetHeight()/(double)size.GetHeight();
+    if (scaleFactor != 1){ //Scale to fit the panel
+    	imageCopy.Rescale(imageOrig.GetWidth()/scaleFactor,imageOrig.GetHeight()/scaleFactor,wxIMAGE_QUALITY_HIGH);
+    	resizedImage = *(new wxBitmap(imageCopy));
+    }else{ //No scaling needed
+    	resizedImage = *(new wxBitmap(imageOrig));
+    }
     
 }
 
@@ -48,7 +56,7 @@ void ImagePanel::paintNow()
  */
 void ImagePanel::render(wxDC&  dc)
 {
-    dc.DrawBitmap( image, 0, 0, false );
+    dc.DrawBitmap( resizedImage, 0, 0, false );
 }
 
 /*EVENT TABLE*/

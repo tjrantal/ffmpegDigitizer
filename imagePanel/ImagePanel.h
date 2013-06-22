@@ -5,7 +5,10 @@
 	#include <wx/image.h>
 
 	class ImagePanel : public wxPanel{
-			wxBitmap image;
+			wxBitmap	imageOrig;
+			wxImage		imageCopy;
+			wxBitmap	resizedImage;
+			double		scaleFactor;
 			public:
 		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size);
 		    
