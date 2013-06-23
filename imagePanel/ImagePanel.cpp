@@ -17,11 +17,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef IMAGEPANEL_H
 	#include "ImagePanel.h"
 #endif
-ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size) :
-wxPanel(parent,id,pos,size)
+ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn) :
+wxPanel(parent,id,pos,sizeIn)
 {
 	
     // load the file... ideally add a check to see if loading was successful
+    size = sizeIn;
     wxImage::AddHandler(new wxJPEGHandler);
     imageOrig.LoadFile(file, format);
     imageCopy = imageOrig.ConvertToImage();
@@ -35,7 +36,19 @@ wxPanel(parent,id,pos,size)
     
 }
 
+/*Set image to show*/
+void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data){
+	imageCopy =*(new wxImage(width,height,data,static_data));
+	scaleFactor = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
+    if (scaleFactor != 1){ //Scale to fit the panel
+    	imageCopy.Rescale(width/scaleFactor,height/scaleFactor,wxIMAGE_QUALITY_HIGH);
+    	resizedImage = *(new wxBitmap(imageCopy));
+    }else{ //No scaling needed
+    	resizedImage = *(new wxBitmap(imageOrig));
+    }
+    Refresh();
 
+}
  
 /*
  * Called by the system of by wxWidgets when the panel needs

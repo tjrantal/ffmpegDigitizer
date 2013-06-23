@@ -24,10 +24,11 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxBitmap	imageOrig;
 			wxImage		imageCopy;
 			wxBitmap	resizedImage;
+			wxSize		size;
 			double		scaleFactor;
 			public:
-		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& size);
-		    
+		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn);
+		    void setImage(int width, int height, unsigned char* data,bool static_data=true);
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
 		    
