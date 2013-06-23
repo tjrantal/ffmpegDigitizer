@@ -13,6 +13,10 @@
 #ifndef DIGITIZERFRAME_H
 	#include "digitizerFrame/DigitizerFrame.h"
 #endif
+#ifndef VIDEOREADER_H
+	#include "videoReader/VideoReader.h"
+#endif
+
 class DigitizerApp: public wxApp
 {
     virtual bool OnInit();

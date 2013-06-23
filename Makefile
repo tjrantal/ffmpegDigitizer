@@ -4,7 +4,7 @@ CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavf
 #LDFLAGS= -static -O3 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat) $(shell pkg-config --libs libavcodec) $(shell pkg-config --libs libswscale)
 LDFLAGS= -O3 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat) $(shell pkg-config --libs libavcodec) $(shell pkg-config --libs libswscale)
 #-lgsl -lgslcblas
-SOURCES=imagePanel/ImagePanel.cpp digitizerFrame/DigitizerFrame.cpp Digitizer.cpp 
+SOURCES=imagePanel/ImagePanel.cpp videoReader/VideoReader.cpp digitizerFrame/DigitizerFrame.cpp Digitizer.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=digitizer.exe
 #	@echo ${CC} ${LDFLAGS} ${OBJECTS} -o ${@}
