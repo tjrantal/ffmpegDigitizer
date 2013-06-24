@@ -50,6 +50,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		public:
 		const char *filename;
 		int frames,leveys,korkeus,varattu;
+		double timeBase,duration;
+		long startTime;
 		unsigned char **video;
 
 		//Class function declarations

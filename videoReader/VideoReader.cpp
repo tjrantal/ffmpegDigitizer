@@ -243,7 +243,7 @@ int VideoReader::readFrames(){
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
-	printf("\nViimeinen %ld %ld\n",packet.pts,tstamp.front());
+	//printf("\nViimeinen %ld %ld\n",packet.pts,tstamp.front());
 	frames = frameja2;
 	return 1;
 }
@@ -264,14 +264,18 @@ int VideoReader::closeVideo(){
 }
 
 int VideoReader::getNumberOfFrames(){
+	timeBase= (double)pFormatCtx->streams[videoStream]->time_base.num/(double)pFormatCtx->streams[videoStream]->time_base.den;
+	duration = ((double) pFormatCtx->streams[videoStream]->duration)*timeBase;
+	startTime=(long) pFormatCtx->streams[videoStream]->start_time;
+	double frameInterval = (double)pFormatCtx->streams[videoStream]->codec->time_base.num/(double)pFormatCtx->streams[videoStream]->codec->time_base.den;
+	printf("startTime %ld duration %.2f timeBase %.8f frameInterval %.4f\n",startTime,(float) duration,(float) timeBase,(float) frameInterval);
 	if (pFormatCtx->streams[videoStream]->nb_frames > 0){
+	
+		printf("Stream returned the number of frames %d\n",(int) pFormatCtx->streams[videoStream]->nb_frames);
 		return (int) pFormatCtx->streams[videoStream]->nb_frames;
 	}
-	int64_t duration = pFormatCtx->streams[videoStream]->duration; // AV_TIME_BASE fractional seconds
-	double seconds = (double)duration/(double)AV_TIME_BASE;
-	double frameInterval = pFormatCtx->streams[videoStream]->
-	//double)pCodecCtx->time_base.num/(double)pCodecCtx->time_base.den;
-	printf("%ld %.2f %.4f\n",(long) duration,(float) seconds,(float) frameInterval);
-	return (int) (seconds/frameInterval);
+	printf("Stream DID NOT return the number of frames %d\n",(int) (duration/frameInterval));
+
+	return (int) (duration/timeBase);
 }
 
