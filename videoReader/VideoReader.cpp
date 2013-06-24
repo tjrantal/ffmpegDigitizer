@@ -236,13 +236,14 @@ int VideoReader::readFrames(){
 				*/
 				frameja2++;
 				tstamp.insert(tstamp.begin(),packet.pts);
+				printf("tStamp %ld",(long) packet.pts);
 				tstamp.pop_back();
 			}
 	    }
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
-	printf("\nViimeinen %ld\n",packet.pts);
+	printf("\nViimeinen %ld %ld\n",packet.pts,tstamp.front());
 	frames = frameja2;
 	return 1;
 }
@@ -260,5 +261,17 @@ int VideoReader::closeVideo(){
 	delete [] video;
 	video = NULL;
 	return 0;
+}
+
+int VideoReader::getNumberOfFrames(){
+	if (pFormatCtx->streams[videoStream]->nb_frames > 0){
+		return (int) pFormatCtx->streams[videoStream]->nb_frames;
+	}
+	int64_t duration = pFormatCtx->streams[videoStream]->duration; // AV_TIME_BASE fractional seconds
+	double seconds = (double)duration/(double)AV_TIME_BASE;
+	double frameInterval = pFormatCtx->streams[videoStream]->
+	//double)pCodecCtx->time_base.num/(double)pCodecCtx->time_base.den;
+	printf("%ld %.2f %.4f\n",(long) duration,(float) seconds,(float) frameInterval);
+	return (int) (seconds/frameInterval);
 }
 

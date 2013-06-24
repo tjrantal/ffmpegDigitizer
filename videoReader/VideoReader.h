@@ -26,6 +26,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#include <libavcodec/avcodec.h>
 		#include <libavformat/avformat.h>
 		#include <libswscale/swscale.h>
+		#include <libavutil/avutil.h>	/*Stream duration*/
 	}
 
 	/*CLASS FOR VIDEO READING*/
@@ -54,6 +55,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		//Class function declarations
 		int readFrames();
 		int closeVideo();
+		int getNumberOfFrames();
 		//Functions declared
 	
 		/*Consructor,

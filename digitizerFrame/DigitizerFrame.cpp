@@ -51,6 +51,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	
 	imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
 	videoReader = new VideoReader("GOPR0085.MP4",10);
+	printf("Frames in video %d\n",videoReader->getNumberOfFrames());
 	videoReader->readFrames(); 
 	imagePanel->setImage(videoReader->leveys,videoReader->korkeus,videoReader->video[4],true);
 }
