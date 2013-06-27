@@ -211,23 +211,25 @@ int VideoReader::readFrames(){
 }
 
 VideoReader::~VideoReader(){
-	
+	// Close the video file
+	printf("\nClosing avformat\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
+	avformat_close_input(&pFormatCtx);
 	// Close the codec
 	printf("Closing avcodec\n");		//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	avcodec_close(pCodecCtx);
-	
-	// Close the video file
-	printf("Closing avformat\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	avformat_close_input(&pFormatCtx);
+	av_free(pCodecCtx);
+
 	//Attempt to free pictures
 	printf("free tmp_picture\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	av_free(&tmp_picture);
+	fflush(stdout);			//DEBUGGING AVFrame
+	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
+	avcodec_free_frame(&tempPointer);
 	printf("free picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	av_free(&picture);
+	tempPointer = (AVFrame*) &picture;
+	avcodec_free_frame(&tempPointer);
 	//Free memory
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
