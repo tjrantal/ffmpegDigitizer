@@ -29,15 +29,16 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#include <libavutil/avutil.h>	/*Stream duration*/
 	}
 
-	/*CLASS FOR VIDEO READING*/
+	/*! CLASS FOR VIDEO READING*/
 	class VideoReader
 	{
 		private:
-		AVCodecContext *pCodecCtx;
-		AVFrame tmp_picture;
-		AVFrame picture;
-		AVFormatContext *pFormatCtx;
-		int videoStream;
+		/*!Private vars*/
+		AVCodecContext *pCodecCtx; /*!< Codec context*/
+		AVFrame tmp_picture;	/*!< Temp AVFrame*/
+		AVFrame picture;		/*!< swscaled AVFrame*/
+		AVFormatContext *pFormatCtx;	/*!< Format context*/
+		int videoStream;			/*!< video stream index*/
 		AVOutputFormat *fmt;
 		uint8_t *picture_buf;
 		uint8_t *picture_buf2;
@@ -48,7 +49,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int             numBytes;
 	
 		public:
-		const char *filename;
+		const char *filename; /*!< Name of the video file*/
 		int frames,leveys,korkeus,varattu;
 		double timeBase,duration;
 		long startTime;
