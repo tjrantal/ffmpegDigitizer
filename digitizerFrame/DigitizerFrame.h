@@ -36,6 +36,8 @@ class DigitizerFrame: public wxFrame
 public:
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 private:
+	//DEBUG
+	FILE *debug;
 	//Variables
 	wxTextCtrl		*resultsText;			//For displaying text in screen
 	clock_t			*clockCounts,initClock;	//For storing processor times

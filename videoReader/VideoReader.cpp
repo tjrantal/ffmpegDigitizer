@@ -213,17 +213,32 @@ int VideoReader::readFrames(){
 VideoReader::~VideoReader(){
 	
 	// Close the codec
+	printf("Closing avcodec\n");		//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	avcodec_close(pCodecCtx);
+	
 	// Close the video file
+	printf("Closing avformat\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	avformat_close_input(&pFormatCtx);
 	//Attempt to free pictures
+	printf("free tmp_picture\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	av_free(&tmp_picture);
+	printf("free picture\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	av_free(&picture);
 	//Free memory
+	printf("free memory\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	for (int i = 0; i<frames;++i){
 		delete[] video[frames];
 	}
-	delete video;
+	printf("delete video**\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
+	delete[] video;
+	printf("set video to NULL\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	video = NULL;
 }
 

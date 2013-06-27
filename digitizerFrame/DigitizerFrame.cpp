@@ -55,8 +55,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
-	
-	
+	debug = freopen("debug.log","w",stdout);
 }
 
 /*Button event handling*/
@@ -83,6 +82,8 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	if (videoReader != NULL){
 		delete videoReader;
 	}
+	fflush(stdout);	//DEBUGGING
+	fclose(debug);	//DEBUGGING
 	event.Skip();
 }
 
