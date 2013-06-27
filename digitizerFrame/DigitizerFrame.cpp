@@ -55,7 +55,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
-	debug = freopen("debug.log","w",stdout);
+	//debug = freopen("debug.log","w",stdout);
 }
 
 /*Button event handling*/
@@ -83,7 +83,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 		delete videoReader;
 	}
 	fflush(stdout);	//DEBUGGING
-	fclose(debug);	//DEBUGGING
+	//fclose(debug);	//DEBUGGING
 	event.Skip();
 }
 
@@ -120,7 +120,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 	/*Open marker file*/
 		wxFileDialog openFileDialog(this, _("Open video file"), _(""), _(""),
-	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.avi;*.mkv"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
 		resultsText->ChangeValue(_("No video file opened"));
@@ -131,14 +131,14 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		}
 		printf("construct video reader\n");
 		fflush(stdout);			//DEBUGGING
-		videoReader = new VideoReader(openFileDialog.GetPath(),10);
+		videoReader = new VideoReader(openFileDialog.GetPath().char_str(),10);
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
 			printf("Frames in video %d\n",videoReader->getNumberOfFrames());
 			int framesInVid = videoReader->readFrames(); 
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->video[4],true);
-				SetStatusText(wxString::Format(wxT("%s %d"),"Video opened, frames", framesInVid));
+				SetStatusText(wxString::Format(wxT("%s %d"),_("Video opened, frames"), framesInVid));
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
@@ -150,8 +150,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	int currentVal = slider->GetValue();
-	resultsText->ChangeValue(wxString::Format(wxT("%s %d"),"Frame #", currentVal));
-	SetStatusText(wxString::Format(wxT("%s %d"),"Frame #", currentVal));
+	resultsText->ChangeValue(wxString::Format(wxT("%s %d"),_("Frame #"), currentVal));
+	SetStatusText(wxString::Format(wxT("%s %d"),_("Frame #"), currentVal));
 }
 
 /*Event table*/

@@ -28,7 +28,7 @@ VideoReader::VideoReader(const char* file, int fram)
 		tstamp.push_back(0);
 	}
 
-	video = new unsigned char*[frames]; //Allocate memory
+	video = new unsigned char*[frames*sizeof(unsigned char*)]; //Allocate memory
 		
 	// Open video file
 	pFormatCtx = NULL;
@@ -113,7 +113,7 @@ VideoReader::VideoReader(const char* file, int fram)
 	printf("Reserve Memory\n");
 	fflush(stdout);			//DEBUGGING
 	for (int i = 0;i< frames;i++){
-		video[i] =  new unsigned char [width*height*3];
+		video[i] =  new unsigned char [width*height*3*sizeof(unsigned char)];
 	}
 
 	img_convert_ctx = NULL;
@@ -121,24 +121,36 @@ VideoReader::VideoReader(const char* file, int fram)
 	if (pCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 		printf("diffeent pix_fmt\n");
 	
-		picture = *(avcodec_alloc_frame());
-		if (!&picture){
+		picture = avcodec_alloc_frame();
+		if (!picture){
 			printf("Couldn't alloc frame\n");
 			return;
 		}
-		
-		int ret = av_image_alloc(picture_buf, bufLinesize,
+		/*
+    ret = avpicture_alloc(&dst_picture, c->pix_fmt, c->width, c->height);
+    if (ret < 0) {
+        fprintf(stderr, "Could not allocate picture: %s\n", av_err2str(ret));
+        exit(1);
+    }
+*/
+
+		int ret = av_image_alloc(picture->data, picture->linesize,
 						 pCodecCtx->width, pCodecCtx->height,
 						 PIX_FMT_RGB24, 1);
 		if (ret < 0) {
 			fprintf(stderr, "Could not allocate raw video buffer\n");
 			return;
 		}
-	
+		/*
+		picture->data = picture_buf;
+		picture->linesize = bufLinesize;
+		*/
+
+		/*
 		
-		avpicture_fill((AVPicture *)&picture, picture_buf[0],
+		avpicture_fill(picture, picture_buf[0],
 					   PIX_FMT_RGB24, width, height);
-		
+		*/
 		
 		/* as ffmpeg returns a YUV420P picture from a video, we must convert it
 		   to the desired pixel format */
@@ -212,15 +224,15 @@ int VideoReader::readFrames(){
 					}
 				}else{//If pixel_fmt is not targetFormat
 					sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
-	                  0, height, picture.data, picture.linesize);
+	                  0, height, picture->data, picture->linesize);
 			
-					if (picture.linesize[0] != width && picture.linesize[0] != width*3){//Hack for padding (probably not needed...
-						printf("%d memcpy hack\n",picture.linesize[0]);
+					if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
+						printf("%d memcpy hack\n",picture->linesize[0]);
 						for (int zzz = 0; zzz < height;zzz++){
-							memcpy(video[frameja2]+zzz*width*3,picture.data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+							memcpy(video[frameja2]+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
 						}
 					} else {
-						memcpy(video[frameja2],picture.data[0],width*height*sizeof(unsigned char)*3);
+						memcpy(video[frameja2],picture->data[0],width*height*sizeof(unsigned char)*3);
 					}
 				}
 				frameja2++;
@@ -259,12 +271,14 @@ VideoReader::~VideoReader(){
 	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
 	 av_frame_free(&tempPointer);
 	 */
+
+	//av_freep(&picture_buf[0]);
 	printf("free picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	av_free(&picture);
-	printf("free picture buffer\n");	//DEBUGGING
+	avcodec_free_frame(&picture);
+	printf("free  buffer\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	av_free(&picture_buf[0]);
+	//av_free(&picture_buf[0]);
 	/*
 	tempPointer = (AVFrame*) &picture;
 	 av_frame_free(&tempPointer);
@@ -283,7 +297,7 @@ VideoReader::~VideoReader(){
 	delete[] video;
 	printf("set video to NULL\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	video = NULL;
+	//video = NULL;
 }
 
 int VideoReader::getNumberOfFrames(){

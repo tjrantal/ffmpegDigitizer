@@ -23,7 +23,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#define UINT64_C(c) (c ## ULL)
 	#endif
 	
-	#include <windows.h>
+	//#include <windows.h>
 	#include <vector>
 	extern "C" {
 		#include <libavcodec/avcodec.h>
@@ -40,7 +40,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		/*!Private vars*/
 		AVCodecContext *pCodecCtx; /*!< Codec context*/
 		AVFrame *tmp_picture;	/*!< Temp AVFrame*/
-		AVFrame picture;		/*!< swscaled AVFrame*/
+		AVFrame *picture;		/*!< swscaled AVFrame*/
 		AVFormatContext *pFormatCtx;	/*!< Format context*/
 		int videoStream;			/*!< video stream index*/
 		AVOutputFormat *fmt;
