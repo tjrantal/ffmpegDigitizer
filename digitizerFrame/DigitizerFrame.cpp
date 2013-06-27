@@ -79,12 +79,17 @@ void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCloseEvent &event)
 {
+	printf("Delete vReader at the end\n");
+	fflush(stdout);	//DEBUGGING	
 	if (videoReader != NULL){
 		delete videoReader;
+		videoReader = NULL;
 	}
+	printf("Nearly done\n");
 	fflush(stdout);	//DEBUGGING
 	//fclose(debug);	//DEBUGGING
-	event.Skip();
+ 	wxWindow::Destroy();
+	//event.Skip();
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
@@ -126,8 +131,15 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		resultsText->ChangeValue(_("No video file opened"));
 	}else{
 		/*Close any pre-existing video*/
+		printf("Pre-existing videoReader?\n");
+		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL){
+			printf("Remove pre-existing videoReader?\n");
+			fflush(stdout);			//DEBUGGING
 			delete videoReader;
+					printf("Return from deconstructor\n");
+		fflush(stdout);			//DEBUGGING
+			videoReader = NULL;
 		}
 		printf("construct video reader\n");
 		fflush(stdout);			//DEBUGGING

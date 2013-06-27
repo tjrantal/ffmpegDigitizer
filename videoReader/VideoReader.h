@@ -55,6 +55,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
+		int videoFrames;
 	
 		public:
 		const char *filename; /**< Name of the video file*/

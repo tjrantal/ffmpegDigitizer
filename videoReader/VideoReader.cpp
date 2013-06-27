@@ -23,12 +23,13 @@ VideoReader::VideoReader(const char* file, int fram)
 	av_register_all();	//Register formats
 	filename = file;		//File to open
 	frames = fram;	//Number of frames to be read
+	videoFrames = frames;
 	varattu = frames;
 	for (int lll = 0;lll<2;++lll){
 		tstamp.push_back(0);
 	}
 
-	video = new unsigned char*[frames*sizeof(unsigned char*)]; //Allocate memory
+	video = new unsigned char*[videoFrames*sizeof(unsigned char*)]; //Allocate memory
 		
 	// Open video file
 	pFormatCtx = NULL;
@@ -112,14 +113,14 @@ VideoReader::VideoReader(const char* file, int fram)
 	//Reserve memory for frames
 	printf("Reserve Memory\n");
 	fflush(stdout);			//DEBUGGING
-	for (int i = 0;i< frames;i++){
+	for (int i = 0;i< videoFrames;i++){
 		video[i] =  new unsigned char [width*height*3*sizeof(unsigned char)];
 	}
 
 	img_convert_ctx = NULL;
 	/*PIX_FMT_YUV420P*/
 	if (pCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-		printf("diffeent pix_fmt\n");
+		printf("different pix_fmt\n");
 	
 		picture = avcodec_alloc_frame();
 		if (!picture){
@@ -237,7 +238,7 @@ int VideoReader::readFrames(){
 				}
 				frameja2++;
 				tstamp.insert(tstamp.begin(),packet.pts);
-				printf("tStamp %ld",(long) packet.pts);
+				//printf("tStamp %ld",(long) packet.pts);
 				tstamp.pop_back();
 			}
 	    }
@@ -273,6 +274,9 @@ VideoReader::~VideoReader(){
 	 */
 
 	//av_freep(&picture_buf[0]);
+	printf("free picture->data\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
+	av_freep(&picture->data[0]);
 	printf("free picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	avcodec_free_frame(&picture);
@@ -288,8 +292,8 @@ VideoReader::~VideoReader(){
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	
-	for (int i = 0; i<frames;++i){
-		delete[] video[frames];
+	for (int i = 0; i<videoFrames;++i){
+		delete[] video[i];
 	}
 	
 	printf("delete video**\n");	//DEBUGGING
@@ -297,7 +301,9 @@ VideoReader::~VideoReader(){
 	delete[] video;
 	printf("set video to NULL\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	//video = NULL;
+	video = NULL;
+	printf("video is NULL\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 }
 
 int VideoReader::getNumberOfFrames(){
