@@ -27,7 +27,10 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxSize		size;
 			double		scaleFactor;
 			public:
+			/*Constructor with an image loaded*/
 		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn);
+			/*Constructor without an image*/
+			ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn);
 		    void setImage(int width, int height, unsigned char* data,bool static_data=true);
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();

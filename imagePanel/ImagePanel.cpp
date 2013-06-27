@@ -36,6 +36,13 @@ wxPanel(parent,id,pos,sizeIn)
     
 }
 
+ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn) :
+wxPanel(parent,id,pos,sizeIn)
+{
+    size = sizeIn;
+}
+
+
 /*Set image to show*/
 void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data){
 	imageCopy =*(new wxImage(width,height,data,static_data));

@@ -39,6 +39,8 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	/*Button for reading markers in*/
 	openMarkerFile 	= new wxButton(this,ID_picker,_("Open marker file"),wxPoint(10,150));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
+	openVideoFile 	= new wxButton(this,ID_video,_("Open video file"),wxPoint(10,200));
+	Connect(ID_video,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenVideo),NULL,this);
 	/*Slider for browsing video*/
 	slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
 	//Connect(ID_slider,EVT_SCROLL,wxCommandEventHandler(DigitizerFrame::ScrollVideo),NULL,this);
@@ -49,11 +51,15 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
 	
-	imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
-	videoReader = new VideoReader("GOPR0085.MP4",10);
+	//imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
+	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
+	//videoReader = new VideoReader("GOPR0085.MP4",10);
+	videoReader = NULL;
+	videoReader = new VideoReader("GOPR0091.MP4",10);
 	printf("Frames in video %d\n",videoReader->getNumberOfFrames());
 	videoReader->readFrames(); 
 	imagePanel->setImage(videoReader->leveys,videoReader->korkeus,videoReader->video[4],true);
+	
 }
 
 /*Button event handling*/
@@ -103,6 +109,36 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 	}
 	
 }
+
+void DigitizerFrame::OpenVideo(wxCommandEvent& event){
+	
+	/*Open marker file*/
+		wxFileDialog openFileDialog(this, _("Open video file"), _(""), _(""),
+	_("Video files (*.mp4)|*.mp4|(*.avi)|*.avi|(*.mkv)|*.mkv"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+	if (openFileDialog.ShowModal() == wxID_CANCEL){
+		SetStatusText(_("No marker file opened"));
+		resultsText->ChangeValue(_("No marker file opened"));
+	}else{
+		// save the current contents in the file;
+		// this can be done with e.g. wxWidgets output streams:
+		openFile = new wxFile( openFileDialog.GetPath(), wxFile::write_append );
+		if (!openFile->IsOpened())
+		{
+			SetStatusText(_("Could not open save file!"));
+			resultsText->ChangeValue(_("Could not open save file!"));
+			openFile = NULL;
+		}else{
+			//READ MARKERS HERE
+			/*Close the save file*/
+			if (openFile != NULL){
+				openFile->Close();
+			}
+			SetStatusText( _("Markers read"));
+		}
+	}
+	
+}
+
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	int currentVal = slider->GetValue();

@@ -45,6 +45,8 @@ private:
 	FILE			*resultFile;			//File to save to
 	wxButton 		*openMarkerFile;		//Pick a file to save to
 	wxFile 			*openFile;
+	wxButton 		*openVideoFile;		//Pick a file to save to
+	wxFile 			*openVideo;
 	wxSlider		*slider;				//Slider
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;				//videoReader
@@ -54,6 +56,7 @@ private:
 	void LeftButtonUp(wxMouseEvent &event);
 	void ResetClock(wxCommandEvent &event);
 	void OpenFile(wxCommandEvent &event);
+	void OpenVideo(wxCommandEvent &event);
 	void ScrollVideo(wxScrollEvent &event);
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
@@ -65,6 +68,7 @@ enum
     ID_About,
 	ID_Reset,
 	ID_picker,
+	ID_video,
 	ID_slider,
 	ID_panel,
 };
