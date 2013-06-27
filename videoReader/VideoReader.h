@@ -49,22 +49,30 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int             numBytes;
 	
 		public:
-		const char *filename; /*!< Name of the video file*/
-		int frames,leveys,korkeus,varattu;
-		double timeBase,duration;
-		long startTime;
-		unsigned char **video;
+		const char *filename; /**< Name of the video file*/
+		int frames;			/**< Number of frames read to memory*/
+		int width;			/**< Width of the video frame*/
+		int height;		/**< Height of the video frame*/
+		int varattu;		/**< does nothing*/
+		double timeBase;	/**< ffmpeg timeBase*/
+		double duration;	/**< ffmpeg duration of the file in s*/
+		long startTime;		/**< ffmpeg startTime*/
+		bool videoOpen;		/**< true, if video was opened successfully*/
+		unsigned char **video;	/**< Pointer to the frames read from the video*/
 
 		//Class function declarations
-		int readFrames();
-		int closeVideo();
-		int getNumberOfFrames();
+		int readFrames();	/**< Read next "frames" frames or to the end of the video*/
+		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
 		//Functions declared
 	
-		/*Consructor,
-		file name to open
-		number of frames to read at a time
+		/**Consructor,
+		@param file file to open
+		@param fram number of frames to read at a time
 		*/
-		VideoReader(const char* file, int fram);
+		VideoReader(const char* file, int fram); 
+		
+		/**Deconstructor*/
+		~VideoReader();	/**< Close the video file and release memory*/
+		
 	};
 #endif

@@ -76,7 +76,6 @@ void DigitizerFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
 	if (videoReader != NULL){
-		videoReader->closeVideo();
 		delete videoReader;
 	}
     Close(true);
@@ -122,14 +121,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	}else{
 		/*Close any pre-existing video*/
 		if (videoReader != NULL){
-			videoReader->closeVideo();
 			delete videoReader;
 		}
 		videoReader = new VideoReader(openFileDialog.GetPath(),10);
 		if (videoReader != NULL){
 			printf("Frames in video %d\n",videoReader->getNumberOfFrames());
 			int framesInVid = videoReader->readFrames(); 
-			imagePanel->setImage(videoReader->leveys,videoReader->korkeus,videoReader->video[4],true);
+			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->video[4],true);
 				SetStatusText(wxString::Format(wxT("%s %d"),"Video opened, frames", framesInVid));
 		}else{
 			SetStatusText(_("Could not open video!"));
