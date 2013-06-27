@@ -39,7 +39,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		private:
 		/*!Private vars*/
 		AVCodecContext *pCodecCtx; /*!< Codec context*/
-		AVFrame tmp_picture;	/*!< Temp AVFrame*/
+		AVFrame *tmp_picture;	/*!< Temp AVFrame*/
 		AVFrame picture;		/*!< swscaled AVFrame*/
 		AVFormatContext *pFormatCtx;	/*!< Format context*/
 		int videoStream;			/*!< video stream index*/

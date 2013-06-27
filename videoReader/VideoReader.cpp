@@ -41,7 +41,7 @@ VideoReader::VideoReader(const char* file, int fram)
 	}
 				//return -1; // Couldn't open file
 	// Retrieve stream information
-	printf("findStreams\n",);
+	printf("findStreams\n");
 	fflush(stdout);			//DEBUGGING
 	if(avformat_find_stream_info(pFormatCtx,NULL)<0){
 		printf("Coudln't find stream\n");
@@ -54,12 +54,20 @@ VideoReader::VideoReader(const char* file, int fram)
 			// Find the first video stream
 	
 	  /* retrieve stream information */
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
-        printf("Could not find stream information\n");
+	videoStream=-1;
+	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++){
+		if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO)
+		{
+		videoStream=i;
+		break;
+		}
+	}
+	if(videoStream==-1){
+		printf("no videostream\n");
 		fflush(stdout);			//DEBUGGING
-        return;
-    }
-	printf("find_stream_info\n",);
+		return;
+	}
+	printf("find_stream_info\n");
 	fflush(stdout);			//DEBUGGING
 	
 	videoStream = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
@@ -69,7 +77,7 @@ VideoReader::VideoReader(const char* file, int fram)
 		fflush(stdout);			//DEBUGGING
         return;
 	}	
-		printf("videoStreamIndex\n",);
+		printf("videoStreamIndex\n");
 	fflush(stdout);			//DEBUGGING
 	// Get a pointer to the codec context for the video stream
 	pCodecCtx=pFormatCtx->streams[videoStream]->codec;
@@ -94,31 +102,12 @@ VideoReader::VideoReader(const char* file, int fram)
 
 
 	
-	tmp_picture=*(avcodec_alloc_frame());
-	if (!&tmp_picture){
+	tmp_picture=avcodec_alloc_frame();
+	if (!tmp_picture){
 		printf("Coulnd't alloc frame\n");
 		fflush(stdout);			//DEBUGGING
 		return;
 	}
-	
-	/*
-	//Allocate memory for decoded image
-	int ret = av_image_alloc(picture_buf2, buf2Linesize,
-						 pCodecCtx->width, pCodecCtx->height,
-						 pCodecCtx->pix_fmt, 1);
-						 
-		if (ret < 0) {
-		fprintf(stderr, "Could not allocate raw video buffer\n");
-		return;
-	}
-	*/
-	
-	/*
-	avpicture_fill((AVPicture *)&tmp_picture, picture_buf2,
-					   pCodecCtx->pix_fmt, width, height);
-	
-	*/
-
 	
 	//Reserve memory for frames
 	printf("Reserve Memory\n");
@@ -167,7 +156,11 @@ VideoReader::VideoReader(const char* file, int fram)
 		}
 	}
 	videoOpen = true;
+	av_init_packet(&packet);
+	packet.data = NULL;
+	packet.size = 0;
 }
+
 
 
 int VideoReader::readFrames(){
@@ -189,7 +182,7 @@ int VideoReader::readFrames(){
 			av_read_frame( pFormatCtx, &packet );
 			if(packet.stream_index==videoStream)
 			{
-				avcodec_decode_video2(pCodecCtx, &tmp_picture, &frameFinished, 
+				avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &packet);
 				targetPosition = packet.pts;
 				if (targetPosition == tstamp[0]){
@@ -206,25 +199,25 @@ int VideoReader::readFrames(){
 	{
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {
-	        avcodec_decode_video2(pCodecCtx, &tmp_picture, &frameFinished, &packet);            // Decode video frame
+	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
 	        if(frameFinished)	            // Did we get a video frame?
 	        {
 				if(img_convert_ctx == NULL){
-					if (tmp_picture.linesize[0] != width){ //Hack for padding
+					if (tmp_picture->linesize[0] != width){ //Hack for padding
 						for (int zzz = 0; zzz < height;zzz++){
-							memcpy(video[frameja2]+zzz*width*3,tmp_picture.data[0]+zzz*tmp_picture.linesize[0]*3,width*sizeof(unsigned char)*3);
+							memcpy(video[frameja2]+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
 						}
 					} else {
-						memcpy(video[frameja2],tmp_picture.data[0],width*height*sizeof(unsigned char)*3);
+						memcpy(video[frameja2],tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
 					}
 				}else{//If pixel_fmt is not targetFormat
-					sws_scale(img_convert_ctx, tmp_picture.data, tmp_picture.linesize,
+					sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
 	                  0, height, picture.data, picture.linesize);
 			
 					if (picture.linesize[0] != width && picture.linesize[0] != width*3){//Hack for padding (probably not needed...
 						printf("%d memcpy hack\n",picture.linesize[0]);
 						for (int zzz = 0; zzz < height;zzz++){
-							memcpy(video[frameja2]+zzz*width*3,picture.data[0]+zzz*tmp_picture.linesize[0]*3,width*sizeof(unsigned char)*3);
+							memcpy(video[frameja2]+zzz*width*3,picture.data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
 						}
 					} else {
 						memcpy(video[frameja2],picture.data[0],width*height*sizeof(unsigned char)*3);
@@ -259,7 +252,8 @@ VideoReader::~VideoReader(){
 	//Attempt to free pictures
 	printf("free tmp_picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING AVFrame
-	av_free(&tmp_picture);
+	avcodec_free_frame(&tmp_picture);
+	//av_free(&tmp_picture);
 	
 	/*
 	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
