@@ -129,8 +129,12 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		if (videoReader != NULL){
 			delete videoReader;
 		}
+		printf("construct video reader\n");
+		fflush(stdout);			//DEBUGGING
 		videoReader = new VideoReader(openFileDialog.GetPath(),10);
-		if (videoReader != NULL){
+		printf("video reader constructed\n");
+		fflush(stdout);			//DEBUGGING
+		if (videoReader != NULL && videoReader->videoOpen){
 			printf("Frames in video %d\n",videoReader->getNumberOfFrames());
 			int framesInVid = videoReader->readFrames(); 
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->video[4],true);

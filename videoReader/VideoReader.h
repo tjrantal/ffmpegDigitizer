@@ -30,6 +30,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#include <libavformat/avformat.h>
 		#include <libswscale/swscale.h>
 		#include <libavutil/avutil.h>	/*Stream duration*/
+		#include <libavutil/imgutils.h>	/*av_image_alloc*/
 	}
 
 	/*! CLASS FOR VIDEO READING*/
