@@ -77,13 +77,14 @@ VideoReader::VideoReader(const char* file, int fram)
 	if(pCodecCtx->time_base.num>1000 && pCodecCtx->time_base.den==1)
 		pCodecCtx->time_base.den=1000;
 	// Allocate video frame
-	 int size;
+	
 	tmp_picture=*(avcodec_alloc_frame());
 	if (!&tmp_picture){
 		printf("Coulnd't alloc frame\n");
 		return;
 	}
 	/*
+	int size;
 	size = avpicture_get_size(pCodecCtx->pix_fmt, width, height);
 	picture_buf2 = (uint8_t*) av_malloc(size);
 	if (!picture_buf2) {
@@ -231,7 +232,7 @@ VideoReader::~VideoReader(){
 	fflush(stdout);			//DEBUGGING
 	avcodec_close(pCodecCtx);
 	av_free(pCodecCtx);
-
+	/*
 	//Attempt to free pictures
 	printf("free tmp_picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING AVFrame
@@ -242,6 +243,7 @@ VideoReader::~VideoReader(){
 	tempPointer = (AVFrame*) &picture;
 	 av_frame_free(&tempPointer);
 	//Free memory
+	*/
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	for (int i = 0; i<frames;++i){
