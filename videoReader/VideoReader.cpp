@@ -83,6 +83,7 @@ VideoReader::VideoReader(const char* file, int fram)
 		printf("Coulnd't alloc frame\n");
 		return;
 	}
+	/*
 	size = avpicture_get_size(pCodecCtx->pix_fmt, width, height);
 	picture_buf2 = (uint8_t*) av_malloc(size);
 	if (!picture_buf2) {
@@ -90,9 +91,9 @@ VideoReader::VideoReader(const char* file, int fram)
 		printf("Couldn't av_malloc\n");
 		return;
 	}
-	avpicture_fill(tmp_picture, picture_buf2,
+	avpicture_fill((AVPicture*) tmp_picture, picture_buf2,
 				   pCodecCtx->pix_fmt, width, height);
-
+	*/
 	//Reserve memory for frames
 	for (int i = 0;i< frames;i++){
 		video[i] =  new unsigned char [width*height*3];
@@ -108,6 +109,7 @@ VideoReader::VideoReader(const char* file, int fram)
 			printf("Couldn't alloc frame\n");
 			return;
 		}
+		/*
 		int size = avpicture_get_size(PIX_FMT_RGB24, width, height);
 		picture_buf = (uint8_t*) av_malloc(size);
 		if (!picture_buf) {
@@ -115,9 +117,10 @@ VideoReader::VideoReader(const char* file, int fram)
 			printf("Couldn't av_malloc\n");
 			return;
 		}
-		avpicture_fill(picture, picture_buf,
+		avpicture_fill((AVPicture*) picture, picture_buf,
 					   PIX_FMT_RGB24, width, height);
-	
+		*/
+		
 		/* as ffmpeg returns a YUV420P picture from a video, we must convert it
 		   to the desired pixel format */
 		if (img_convert_ctx == NULL) {
