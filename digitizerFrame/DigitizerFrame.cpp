@@ -78,11 +78,12 @@ void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
     Close(true);
 }
 
-void DigitizerFrame::OnQuit(wxCloseEvent& WXUNUSED(event))
+void DigitizerFrame::OnQuit(wxCloseEvent &event)
 {
 	if (videoReader != NULL){
 		delete videoReader;
 	}
+	event.Skip();
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
