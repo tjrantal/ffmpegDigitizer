@@ -43,8 +43,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVFormatContext *pFormatCtx;	/*!< Format context*/
 		int videoStream;			/*!< video stream index*/
 		AVOutputFormat *fmt;
-		uint8_t *picture_buf;
-		uint8_t *picture_buf2;
+		uint8_t *picture_buf[4];
+		int		bufLinesize[4];
+		int bufSize;
+		uint8_t *picture_buf2[4];
+		int		buf2Linesize[4];
+		int bufSize2;
 		std::vector<int64_t> tstamp;
 		struct SwsContext *img_convert_ctx;
 		AVPacket packet;

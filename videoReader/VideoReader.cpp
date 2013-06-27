@@ -83,7 +83,7 @@ VideoReader::VideoReader(const char* file, int fram)
 		printf("Coulnd't alloc frame\n");
 		return;
 	}
-	/*
+	
 	int size;
 	size = avpicture_get_size(pCodecCtx->pix_fmt, width, height);
 	picture_buf2 = (uint8_t*) av_malloc(size);
@@ -92,13 +92,9 @@ VideoReader::VideoReader(const char* file, int fram)
 		printf("Couldn't av_malloc\n");
 		return;
 	}
-<<<<<<< HEAD
-	avpicture_fill((AVPicture*) tmp_picture, picture_buf2,
-=======
 	avpicture_fill((AVPicture *)&tmp_picture, picture_buf2,
->>>>>>> parent of c6ed2d7... Debugging changed AVFrame picture and tmp_picture to pointers
 				   pCodecCtx->pix_fmt, width, height);
-	*/
+	
 	//Reserve memory for frames
 	for (int i = 0;i< frames;i++){
 		video[i] =  new unsigned char [width*height*3];
@@ -114,7 +110,7 @@ VideoReader::VideoReader(const char* file, int fram)
 			printf("Couldn't alloc frame\n");
 			return;
 		}
-		/*
+		
 		int size = avpicture_get_size(PIX_FMT_RGB24, width, height);
 		picture_buf = (uint8_t*) av_malloc(size);
 		if (!picture_buf) {
@@ -122,13 +118,9 @@ VideoReader::VideoReader(const char* file, int fram)
 			printf("Couldn't av_malloc\n");
 			return;
 		}
-<<<<<<< HEAD
-		avpicture_fill((AVPicture*) picture, picture_buf,
-=======
 		avpicture_fill((AVPicture *)&picture, picture_buf,
->>>>>>> parent of c6ed2d7... Debugging changed AVFrame picture and tmp_picture to pointers
 					   PIX_FMT_RGB24, width, height);
-		*/
+		
 		
 		/* as ffmpeg returns a YUV420P picture from a video, we must convert it
 		   to the desired pixel format */
@@ -157,7 +149,7 @@ int VideoReader::readFrames(){
 	if (tstamp[0] != 0){ //Have to seek in order to start from the last key frame prior to the time stamp of interest
 		printf("\nSeek\n");
 		int64_t targetPosition = tstamp[2];
-		printf("Tstamp prior to search %ld\n",tstamp[0]);
+		printf("Tstamp prior to search %ld\n", (long)tstamp[0]);
 		int success = av_seek_frame(pFormatCtx,videoStream,tstamp[2],AVSEEK_FLAG_BACKWARD);
 		if (success < 0){
 			printf("Seek failes %d\n",success);
@@ -178,7 +170,7 @@ int VideoReader::readFrames(){
 		
 			av_free_packet( &packet );
 		}
-		 printf("Tstamp after seek %ld packet %ld\n",targetPosition,packet.pts);
+		 printf("Tstamp after seek %ld packet %ld\n",(long)targetPosition,(long)packet.pts);
 	}
 
 	while(av_read_frame(pFormatCtx, &packet)>=0 && frameja2 < frames )
@@ -224,31 +216,41 @@ int VideoReader::readFrames(){
 
 VideoReader::~VideoReader(){
 	// Close the video file
-	printf("\nClosing avformat\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	avformat_close_input(&pFormatCtx);
-	// Close the codec
 	printf("Closing avcodec\n");		//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	avcodec_close(pCodecCtx);
-	av_free(pCodecCtx);
-	/*
+	printf("\nClosing avformat\n");	//DEBUGGING
+	fflush(stdout);			//DEBUGGING
+	avformat_close_input(&pFormatCtx);
+	printf("Set format and codec to null\n");		//DEBUGGING
+	fflush(stdout);			//DEBUGGING
+	pFormatCtx = NULL;
+	pCodecCtx =NULL;
+	
 	//Attempt to free pictures
 	printf("free tmp_picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING AVFrame
+	av_free(&tmp_picture);
+	/*
 	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
 	 av_frame_free(&tempPointer);
+	 */
 	printf("free picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
+	av_free(&picture);
+	/*
 	tempPointer = (AVFrame*) &picture;
 	 av_frame_free(&tempPointer);
+	 */
 	//Free memory
-	*/
+	
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
+	
 	for (int i = 0; i<frames;++i){
 		delete[] video[frames];
 	}
+	
 	printf("delete video**\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
 	delete[] video;
