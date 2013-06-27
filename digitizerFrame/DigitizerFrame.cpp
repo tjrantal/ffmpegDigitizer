@@ -55,10 +55,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
-	videoReader = new VideoReader("GOPR0091.MP4",10);
-	printf("Frames in video %d\n",videoReader->getNumberOfFrames());
-	videoReader->readFrames(); 
-	imagePanel->setImage(videoReader->leveys,videoReader->korkeus,videoReader->video[4],true);
+	
 	
 }
 
@@ -78,13 +75,17 @@ void DigitizerFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
+	if (videoReader != NULL){
+		videoReader->closeVideo();
+		delete videoReader;
+	}
     Close(true);
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
-	
+
 	/*Open marker file*/
-		wxFileDialog openFileDialog(this, _("Open TAB file"), _(""), _(""),
+	wxFileDialog openFileDialog(this, _("Open TAB file"), _(""), _(""),
 	_("TAB files (*.tab)|*.tab"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
@@ -104,36 +105,35 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			if (openFile != NULL){
 				openFile->Close();
 			}
-			SetStatusText( _("Markers read"));
+		SetStatusText( _("Markers read"));
 		}
 	}
-	
+
 }
 
 void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 	/*Open marker file*/
 		wxFileDialog openFileDialog(this, _("Open video file"), _(""), _(""),
-	_("Video files (*.mp4)|*.mp4|(*.avi)|*.avi|(*.mkv)|*.mkv"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.avi;*.mkv"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
-		SetStatusText(_("No marker file opened"));
-		resultsText->ChangeValue(_("No marker file opened"));
+		SetStatusText(_("No video file opened"));
+		resultsText->ChangeValue(_("No video file opened"));
 	}else{
-		// save the current contents in the file;
-		// this can be done with e.g. wxWidgets output streams:
-		openFile = new wxFile( openFileDialog.GetPath(), wxFile::write_append );
-		if (!openFile->IsOpened())
-		{
-			SetStatusText(_("Could not open save file!"));
-			resultsText->ChangeValue(_("Could not open save file!"));
-			openFile = NULL;
+		/*Close any pre-existing video*/
+		if (videoReader != NULL){
+			videoReader->closeVideo();
+			delete videoReader;
+		}
+		videoReader = new VideoReader(openFileDialog.GetPath(),10);
+		if (videoReader != NULL){
+			printf("Frames in video %d\n",videoReader->getNumberOfFrames());
+			int framesInVid = videoReader->readFrames(); 
+			imagePanel->setImage(videoReader->leveys,videoReader->korkeus,videoReader->video[4],true);
+				SetStatusText(wxString::Format(wxT("%s %d"),"Video opened, frames", framesInVid));
 		}else{
-			//READ MARKERS HERE
-			/*Close the save file*/
-			if (openFile != NULL){
-				openFile->Close();
-			}
-			SetStatusText( _("Markers read"));
+			SetStatusText(_("Could not open video!"));
+			resultsText->ChangeValue(_("Could not open video!"));
 		}
 	}
 	
