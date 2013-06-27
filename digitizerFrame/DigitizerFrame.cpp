@@ -75,10 +75,14 @@ void DigitizerFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
+    Close(true);
+}
+
+void DigitizerFrame::OnQuit(wxCloseEvent& WXUNUSED(event))
+{
 	if (videoReader != NULL){
 		delete videoReader;
 	}
-    Close(true);
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
@@ -146,6 +150,7 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 
 /*Event table*/
 BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
+	EVT_CLOSE(DigitizerFrame::OnQuit)
     EVT_MENU(ID_Quit,  		DigitizerFrame::OnQuit)
     EVT_MENU(ID_About, 		DigitizerFrame::OnAbout)
 	EVT_SCROLL(DigitizerFrame::ScrollVideo)	

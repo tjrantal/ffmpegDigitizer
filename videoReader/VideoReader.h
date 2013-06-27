@@ -17,10 +17,13 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #define VIDEOREADER_H
 	/*Workaround libavformat "bug" with c++*/
 	#ifndef INT64_C
-	#define INT64_C(c) (c ## LL)
-	#define UINT64_C(c) (c ## ULL)
+		#define INT64_C(c) (c ## LL)
 	#endif
-	//#include <windows.h>
+	#ifndef UINT64_C
+		#define UINT64_C(c) (c ## ULL)
+	#endif
+	
+	#include <windows.h>
 	#include <vector>
 	extern "C" {
 		#include <libavcodec/avcodec.h>

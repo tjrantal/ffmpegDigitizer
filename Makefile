@@ -1,7 +1,7 @@
 CC=g++
 #CFLAGS=-c -Wall
 CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-LDFLAGS= -static -O3 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2
+LDFLAGS= -static -static-libgcc -O3 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2
 #LDFLAGS= -O3 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264)
 #pkg-config --libs libavformat libavcodec libswscale
 

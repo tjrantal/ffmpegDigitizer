@@ -51,6 +51,7 @@ private:
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;				//videoReader
     void OnQuit(wxCommandEvent &event);
+	void OnQuit(wxCloseEvent& event);
     void OnAbout(wxCommandEvent &event);
 	void LeftButtonDown(wxMouseEvent &event);
 	void LeftButtonUp(wxMouseEvent &event);
