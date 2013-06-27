@@ -224,12 +224,10 @@ VideoReader::~VideoReader(){
 	//Attempt to free pictures
 	printf("free tmp_picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING AVFrame
-	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
-	 av_frame_free(&tempPointer);
+	av_frame_free(&&tmp_picture);
 	printf("free picture\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	tempPointer = (AVFrame*) &picture;
-	 av_frame_free(&tempPointer);
+	av_frame_free(&&picture);
 	//Free memory
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
