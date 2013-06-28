@@ -55,6 +55,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
+	markerSelector = NULL;
 	//debug = freopen("debug.log","w",stdout);
 }
 
@@ -103,19 +104,16 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 	}else{
 		// save the current contents in the file;
 		// this can be done with e.g. wxWidgets output streams:
-		openFile = new wxFile( openFileDialog.GetPath(), wxFile::write_append );
-		if (!openFile->IsOpened())
+		if (markerSelector == NULL){
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this);
+		}
+		if (markerSelector == NULL)
 		{
-			SetStatusText(_("Could not open save file!"));
-			resultsText->ChangeValue(_("Could not open save file!"));
+			SetStatusText(_("Could not open markers!"));
+			resultsText->ChangeValue(_("Could not open markers!"));
 			openFile = NULL;
 		}else{
-			//READ MARKERS HERE
-			/*Close the save file*/
-			if (openFile != NULL){
-				openFile->Close();
-			}
-		SetStatusText( _("Markers read"));
+			SetStatusText( _("Markers read"));
 		}
 	}
 

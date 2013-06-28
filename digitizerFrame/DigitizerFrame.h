@@ -30,6 +30,9 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef VIDEOREADER_H
 	#include "../videoReader/VideoReader.h"
 #endif
+#ifndef MARKERSELECTOR_H
+	#include "../markerSelector/MarkerSelector.h"
+#endif
 
 class DigitizerFrame: public wxFrame
 {
@@ -51,7 +54,8 @@ private:
 	wxFile 			*openVideo;
 	wxSlider		*slider;				//Slider
 	ImagePanel		*imagePanel;			//ImagePanel
-	VideoReader		*videoReader;				//videoReader
+	VideoReader		*videoReader;			//videoReader
+	MarkerSelector	*markerSelector;		//Marker selector
     void OnQuit(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent& event);
     void OnAbout(wxCommandEvent &event);
