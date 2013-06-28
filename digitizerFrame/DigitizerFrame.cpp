@@ -82,6 +82,7 @@ void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCloseEvent &event)
 {
+	delete markerSelector;	//remove marker selector
 	printf("Delete vReader at the end\n");
 	fflush(stdout);	//DEBUGGING	
 	if (videoReader != NULL){
@@ -104,10 +105,11 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		SetStatusText(_("No marker file opened"));
 		resultsText->ChangeValue(_("No marker file opened"));
 	}else{
-		// save the current contents in the file;
-		// this can be done with e.g. wxWidgets output streams:
+		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
 			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
+		} else {
+			markerSelector->setMarkerList(openFileDialog.GetPath());
 		}
 		if (markerSelector == NULL)
 		{

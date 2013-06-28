@@ -23,6 +23,7 @@ MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowI
 	markerFile->Open(fileIn,wxConvUTF8); /*Open the file for reading*/
 	wxString temp;
 	markers = new std::vector<wxString>();
+	/*Read markers from the list and add them to the dropdown menu*/
 	if (markerFile->IsOpened()){
 		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
 			markers->push_back(temp);
@@ -30,8 +31,34 @@ MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowI
 		}
 	
 	}
+	SetSelection(0);	//Select the first item on the list
 	markerFile->Close();
 	delete markerFile;
 }
 
-MarkerSelector::~MarkerSelector(){}
+void MarkerSelector::setMarkerList(wxString fileIn){
+	wxTextFile* markerFile = new wxTextFile();
+	markerFile->Open(fileIn,wxConvUTF8); /*Open the file for reading*/
+	wxString temp;
+	Clear();	/*Remove pre-existing items*/
+	delete markers;
+	markers = new std::vector<wxString>();
+	/*Read markers from the list and add them to the dropdown menu*/
+	if (markerFile->IsOpened()){
+		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
+			markers->push_back(temp);
+			Append((const wxString) temp);
+		}
+	
+	}
+	SetSelection(0);	//Select the first item on the list
+	markerFile->Close();
+	delete markerFile;
+}
+
+MarkerSelector::~MarkerSelector(){
+	if (markers !=NULL){
+		markers->clear();
+		delete markers;
+	}
+}

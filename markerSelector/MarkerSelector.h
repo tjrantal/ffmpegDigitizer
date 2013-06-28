@@ -22,7 +22,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <vector>
 
 
-/*! CLASS FOR READING MARKERS FROM A FILE AND DISPLAYING A MARKER LIST*/
+/** CLASS FOR READING MARKERS FROM A FILE AND DISPLAYING A MARKER LIST*/
 class MarkerSelector : public wxComboBox{
 	private:
 		
@@ -31,10 +31,14 @@ class MarkerSelector : public wxComboBox{
 		/*Variables*/
 		std::vector<wxString> *markers;	/**< Markers read from the file*/
 		/*Functions*/
-		
-		/**Consructor,
-		@param file file to open
-		@param fram number of frames to read at a time
+		/**Reset marker list dropdown 
+		@param fileIn file to open*/
+		void setMarkerList(wxString fileIn);	/**< Reset the marker list*/
+		/**Consructor
+		@param fileIn file to open
+		@param parent Parent window to insert the dropdown menu to
+		@param pos position of the menu
+		@param size size of the menu
 		*/
 		MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
 		
