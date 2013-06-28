@@ -29,7 +29,11 @@ MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowI
 		}
 	
 	}
+	markers = new wxString[tempMarkers.size()];
 	std::copy(tempMarkers.begin(), tempMarkers.end(), markers);
+	delete tempMarkers;
+	Append(markers);
+	
 }
 
 MarkerSelector::~MarkerSelector(){}
