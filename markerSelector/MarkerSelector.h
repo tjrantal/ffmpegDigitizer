@@ -28,6 +28,19 @@ class MarkerSelector : public wxComboBox{
 		
 	
 	public:
+		/**Structure for marker trajectories*/
+		typedef struct{
+			std::vector<int> aksat;
+			std::vector<int> yyt;
+			int boxSize;
+			unsigned char vari;
+			int searchx;
+			int searchy;
+			unsigned char loytynyt;
+			unsigned char predictive;
+			int notFound;
+		} marker;
+		
 		/*Variables*/
 		std::vector<wxString> *markers;	/**< Markers read from the file*/
 		/*Functions*/

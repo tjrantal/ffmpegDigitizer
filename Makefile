@@ -38,4 +38,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 	
 clean:
-	rm *.o imagePanel/*.o videoReader/*.o digitizerFrame/*.o $(EXECUTABLE)
+	rm *.o imagePanel/*.o videoReader/*.o digitizerFrame/*.o markerSelector/*.o $(EXECUTABLE)
