@@ -17,6 +17,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #define MARKERSELECTOR_H
 
 #include <wx/wx.h>
+#include <wx/textfile.h>
 #include "../digitizerFrame/DigitizerFrame.h"
 #include <vector>
 
@@ -24,11 +25,11 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 /*! CLASS FOR READING MARKERS FROM A FILE AND DISPLAYING A MARKER LIST*/
 class MarkerSelector : public wxComboBox{
 	private:
-		std::vector<wxString> tempMarkers;
+		
 	
 	public:
 		/*Variables*/
-		wxString[] markers;	/**< Markers read from the file*/
+		std::vector<wxString> *markers;	/**< Markers read from the file*/
 		/*Functions*/
 		
 		/**Consructor,

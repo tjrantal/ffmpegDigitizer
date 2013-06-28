@@ -20,20 +20,18 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos,const wxSize &size) : wxComboBox((wxWindow *)parent,id,_(""),pos,size,0,NULL,wxCB_DROPDOWN){
 	
 	wxTextFile* markerFile = new wxTextFile();
-	markerFile->open(fileIn,wxConvUTF8); /*Open the file for reading*/
+	markerFile->Open(fileIn,wxConvUTF8); /*Open the file for reading*/
 	wxString temp;
-	tempMarkers = new std::vector<wxString>();
-	if (markerFile->IsOpen()){
-		for (temp = markerFile->GetFistLine(); !markerFile ->EoF(); temp = markerFile->GetNextLine()){
-			tempMarkers.push_back(temp);
+	markers = new std::vector<wxString>();
+	if (markerFile->IsOpened()){
+		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
+			markers->push_back(temp);
+			Append((const wxString) temp);
 		}
 	
 	}
-	markers = new wxString[tempMarkers.size()];
-	std::copy(tempMarkers.begin(), tempMarkers.end(), markers);
-	delete tempMarkers;
-	Append(markers);
-	
+	markerFile->Close();
+	delete markerFile;
 }
 
 MarkerSelector::~MarkerSelector(){}
