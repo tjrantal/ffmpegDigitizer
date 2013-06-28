@@ -17,3 +17,19 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef MARKERSELECTOR_H
 	#include "MarkerSelector.h"
 #endif
+MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos,const wxSize &size) : wxComboBox((wxWindow *)parent,id,_(""),pos,size,0,NULL,wxCB_DROPDOWN){
+	
+	wxTextFile* markerFile = new wxTextFile();
+	markerFile->open(fileIn,wxConvUTF8); /*Open the file for reading*/
+	wxString temp;
+	tempMarkers = new std::vector<wxString>();
+	if (markerFile->IsOpen()){
+		for (temp = markerFile->GetFistLine(); !markerFile ->EoF(); temp = markerFile->GetNextLine()){
+			tempMarkers.push_back(temp);
+		}
+	
+	}
+	std::copy(tempMarkers.begin(), tempMarkers.end(), markers);
+}
+
+MarkerSelector::~MarkerSelector(){}

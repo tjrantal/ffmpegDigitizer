@@ -16,25 +16,26 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef MARKERSELECTOR_H
 #define MARKERSELECTOR_H
 
-#include <wx/combobox.h>
-#include <wx/wxfile.h>
-#include <wx/string.h>
-#ifndef DIGITIZERFRAME_H
-	#include "../digitizerFrame/DigitizerFrame.h"
-#endif
+#include <wx/wx.h>
+#include "../digitizerFrame/DigitizerFrame.h"
+#include <vector>
+
 
 /*! CLASS FOR READING MARKERS FROM A FILE AND DISPLAYING A MARKER LIST*/
 class MarkerSelector : public wxComboBox{
 	private:
+		std::vector<wxString> tempMarkers;
 	
 	public:
+		/*Variables*/
+		wxString[] markers;	/**< Markers read from the file*/
 		/*Functions*/
-	
+		
 		/**Consructor,
 		@param file file to open
 		@param fram number of frames to read at a time
 		*/
-		MarkerSelector(wxString fileIn, DigitizerFrame parent);
+		MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
 		
 		/**Deconstructor*/
 		~MarkerSelector();	/**< release memory*/

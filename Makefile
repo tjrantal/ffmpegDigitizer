@@ -22,7 +22,7 @@ else
 endif
 
 #-lgsl -lgslcblas
-SOURCES=imagePanel/ImagePanel.cpp videoReader/VideoReader.cpp digitizerFrame/DigitizerFrame.cpp Digitizer.cpp 
+SOURCES=imagePanel/ImagePanel.cpp videoReader/VideoReader.cpp digitizerFrame/DigitizerFrame.cpp markerSelector/MarkerSelector.cpp Digitizer.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=digitizer.exe
 #	@echo ${CC} ${LDFLAGS} ${OBJECTS} -o ${@}

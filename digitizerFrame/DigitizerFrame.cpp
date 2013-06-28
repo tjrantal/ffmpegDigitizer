@@ -14,9 +14,11 @@ GNU General Public License for more details.
 For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DIGITIZERFRAME_H
-	#include "DigitizerFrame.h"
-#endif
+#include "DigitizerFrame.h"
+#include "../imagePanel/ImagePanel.h"
+#include "../videoReader/VideoReader.h"
+#include "../markerSelector/MarkerSelector.h"
+
 
 DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
        : wxFrame(NULL, -1, title, pos, size)
@@ -105,7 +107,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		// save the current contents in the file;
 		// this can be done with e.g. wxWidgets output streams:
 		if (markerSelector == NULL){
-			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this);
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
 		}
 		if (markerSelector == NULL)
 		{
