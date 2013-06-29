@@ -1,3 +1,4 @@
+#Makefile obtained from http://mrbook.org/tutorials/make/ and adated to the project's needs
 CC=g++
 #CFLAGS=-c -Wall
 #Try to figure out if compiling on mingw windows or on linux
