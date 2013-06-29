@@ -30,19 +30,19 @@ class MarkerSelector : public wxComboBox{
 	public:
 		/**Structure for marker trajectories*/
 		typedef struct{
-			std::vector<int> aksat;
-			std::vector<int> yyt;
-			int boxSize;
-			unsigned char vari;
-			int searchx;
-			int searchy;
-			unsigned char loytynyt;
-			unsigned char predictive;
-			int notFound;
+			wxString markerName;				/**< Marker name*/
+			std::vector<int> xCoordinates;	/**< X-coordinates*/
+			std::vector<int> yCoordinates;	/**< Y-coordinates*/
+			int lbpRadius;				/**< Size of LBP box*/
+			unsigned char colorImage;			/**< Color or BW image*/
+			int searchRadius;				/**< The radius of the search window*/
+			unsigned char trackMarker;	/**< Is the marker being tracked*/
+			unsigned char predictive;	/**< Trying to predict the marker trajectory*/
+			int notFound;	/**< Was marker not found in the current frame*/
 		} marker;
 		
 		/*Variables*/
-		std::vector<wxString> *markers;	/**< Markers read from the file*/
+		std::vector<marker> markers;	/**< Markers read from the file*/
 		/*Functions*/
 		/**Reset marker list dropdown 
 		@param fileIn file to open*/
@@ -56,7 +56,7 @@ class MarkerSelector : public wxComboBox{
 		MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
 		
 		/**Deconstructor*/
-		~MarkerSelector();	/**< release memory*/
+		/*~MarkerSelector();	/**< release memory*/
 
 };
 

@@ -82,7 +82,7 @@ void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCloseEvent &event)
 {
-	delete markerSelector;	//remove marker selector
+	//delete markerSelector;	//remove marker selector
 	printf("Delete vReader at the end\n");
 	fflush(stdout);	//DEBUGGING	
 	if (videoReader != NULL){
