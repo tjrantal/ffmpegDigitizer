@@ -14,9 +14,11 @@ GNU General Public License for more details.
 For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DIGITIZERFRAME_H
-	#include "DigitizerFrame.h"
-#endif
+#include "DigitizerFrame.h"
+#include "../imagePanel/ImagePanel.h"
+#include "../videoReader/VideoReader.h"
+#include "../markerSelector/MarkerSelector.h"
+
 
 DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
        : wxFrame(NULL, -1, title, pos, size)
@@ -55,6 +57,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
+	markerSelector = NULL;
 	//debug = freopen("debug.log","w",stdout);
 }
 
@@ -79,6 +82,7 @@ void DigitizerFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void DigitizerFrame::OnQuit(wxCloseEvent &event)
 {
+	delete markerSelector;	//remove marker selector
 	printf("Delete vReader at the end\n");
 	fflush(stdout);	//DEBUGGING	
 	if (videoReader != NULL){
@@ -101,21 +105,19 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		SetStatusText(_("No marker file opened"));
 		resultsText->ChangeValue(_("No marker file opened"));
 	}else{
-		// save the current contents in the file;
-		// this can be done with e.g. wxWidgets output streams:
-		openFile = new wxFile( openFileDialog.GetPath(), wxFile::write_append );
-		if (!openFile->IsOpened())
+		//If marker list does not exist yet, create it, otherwise replace with the new list
+		if (markerSelector == NULL){
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
+		} else {
+			markerSelector->setMarkerList(openFileDialog.GetPath());
+		}
+		if (markerSelector == NULL)
 		{
-			SetStatusText(_("Could not open save file!"));
-			resultsText->ChangeValue(_("Could not open save file!"));
+			SetStatusText(_("Could not open markers!"));
+			resultsText->ChangeValue(_("Could not open markers!"));
 			openFile = NULL;
 		}else{
-			//READ MARKERS HERE
-			/*Close the save file*/
-			if (openFile != NULL){
-				openFile->Close();
-			}
-		SetStatusText( _("Markers read"));
+			SetStatusText( _("Markers read"));
 		}
 	}
 

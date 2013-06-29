@@ -24,12 +24,11 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/filedlg.h>		//For selecting a file to read
 #include <wx/file.h>		//For reading a file
 #include <wx/slider.h>		//For slider
-#ifndef IMAGEPANEL_H
-	#include "../imagePanel/ImagePanel.h"
-#endif
-#ifndef VIDEOREADER_H
-	#include "../videoReader/VideoReader.h"
-#endif
+
+/*Forward declare classes that are pointed to*/
+class ImagePanel;
+class VideoReader;
+class MarkerSelector;
 
 class DigitizerFrame: public wxFrame
 {
@@ -51,7 +50,8 @@ private:
 	wxFile 			*openVideo;
 	wxSlider		*slider;				//Slider
 	ImagePanel		*imagePanel;			//ImagePanel
-	VideoReader		*videoReader;				//videoReader
+	VideoReader		*videoReader;			//videoReader
+	MarkerSelector	*markerSelector;		//Marker selector
     void OnQuit(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent& event);
     void OnAbout(wxCommandEvent &event);
@@ -74,6 +74,7 @@ enum
 	ID_video,
 	ID_slider,
 	ID_panel,
+	ID_markers,
 };
 
 
