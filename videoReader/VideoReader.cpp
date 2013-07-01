@@ -296,13 +296,12 @@ int VideoReader::decodeFrame(int frameNo){
 int VideoReader::readNextFrameFromDisk(){
 	int frameFinished = 0;
 	printf("In reader\n");
-						fflush(stdout);			//DEBUGGING
+	fflush(stdout);			//DEBUGGING
 	int readMore = 1;
-	while(readMore ==1 && frameFinished==0) //av_read_frame(pFormatCtx, &packet)>=0
+	while(readMore ==1 && frameFinished==0) //C(pFormatCtx, &packet)>=0
 	{
-		
 		printf("In while %d\n",av_read_frame(pFormatCtx, &packet)); /*Is the stream open?*/
-						fflush(stdout);			//DEBUGGING
+		fflush(stdout);			//DEBUGGING
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {
 	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
@@ -330,7 +329,7 @@ int VideoReader::readNextFrameFromDisk(){
 						}
 					} else {
 						memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
-						printf("Decoded %d\n",tmp_picture->display_picture_number);
+						printf("Decoded %d tStamp %ld\n",tmp_picture->display_picture_number, (long long) tmp_picture->pts);
 						fflush(stdout);			//DEBUGGING
 					}
 				}
