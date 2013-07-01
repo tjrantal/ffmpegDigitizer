@@ -58,7 +58,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
 	markerSelector = NULL;
-	//debug = freopen("debug.log","w",stdout);
+	debug = freopen("debug.log","w",stdout);
 }
 
 /*Button event handling*/
@@ -91,7 +91,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	}
 	printf("Nearly done\n");
 	fflush(stdout);	//DEBUGGING
-	//fclose(debug);	//DEBUGGING
+	fclose(debug);	//DEBUGGING
  	wxWindow::Destroy();
 	//event.Skip();
 }
