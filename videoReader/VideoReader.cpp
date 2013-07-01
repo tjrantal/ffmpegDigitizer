@@ -206,6 +206,7 @@ int VideoReader::decodeNextFrame(){
 	int frameFinished = 0;
 	while (!frameFinished){
 		if (packets.size()< lastPacket+1){
+			printf("No more packets, packet %d\n",lastPacket);
 			return 0;
 		}
 		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
@@ -237,6 +238,8 @@ int VideoReader::decodeNextFrame(){
 		}
 	}
 	lastFrame = tmp_picture->display_picture_number;
+	printf("Frame %d\n",lastFrame);
+	fflush(stdout);
 	return 1;
 }
 
