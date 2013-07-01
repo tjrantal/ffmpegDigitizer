@@ -67,6 +67,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		std::vector<framePacket> packets;
 		int videoFrames;
 		long fileSize;
+		int lastPacket;	/*Index of last decoded packet*/
 	
 		public:
 		const char *filename; /**< Name of the video file*/
@@ -85,6 +86,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
 		int readPackets();	/**< Read all packets to packets vector, not suitable for large files (i.e. if in risk of running out of memory)*/
 		int getNumberOfPackets();	/**< Returns the number of video packets*/
+		int decodeNextPacket();			/**< Decodes next packet from <framePacket> packets*/
+		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
 		//Functions declared
 	
 		/**Consructor,
