@@ -19,6 +19,10 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 //Constructor
 VideoReader::VideoReader(const char* file, int fram)
 {
+	/*Check file size, if less than 1G the file packages will be read into memory, otherwise nothing happens*/
+	
+	
+	
 	videoOpen = false;
 	av_register_all();	//Register formats
 	filename = file;		//File to open
@@ -174,7 +178,31 @@ VideoReader::VideoReader(const char* file, int fram)
 	packet.size = 0;
 }
 
+int VideoReader::readPackets(){
+	int frameFinished;
+	int lastKeyFramePacket = 0;
+	packets = std::vector<framePacket>();
+	int currentPacket = 0;
+	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
+	{
+	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
+	    {	
+			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+	            &packet);
+			if (tmp_picture->key_frame == 1){
+				lastKeyFramePacket = currentPacket;
+			}
+			framePacket lastPacket = {packet,lastKeyFramePacket,tmp_picture->display_picture_number};
+			packets.push_back(lastPacket);
+			++currentPacket;
+	    }
+	    // Free the packet that was allocated by av_read_frame
+	    av_free_packet(&packet);
+	}
+	frames = frameja2;
+	return 1;
 
+}
 
 int VideoReader::readFrames(){
 

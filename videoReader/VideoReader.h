@@ -25,6 +25,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	
 	//#include <windows.h>
 	#include <vector>
+	#include <stdio.h>	/*Check file size to determine whether the packets can be read to memory*/
 	extern "C" {
 		#include <libavcodec/avcodec.h>
 		#include <libavformat/avformat.h>
@@ -32,7 +33,15 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#include <libavutil/avutil.h>	/*Stream duration*/
 		#include <libavutil/imgutils.h>	/*av_image_alloc*/
 	}
-
+	
+	/**Struct to store packets and the latest keyframe*/
+	typedef struct{
+		AVPacket packet;	/**< Packet*/
+		int lastKeyframePacket;	/**< Latest keyframe, packets from this to the frame of interest need to be decoded to get a full frame*/
+		int 	display_picture_number;	/**< Number of picture in series*/
+	} framePacket;
+	
+	
 	/*! CLASS FOR VIDEO READING*/
 	class VideoReader
 	{
@@ -55,6 +64,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
+		std::vector<framePacket> packets;
 		int videoFrames;
 	
 		public:
@@ -72,6 +82,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		//Class function declarations
 		int readFrames();	/**< Read next "frames" frames or to the end of the video*/
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
+		int readPackets();	/**< Read all packets to packets vector, not suitable for large files (i.e. if in risk of running out of memory)*/
 		//Functions declared
 	
 		/**Consructor,
