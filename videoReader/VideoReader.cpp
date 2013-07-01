@@ -329,7 +329,7 @@ int VideoReader::readNextFrameFromDisk(){
 						}
 					} else {
 						memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
-						printf("Decoded %d tStamp %ld\n",tmp_picture->display_picture_number, (long long) tmp_picture->pts);
+						printf("Decoded %d tStamp %ld\n",tmp_picture->display_picture_number, (long int) tmp_picture->pts);
 						fflush(stdout);			//DEBUGGING
 					}
 				}
