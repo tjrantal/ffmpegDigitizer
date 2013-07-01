@@ -207,7 +207,6 @@ int VideoReader::readPackets(){
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
-	frames = frameja2;
 	return 1;
 
 }
@@ -358,3 +357,6 @@ int VideoReader::getNumberOfFrames(){
 	return (int) (duration/timeBase);
 }
 
+int VideoReader::getNumberOfPackets(){
+	return packets.size();
+}

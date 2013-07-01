@@ -155,7 +155,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			int gotPackets = videoReader->readPackets();
 			//int framesInVid = videoReader->readFrames(); 
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->video[4],true);
-				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d"),_("Video opened, frames:"), framesInVid, imagePanel->packets.size()));
+				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfPackets()));
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));

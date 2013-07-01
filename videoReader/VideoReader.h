@@ -84,6 +84,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int readFrames();	/**< Read next "frames" frames or to the end of the video*/
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
 		int readPackets();	/**< Read all packets to packets vector, not suitable for large files (i.e. if in risk of running out of memory)*/
+		int getNumberOfPackets();	/**< Returns the number of video packets*/
 		//Functions declared
 	
 		/**Consructor,
