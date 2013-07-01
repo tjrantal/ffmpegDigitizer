@@ -297,15 +297,20 @@ int VideoReader::readNextFrameFromDisk(){
 	int frameFinished = 0;
 	printf("In reader\n");
 						fflush(stdout);			//DEBUGGING
-	while(av_read_frame(pFormatCtx, &packet)>=0 && frameFinished ==0 )
+	int readMore = 1;
+	while(readMore ==1 && frameFinished==0) //av_read_frame(pFormatCtx, &packet)>=0
 	{
+		
+		printf("In while %d\n",av_read_frame(pFormatCtx, &packet)); /*Is the stream open?*/
+						fflush(stdout);			//DEBUGGING
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {
 	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
-				printf("Decoded\n");
+				printf("Decoded %d\n",frameFinished);
 						fflush(stdout);			//DEBUGGING
 	        if(frameFinished)	            // Did we get a video frame?
 	        {
+				readMore = 0;
 				if(img_convert_ctx == NULL){
 					if (tmp_picture->linesize[0] != width){ //Hack for padding
 						for (int zzz = 0; zzz < height;zzz++){
