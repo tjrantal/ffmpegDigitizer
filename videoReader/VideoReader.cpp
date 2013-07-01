@@ -173,31 +173,43 @@ int VideoReader::readPackets(){
 	packets = std::vector<framePacket>();
 	int currentPacket = 0;
 	int readMore = 1;
+	int endOfFile = 0;
+	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
+	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
+	int packetPictureNo = 0;
+	printf("\n");
 	while(1) /*Read all frames to memory*/
 	{
 		AVPacket tempPacket;
 		av_init_packet(&tempPacket);
 		tempPacket.data = NULL;
 		tempPacket.size = 0;
-		if (av_read_frame(pFormatCtx, &tempPacket)<0){
-			break;
+		endOfFile = av_read_frame(pFormatCtx, &tempPacket); 
+		if (endOfFile<0){
+			printf("got to EOF\n");
+			fflush(stdout);
+			return 1;
 		}
-		
+		printf("%d\n",packetPictureNo);
 
-	    if(tempPacket.stream_index==videoStream && av_read_frame(pFormatCtx, &tempPacket)>=0)		 // Is this a packet from the video stream?
+	    if(tempPacket.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {	
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &tempPacket);
-			if (tmp_picture->key_frame == 1){
-				lastKeyFramePacket = currentPacket;
+	        if (frameFinished){
+				if (tmp_picture->key_frame == 1){
+					lastKeyFramePacket = currentPacket;
+				}
+				packetPictureNo = tmp_picture->coded_picture_number;
 			}
-			framePacket lastPacket = {tempPacket,lastKeyFramePacket,tmp_picture->display_picture_number};
+			framePacket lastPacket = {tempPacket,lastKeyFramePacket,packetPictureNo};
 			packets.push_back(lastPacket);
 			++currentPacket;
+	    }else{
+	    	av_free_packet(&packet);
 	    }
 	}
-	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
-	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
+
 	return 1;
 
 }
@@ -238,10 +250,10 @@ int VideoReader::decodeNextFrame(){
 			}
 		}
 	}
-	lastFrame = tmp_picture->display_picture_number;
+	lastFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 	printf("Frame %d\n",lastFrame);
 	fflush(stdout);
-	return 1;
+	return lastFrame;
 }
 
 /* Decodes frame frameNo from <framePacket> packets*/
@@ -264,7 +276,7 @@ int VideoReader::decodeFrame(int frameNo){
 		++lastPacket;
 		if(frameFinished)	            // Did we get a video frame?
 		{
-			currentFrame = tmp_picture->display_picture_number;
+			currentFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 		}
 	}
 	/*Convert the image*/
@@ -290,8 +302,8 @@ int VideoReader::decodeFrame(int frameNo){
 			memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
 		}
 	}
-	lastFrame = tmp_picture->display_picture_number;
-	return 1;
+	lastFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
+	return lastFrame;
 }	
 
 int VideoReader::readNextFrameFromDisk(){
