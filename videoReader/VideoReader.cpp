@@ -172,21 +172,28 @@ int VideoReader::readPackets(){
 	int lastKeyFramePacket = 0;
 	packets = std::vector<framePacket>();
 	int currentPacket = 0;
-	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
+	int readMore = 1;
+	while(1) /*Read all frames to memory*/
 	{
-	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
+		if (av_read_frame(pFormatCtx, &packet)<0){
+			break;
+		}
+		AVPacket tempPacket;
+		av_init_packet(&tempPacket);
+		tempPacket.data = NULL;
+		tempPacket.size = 0;
+
+	    if(packet.stream_index==videoStream && av_read_frame(pFormatCtx, &tempPacket)>=0)		 // Is this a packet from the video stream?
 	    {	
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
-	            &packet);
+	            &tempPacket);
 			if (tmp_picture->key_frame == 1){
 				lastKeyFramePacket = currentPacket;
 			}
-			framePacket lastPacket = {packet,lastKeyFramePacket,tmp_picture->display_picture_number};
+			framePacket lastPacket = {tempPacket,lastKeyFramePacket,tmp_picture->display_picture_number};
 			packets.push_back(lastPacket);
 			++currentPacket;
 	    }
-	    // Free the packet that was allocated by av_read_frame
-	    av_free_packet(&packet);
 	}
 	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
