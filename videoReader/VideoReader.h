@@ -90,6 +90,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int getNumberOfPackets();	/**< Returns the number of video packets*/
 		int decodeNextFrame();			/**< Decodes next packet from <framePacket> packets*/
 		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
+		int readNextFrameFromDisk();	/**< Reads the next package in series */
 		//Functions declared
 	
 		/**Consructor,

@@ -293,6 +293,51 @@ int VideoReader::decodeFrame(int frameNo){
 	return 1;
 }	
 
+int VideoReader::readNextFrameFromDisk(){
+	int frameFinished = 0;
+	printf("In reader\n");
+						fflush(stdout);			//DEBUGGING
+	while(av_read_frame(pFormatCtx, &packet)>=0 && frameFinished ==0 )
+	{
+	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
+	    {
+	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
+				printf("Decoded\n");
+						fflush(stdout);			//DEBUGGING
+	        if(frameFinished)	            // Did we get a video frame?
+	        {
+				if(img_convert_ctx == NULL){
+					if (tmp_picture->linesize[0] != width){ //Hack for padding
+						for (int zzz = 0; zzz < height;zzz++){
+							memcpy(decodedFrame+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+						}
+					} else {
+						memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
+					}
+				}else{//If pixel_fmt is not targetFormat
+					sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
+	                  0, height, picture->data, picture->linesize);
+			
+					if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
+						printf("%d memcpy hack\n",picture->linesize[0]);
+						for (int zzz = 0; zzz < height;zzz++){
+							memcpy(decodedFrame+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+						}
+					} else {
+						memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
+						printf("Decoded %d\n",tmp_picture->display_picture_number);
+						fflush(stdout);			//DEBUGGING
+					}
+				}
+			}
+	    }
+	    // Free the packet that was allocated by av_read_frame
+	    av_free_packet(&packet);
+	}
+	return tmp_picture->display_picture_number;
+}
+
+
 int VideoReader::readFrames(){
 
 	int frameja2 = 0;

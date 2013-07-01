@@ -153,10 +153,12 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			printf("Frames in video %d\n",framesInVid);
 			SetStatusText(_("Wait file reading packets to memory. Requires decoding, will take a while ..."));
 			int gotPackets = videoReader->readPackets();
-			int gotFrame = videoReader->decodeNextFrame();
+			printf("Reading frame\n");
+			fflush(stdout);			//DEBUGGING
+			int displayPictureNumber = videoReader->readNextFrameFromDisk();
 			//int framesInVid = videoReader->readFrames(); 
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
-				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfPackets()));
+				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfPackets()),displayPictureNumber);
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
@@ -168,10 +170,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	int currentVal = slider->GetValue();
-	int gotFrame = videoReader->decodeFrame(currentVal);
+	//int gotFrame = videoReader->decodeFrame(currentVal);
+	printf("Reading frame scroller %d\n",currentVal);
+	fflush(stdout);			//DEBUGGING
+	int displayPictureNumber = videoReader->readNextFrameFromDisk();
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
-	resultsText->ChangeValue(wxString::Format(wxT("%s %d"),_("Frame #"), currentVal));
-	SetStatusText(wxString::Format(wxT("%s %d"),_("Frame #"), currentVal));
+	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
+	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 }
 
 /*Event table*/
