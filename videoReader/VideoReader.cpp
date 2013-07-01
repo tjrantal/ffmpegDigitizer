@@ -175,15 +175,16 @@ int VideoReader::readPackets(){
 	int readMore = 1;
 	while(1) /*Read all frames to memory*/
 	{
-		if (av_read_frame(pFormatCtx, &packet)<0){
-			break;
-		}
 		AVPacket tempPacket;
 		av_init_packet(&tempPacket);
 		tempPacket.data = NULL;
 		tempPacket.size = 0;
+		if (av_read_frame(pFormatCtx, &tempPacket)<0){
+			break;
+		}
+		
 
-	    if(packet.stream_index==videoStream && av_read_frame(pFormatCtx, &tempPacket)>=0)		 // Is this a packet from the video stream?
+	    if(tempPacket.stream_index==videoStream && av_read_frame(pFormatCtx, &tempPacket)>=0)		 // Is this a packet from the video stream?
 	    {	
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &tempPacket);
@@ -310,6 +311,9 @@ int VideoReader::readNextFrameFromDisk(){
 	        if(frameFinished)	            // Did we get a video frame?
 	        {
 				readMore = 0;
+				printf("Decoded %d tStamp %ld pTStap %ld codedPNo %d\n",tmp_picture->display_picture_number, (long int) tmp_picture->pts,(long int) tmp_picture->pkt_pts,tmp_picture->coded_picture_number);
+						fflush(stdout);			//DEBUGGING
+				
 				if(img_convert_ctx == NULL){
 					if (tmp_picture->linesize[0] != width){ //Hack for padding
 						for (int zzz = 0; zzz < height;zzz++){
@@ -329,8 +333,7 @@ int VideoReader::readNextFrameFromDisk(){
 						}
 					} else {
 						memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
-						printf("Decoded %d tStamp %ld\n",tmp_picture->display_picture_number, (long int) tmp_picture->pts);
-						fflush(stdout);			//DEBUGGING
+						
 					}
 				}
 			}
