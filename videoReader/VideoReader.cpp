@@ -40,9 +40,7 @@ VideoReader::VideoReader(const char* file, int fram)
 	for (int lll = 0;lll<2;++lll){
 		tstamp.push_back(0);
 	}
-
-	video = new unsigned char*[videoFrames*sizeof(unsigned char*)]; //Allocate memory
-		
+	
 	// Open video file
 	pFormatCtx = NULL;
 	printf("%s\n",filename);
@@ -125,11 +123,6 @@ VideoReader::VideoReader(const char* file, int fram)
 	//Reserve memory for frames
 	printf("Reserve Memory\n");
 	fflush(stdout);			//DEBUGGING
-	for (int i = 0;i< videoFrames;i++){
-		video[i] =  new unsigned char [width*height*3*sizeof(unsigned char)];
-	}
-	//Reserve memory for a frame
-	decodedFrame = new unsigned char [width*height*3*sizeof(unsigned char)];
 
 	img_convert_ctx = NULL;
 	/*PIX_FMT_YUV420P*/
@@ -141,13 +134,6 @@ VideoReader::VideoReader(const char* file, int fram)
 			printf("Couldn't alloc frame\n");
 			return;
 		}
-		/*
-    ret = avpicture_alloc(&dst_picture, c->pix_fmt, c->width, c->height);
-    if (ret < 0) {
-        fprintf(stderr, "Could not allocate picture: %s\n", av_err2str(ret));
-        exit(1);
-    }
-*/
 
 		int ret = av_image_alloc(picture->data, picture->linesize,
 						 pCodecCtx->width, pCodecCtx->height,
@@ -156,16 +142,6 @@ VideoReader::VideoReader(const char* file, int fram)
 			fprintf(stderr, "Could not allocate raw video buffer\n");
 			return;
 		}
-		/*
-		picture->data = picture_buf;
-		picture->linesize = bufLinesize;
-		*/
-
-		/*
-		
-		avpicture_fill(picture, picture_buf[0],
-					   PIX_FMT_RGB24, width, height);
-		*/
 		
 		/* as ffmpeg returns a YUV420P picture from a video, we must convert it
 		   to the desired pixel format */
@@ -186,6 +162,8 @@ VideoReader::VideoReader(const char* file, int fram)
 	av_init_packet(&packet);
 	packet.data = NULL;
 	packet.size = 0;
+	//Reserve memory for a frame
+	decodedFrame = new unsigned char [width*height*3*sizeof(unsigned char)];
 }
 
 /*Read all of the packets to memory, might need to check whether the video is small enough to it into memory..*/
@@ -420,19 +398,7 @@ VideoReader::~VideoReader(){
 	
 	printf("free memory\n");	//DEBUGGING
 	fflush(stdout);			//DEBUGGING
-	
-	for (int i = 0; i<videoFrames;++i){
-		delete[] video[i];
-	}
-	
-	printf("delete video**\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	delete[] video;
-	printf("set video to NULL\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	video = NULL;
-	printf("video is NULL\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
+
 	if (&packets != NULL){
 		packets.clear();
 	}
