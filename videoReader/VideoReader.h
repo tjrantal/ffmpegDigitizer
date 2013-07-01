@@ -68,6 +68,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int videoFrames;
 		long fileSize;
 		int lastPacket;	/*Index of last decoded packet*/
+		int lastFrame;	/*Index of last decoded frame*/
 	
 		public:
 		const char *filename; /**< Name of the video file*/
@@ -80,13 +81,14 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		long startTime;		/**< ffmpeg startTime*/
 		bool videoOpen;		/**< true, if video was opened successfully*/
 		unsigned char **video;	/**< Pointer to the frames read from the video*/
+		unsigned char *decodedFrame;	/**< Current decoded frame*/
 
 		//Class function declarations
 		int readFrames();	/**< Read next "frames" frames or to the end of the video*/
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
 		int readPackets();	/**< Read all packets to packets vector, not suitable for large files (i.e. if in risk of running out of memory)*/
 		int getNumberOfPackets();	/**< Returns the number of video packets*/
-		int decodeNextPacket();			/**< Decodes next packet from <framePacket> packets*/
+		int decodeNextFrame();			/**< Decodes next packet from <framePacket> packets*/
 		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
 		//Functions declared
 	
