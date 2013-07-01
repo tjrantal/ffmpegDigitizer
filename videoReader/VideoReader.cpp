@@ -220,8 +220,11 @@ int VideoReader::readPackets(){
 int VideoReader::decodeNextFrame(){
 	int frameFinished = 0;
 	while (!frameFinished){
-		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.get(lastPacket+1).packet);            // Decode video frame
-		++lastPacket
+		if (packets.size()< lastPacket+1){
+			return 0;
+		}
+		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
+		++lastPacket;
 		if(frameFinished)	            // Did we get a video frame?
 		{
 			if(img_convert_ctx == NULL){
@@ -259,14 +262,17 @@ int VideoReader::decodeFrame(int frameNo){
 		decodeNextFrame();
 		return 1;
 	}
-	lastPacket = packets.get(frameNo).lastKeyframePacket-1;
+	lastPacket = packets.at(frameNo).lastKeyframePacket-1;
 	int frameFinished = 0;
 	int currentFrame = -1;
 	
 	
 	while (!frameFinished && currentFrame!= frameNo){
-		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.get(lastPacket+1).packet);            // Decode video frame
-		++lastPacket
+		if (packets.size()< lastPacket+1){
+			return 0;
+		}
+		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
+		++lastPacket;
 		if(frameFinished)	            // Did we get a video frame?
 		{
 			currentFrame = tmp_picture->display_picture_number;
