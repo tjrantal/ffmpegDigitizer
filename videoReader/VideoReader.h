@@ -39,6 +39,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;	/**< Packet*/
 		int lastKeyframePacket;	/**< Latest keyframe, packets from this to the frame of interest need to be decoded to get a full frame*/
 		int 	decode_picture_number;	/**< Number of picture in series*/
+		/*ADD tstamp -> use timestamp for searching in addition to packete number*/
 	} framePacket;
 	
 	
