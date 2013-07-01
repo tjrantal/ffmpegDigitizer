@@ -149,10 +149,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
-			printf("Frames in video %d\n",videoReader->getNumberOfFrames());
-			int framesInVid = videoReader->readFrames(); 
+			int framesInVid = videoReader->getNumberOfFrames();
+			printf("Frames in video %d\n",framesInVid);
+			SetStatusText(_("Wait file reading packets to memory. Requires decoding, will take a while ..."));
+			int gotPackets = videoReader->readPackets();
+			//int framesInVid = videoReader->readFrames(); 
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->video[4],true);
-				SetStatusText(wxString::Format(wxT("%s %d"),_("Video opened, frames"), framesInVid));
+				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d"),_("Video opened, frames:"), framesInVid, imagePanel->packets.size()));
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));

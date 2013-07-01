@@ -20,8 +20,16 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 VideoReader::VideoReader(const char* file, int fram)
 {
 	/*Check file size, if less than 1G the file packages will be read into memory, otherwise nothing happens*/
-	
-	
+	try{
+		FILE* tempFile = fopen(file,"rb");
+		fseek(tempFile,0,SEEK_END);
+		fileSize = ftell(tempFile);
+		fclose(tempFile);
+		printf("Got filesize %d MB\n",(int) fileSize/1024/1024);
+		
+	}catch (int e){
+		printf("Couldn't get file size\n");
+	}
 	
 	videoOpen = false;
 	av_register_all();	//Register formats

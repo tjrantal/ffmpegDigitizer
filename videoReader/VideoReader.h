@@ -66,6 +66,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int             numBytes;
 		std::vector<framePacket> packets;
 		int videoFrames;
+		long fileSize;
 	
 		public:
 		const char *filename; /**< Name of the video file*/
