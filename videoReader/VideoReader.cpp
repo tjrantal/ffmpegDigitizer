@@ -250,7 +250,7 @@ int VideoReader::decodeNextFrame(){
 			}
 		}
 	}
-	lastFrame = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
+	lastFrame = packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 	printf("Frame %d\n",lastFrame);
 	fflush(stdout);
 	return lastFrame;
@@ -276,7 +276,7 @@ int VideoReader::decodeFrame(int frameNo){
 		++lastPacket;
 		if(frameFinished)	            // Did we get a video frame?
 		{
-			currentFrame = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
+			currentFrame = packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 		}
 	}
 	/*Convert the image*/
@@ -302,7 +302,7 @@ int VideoReader::decodeFrame(int frameNo){
 			memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
 		}
 	}
-	lastFrame = = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
+	lastFrame =packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
 	return lastFrame;
 }	
 
