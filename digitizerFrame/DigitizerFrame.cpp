@@ -175,7 +175,8 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	printf("Reading frame scroller %d\n",currentVal);
 	fflush(stdout);			//DEBUGGING
 	//int displayPictureNumber = videoReader->readNextFrameFromDisk();
-	int displayPictureNumber = videoReader->decodeNextFrame();
+	//int displayPictureNumber = videoReader->decodeNextFrame();
+	int displayPictureNumber = videoReader->decodeFrame(currentVal);
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
