@@ -311,7 +311,7 @@ int VideoReader::readIndices(){
 	frameIndices = std::vector<frameIndice>();
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
 	int frameNo = -1;
-	printf("\n");
+	printf("\n");	
 	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
 	{
 		printf("%d\n",frameNo);
@@ -336,7 +336,7 @@ int VideoReader::readIndices(){
 		packet.data = NULL;
 		packet.size = 0;
 		if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
-	            &packet) >0){
+	            &packet) >=0){
 		
 			if (frameFinished){
 				++frameNo;
@@ -345,7 +345,11 @@ int VideoReader::readIndices(){
 				av_free_packet(&packet);
 				printf("Lisalehdilla %d\n",frameNo);
 				fflush(stdout);
+			}else{
+				printf("Didn't get a frame anymore %d\n",frameNo);
+				break;				
 			}
+			
 		}else{
 			break;
 		}

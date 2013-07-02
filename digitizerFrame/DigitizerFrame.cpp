@@ -149,19 +149,21 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
+			SetStatusText(_("Wait while reading packet indices to memory. Requires decoding the whole file, will take a while ..."));
+			printf("Read indices\n");
+			fflush(stdout);			//DEBUGGING
+			int gotPackets = videoReader->readIndices();			
+			printf("Got indices\n");
+			fflush(stdout);			//DEBUGGING
 			printf("Reading frame\n");
 			fflush(stdout);			//DEBUGGING
 			int displayPictureNumber = videoReader->readNextFrameFromDisk();			
 			int framesInVid = videoReader->getNumberOfFrames();			
 			printf("Frames in video %d\n",framesInVid);
 			fflush(stdout);			//DEBUGGING
-			SetStatusText(_("Wait while reading packet indices to memory. Requires decoding the whole file, will take a while ..."));
+			
 			//int gotPackets = videoReader->readPackets();
-			printf("Read indices\n");
-			fflush(stdout);			//DEBUGGING
-			int gotPackets = videoReader->readIndices();			
-			printf("Got indices\n");
-			fflush(stdout);			//DEBUGGING
+			
 			//int framesInVid = videoReader->readFrames(); 
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
