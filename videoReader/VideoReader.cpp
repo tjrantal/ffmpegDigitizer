@@ -172,7 +172,6 @@ int VideoReader::readPackets(){
 	int lastKeyFramePacket = 0;
 	packets = std::vector<framePacket>();
 	int currentPacket = 0;
-	int readMore = 1;
 	int endOfFile = 0;
 	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
@@ -218,7 +217,7 @@ int VideoReader::readPackets(){
 int VideoReader::decodeNextFrame(){
 	int frameFinished = 0;
 	while (!frameFinished){
-		if (packets.size()< lastPacket+1){
+		if (packets.size()< (unsigned int)(lastPacket+1)){
 			printf("No more packets, packet %d\n",lastPacket);
 			return 0;
 		}
@@ -269,7 +268,7 @@ int VideoReader::decodeFrame(int frameNo){
 	
 	
 	while (!frameFinished && currentFrame!= frameNo){
-		if (packets.size()< lastPacket+1){
+		if (packets.size()<(unsigned int) (lastPacket+1)){
 			return 0;
 		}
 		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
@@ -309,7 +308,6 @@ int VideoReader::decodeFrame(int frameNo){
 /*Read all of the packets to memory, might need to check whether the video is small enough to fit into memory..*/
 int VideoReader::readIndices(){
 	int frameFinished;
-	int lastKeyFramePacket = 0;
 	frameIndices = std::vector<frameIndice>();
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
 	int frameNo = -1;
@@ -338,7 +336,7 @@ int VideoReader::readIndices(){
 		packet.data = NULL;
 		packet.size = 0;
 		if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
-	            &packet) >=0){
+	            &packet) >0){
 		
 			if (frameFinished){
 				++frameNo;
@@ -552,4 +550,8 @@ int VideoReader::getNumberOfFrames(){
 
 int VideoReader::getNumberOfPackets(){
 	return packets.size();
+}
+
+int VideoReader::getNumberOfIndices(){
+	return frameIndices.size();
 }

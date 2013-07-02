@@ -149,18 +149,23 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
-			int framesInVid = videoReader->getNumberOfFrames();
-			printf("Frames in video %d\n",framesInVid);
-			SetStatusText(_("Wait file reading packets to memory. Requires decoding, will take a while ..."));
-			//int gotPackets = videoReader->readPackets();
-			int gotPackets = videoReader->readIndices();
 			printf("Reading frame\n");
 			fflush(stdout);			//DEBUGGING
-			int displayPictureNumber = videoReader->readNextFrameFromDisk();
+			int displayPictureNumber = videoReader->readNextFrameFromDisk();			
+			int framesInVid = videoReader->getNumberOfFrames();			
+			printf("Frames in video %d\n",framesInVid);
+			fflush(stdout);			//DEBUGGING
+			SetStatusText(_("Wait while reading packet indices to memory. Requires decoding the whole file, will take a while ..."));
+			//int gotPackets = videoReader->readPackets();
+			printf("Read indices\n");
+			fflush(stdout);			//DEBUGGING
+			int gotPackets = videoReader->readIndices();			
+			printf("Got indices\n");
+			fflush(stdout);			//DEBUGGING
 			//int framesInVid = videoReader->readFrames(); 
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
-				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfPackets()),displayPictureNumber);
+				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices()),displayPictureNumber);
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
@@ -175,9 +180,9 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	//int gotFrame = videoReader->decodeFrame(currentVal);
 	printf("Reading frame scroller %d\n",currentVal);
 	fflush(stdout);			//DEBUGGING
-	//int displayPictureNumber = videoReader->readNextFrameFromDisk();
+	int displayPictureNumber = videoReader->readNextFrameFromDisk();
 	//int displayPictureNumber = videoReader->decodeNextFrame();
-	int displayPictureNumber = videoReader->decodeFrame(currentVal);
+	//int displayPictureNumber = videoReader->decodeFrame(currentVal);
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
