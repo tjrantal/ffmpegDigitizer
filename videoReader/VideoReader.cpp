@@ -409,9 +409,75 @@ int VideoReader::readNextFrameFromDisk(){
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
-	return tmp_picture->display_picture_number;
+	++lastFrame;
+	return lastFrame;
 }
 
+/** Reads the @param frameNo frame from the file */
+int VideoReader::readFrameFromDisk(int frameNo){
+	/*Do nothing, if requested frame = current frame*/
+	if (frameNo == lastFrame){
+		return frameNo;	
+	}
+	/*Read next frame*/
+	if (frameNo == lastFrame+1){
+		readNextFrameFromDisk();	
+		lastFrame = frameNo;
+		return frameNo;
+	}
+	/*Seek to the desired frame*/
+	int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo).pts,AVSEEK_FLAG_BACKWARD);
+	if (success < 0){
+		printf("Seek failed %d\n",success);
+		fflush(stdout);
+		return 0;
+	}
+	bool moreFrames = true;
+	int frameFinished;
+	while (moreFrames){
+		av_read_frame( pFormatCtx, &packet );
+		if(packet.stream_index==videoStream)
+		{
+			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+			&packet);
+			if (frameFinished){
+				if (packet.pts == frameIndices.at(frameNo).pts){
+					moreFrames = false;
+					if(img_convert_ctx == NULL){
+						if (tmp_picture->linesize[0] != width){ //Hack for padding
+							for (int zzz = 0; zzz < height;zzz++){
+								memcpy(decodedFrame+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+							}
+						} else {
+							memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
+						}
+					}else{//If pixel_fmt is not targetFormat
+						sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
+						  0, height, picture->data, picture->linesize);
+				
+						if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
+							printf("%d memcpy hack\n",picture->linesize[0]);
+							for (int zzz = 0; zzz < height;zzz++){
+								memcpy(decodedFrame+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+							}
+						} else {
+							memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
+							
+						}
+					}
+				}
+				av_free_packet( &packet );
+			}
+				
+		}else{
+			av_free_packet( &packet );
+		}
+	
+		
+	}
+	lastFrame = frameNo;
+	return frameNo;
+}	
 
 int VideoReader::readFrames(){
 

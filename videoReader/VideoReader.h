@@ -103,6 +103,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
 		int readIndices();				/**< Read frame indices and timeStamps from disk, needs to be run first, othewise will miss any frames that have been read already */
 		int readNextFrameFromDisk();	/**< Reads the next package in series */
+		int readFrameFromDisk(int frameNo);	/**< Reads the @param frameNo frame from the file */
 		int getNumberOfIndices();	/**< Returns the number of video indices*/
 		//Functions declared
 	

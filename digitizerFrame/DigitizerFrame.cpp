@@ -153,7 +153,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			printf("Read indices\n");
 			fflush(stdout);			//DEBUGGING
 			int gotPackets = videoReader->readIndices();			
-			printf("Got indices\n");
+			printf("Got indices %d\n", gotPackets);
 			fflush(stdout);			//DEBUGGING
 			printf("Reading frame\n");
 			fflush(stdout);			//DEBUGGING
@@ -167,7 +167,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//int framesInVid = videoReader->readFrames(); 
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
-				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices()),displayPictureNumber);
+				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
@@ -182,7 +182,8 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	//int gotFrame = videoReader->decodeFrame(currentVal);
 	printf("Reading frame scroller %d\n",currentVal);
 	fflush(stdout);			//DEBUGGING
-	int displayPictureNumber = videoReader->readNextFrameFromDisk();
+	//int displayPictureNumber = videoReader->readNextFrameFromDisk();
+	int displayPictureNumber = videoReader->readFrameFromDisk(currentVal);
 	//int displayPictureNumber = videoReader->decodeNextFrame();
 	//int displayPictureNumber = videoReader->decodeFrame(currentVal);
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);

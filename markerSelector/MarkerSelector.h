@@ -54,10 +54,6 @@ class MarkerSelector : public wxComboBox{
 		@param size size of the menu
 		*/
 		MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
-		
-		/**Deconstructor*/
-		/*~MarkerSelector();	/**< release memory*/
-
 };
 
 #endif
