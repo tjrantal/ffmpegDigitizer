@@ -166,7 +166,7 @@ VideoReader::VideoReader(const char* file, int fram)
 	decodedFrame = new unsigned char [width*height*3*sizeof(unsigned char)];
 }
 
-/*Read all of the packets to memory, might need to check whether the video is small enough to it into memory..*/
+/*Read all of the packets to memory, might need to check whether the video is small enough to fit into memory..*/
 int VideoReader::readPackets(){
 	int frameFinished;
 	int lastKeyFramePacket = 0;
@@ -176,7 +176,7 @@ int VideoReader::readPackets(){
 	int endOfFile = 0;
 	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
-	int packetPictureNo = 0;
+	int frameNo = -1;
 	printf("\n");
 	while(1) /*Read all frames to memory*/
 	{
@@ -190,7 +190,7 @@ int VideoReader::readPackets(){
 			fflush(stdout);
 			return 1;
 		}
-		printf("%d\n",packetPictureNo);
+		printf("%d\n",frameNo);
 
 	    if(tempPacket.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {	
@@ -200,9 +200,9 @@ int VideoReader::readPackets(){
 				if (tmp_picture->key_frame == 1){
 					lastKeyFramePacket = currentPacket;
 				}
-				packetPictureNo = tmp_picture->coded_picture_number;
+				++frameNo;
 			}
-			framePacket lastPacket = {tempPacket,lastKeyFramePacket,packetPictureNo};
+			framePacket lastPacket = {tempPacket,lastKeyFramePacket,currentPacket,frameNo};
 			packets.push_back(lastPacket);
 			++currentPacket;
 	    }else{
@@ -250,7 +250,7 @@ int VideoReader::decodeNextFrame(){
 			}
 		}
 	}
-	lastFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
+	lastFrame = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 	printf("Frame %d\n",lastFrame);
 	fflush(stdout);
 	return lastFrame;
@@ -263,7 +263,7 @@ int VideoReader::decodeFrame(int frameNo){
 		decodeNextFrame();
 		return 1;
 	}
-	lastPacket = packets.at(frameNo).lastKeyframePacket-1;
+	lastPacket = packets.at(frameNo).lastKeyframePacket;
 	int frameFinished = 0;
 	int currentFrame = -1;
 	
@@ -276,7 +276,7 @@ int VideoReader::decodeFrame(int frameNo){
 		++lastPacket;
 		if(frameFinished)	            // Did we get a video frame?
 		{
-			currentFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
+			currentFrame = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
 		}
 	}
 	/*Convert the image*/
@@ -302,7 +302,7 @@ int VideoReader::decodeFrame(int frameNo){
 			memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
 		}
 	}
-	lastFrame = tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
+	lastFrame = = packets.at(lastPacket).packet.frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
 	return lastFrame;
 }	
 
