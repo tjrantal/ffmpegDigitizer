@@ -43,6 +43,14 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		/*ADD tstamp -> use timestamp for searching in addition to packete number*/
 	} framePacket;
 	
+		/**Struct to store packets and the latest keyframe*/
+	typedef struct{
+		int 	frameNo;	/**< Number of picture in series*/
+		int64_t	pts;	/**< TimeStamp of the frame */
+		int64_t	pkt_pts;	/**< TimeStamp of the packet */
+		/*ADD tstamp -> use timestamp for searching in addition to packete number*/
+	} frameIndice;
+	
 	
 	/*! CLASS FOR VIDEO READING*/
 	class VideoReader
@@ -67,6 +75,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVCodec         *pCodec;
 		int             numBytes;
 		std::vector<framePacket> packets;
+		std::vector<frameIndice> frameIndices;
 		int videoFrames;
 		long fileSize;
 		int lastPacket;	/*Index of last decoded packet*/
@@ -92,6 +101,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int getNumberOfPackets();	/**< Returns the number of video packets*/
 		int decodeNextFrame();			/**< Decodes next packet from <framePacket> packets*/
 		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
+		int readIndices();				/**< Read frame indices and timeStamps from disk */
 		int readNextFrameFromDisk();	/**< Reads the next package in series */
 		//Functions declared
 	

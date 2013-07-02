@@ -306,10 +306,64 @@ int VideoReader::decodeFrame(int frameNo){
 	return lastFrame;
 }	
 
+/*Read all of the packets to memory, might need to check whether the video is small enough to fit into memory..*/
+int VideoReader::readIndices(){
+	int frameFinished;
+	int lastKeyFramePacket = 0;
+	frameIndices = std::vector<frameIndice>();
+	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
+	int frameNo = -1;
+	printf("\n");
+	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
+	{
+		printf("%d\n",frameNo);
+	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
+	    {	
+			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+	            &packet);
+	        if (frameFinished){
+				++frameNo;
+				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
+				frameIndices.push_back(lastIndice);
+				av_free_packet(&packet);
+			}
+	    }else{
+	    	av_free_packet(&packet);
+	    }
+	}
+	/*Check whether null frames need to be fed in to get the remaining data*/
+	printf("Lisalehdykoille %d\n",frameNo);
+	fflush(stdout);
+	while (1){
+		packet.data = NULL;
+		packet.size = 0;
+		if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+	            &packet) >=0){
+		
+			if (frameFinished){
+				++frameNo;
+				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
+				frameIndices.push_back(lastIndice);
+				av_free_packet(&packet);
+				printf("Lisalehdilla %d\n",frameNo);
+				fflush(stdout);
+			}
+		}else{
+			break;
+		}
+	}
+	
+	
+	av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0).pts,AVSEEK_FLAG_BACKWARD); /*Rewind the file*/
+	return frameNo;
+
+}
+
+
 int VideoReader::readNextFrameFromDisk(){
-	int frameFinished = 0;
 	printf("In reader\n");
 	fflush(stdout);			//DEBUGGING
+	int frameFinished = 0;
 	int readMore = 1;
 	while(readMore ==1 && frameFinished==0) //C(pFormatCtx, &packet)>=0
 	{
