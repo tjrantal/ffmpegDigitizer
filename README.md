@@ -21,16 +21,17 @@ A program for digitizing marker trajectories from video. I am working on an open
 Dependencies (I may or may not update this list)
 	ffmpeg (https://ffmpeg.org/)				for working with video files
 	wxWidgets (http://www.wxwidgets.org/)		for GUI
-	gsl	(http://www.gnu.org/software/gsl/)		for marker tracking
+	gsl	(http://www.gnu.org/software/gsl/)		for marker tracking	 (not needed 2.7.2013)
 	obviously any dependencies the above have
 	
 The plan is to:
 
 	Write digitizer for 2D-images:
-		Read text file with marker names
-		Read video (ffmpeg)
-		Show the first frame (wxWidgets)
-		Add slider to browse through the video
+		Read text file with marker names		(implemented 2.7.2013)
+		Read video (ffmpeg)						(implemented 2.7.2013)
+		Show the first frame (wxWidgets)		(implemented 2.7.2013)
+		Add slider to browse through the video	(implemented 2.7.2013)
+[TO DO]
 		Digitize all markers
 			Start automatic tracking using just RGB thresholds and sufficient number of suitable pixels in a circular region (select the best match, with a certain minimum match goodness)
 			Track all markers simultaneously, allow stopping the autotrack
