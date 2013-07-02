@@ -314,7 +314,7 @@ int VideoReader::readIndices(){
 	printf("\n");	
 	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
 	{
-		printf("%d\n",frameNo);
+		
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {	
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
@@ -322,6 +322,7 @@ int VideoReader::readIndices(){
 	        if (frameFinished){
 				++frameNo;
 				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
+				printf("%d %ld %ld\n",frameNo,(long int) lastIndice.pts,(long int) lastIndice.pkt_pts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}
@@ -343,7 +344,7 @@ int VideoReader::readIndices(){
 				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
-				printf("Lisalehdilla %d\n",frameNo);
+				printf("Lisalehdilla %d  %ld %ld\n",frameNo,(long int) lastIndice.pts,(long int) lastIndice.pkt_pts);
 				fflush(stdout);
 			}else{
 				printf("Didn't get a frame anymore %d\n",frameNo);
@@ -426,7 +427,7 @@ int VideoReader::readFrameFromDisk(int frameNo){
 		return frameNo;
 	}
 	/*Seek to the desired frame*/
-	int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo).pts,AVSEEK_FLAG_BACKWARD);
+	int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo).pkt_pts,AVSEEK_FLAG_BACKWARD);
 	if (success < 0){
 		printf("Seek failed %d\n",success);
 		fflush(stdout);
@@ -441,7 +442,7 @@ int VideoReader::readFrameFromDisk(int frameNo){
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 			&packet);
 			if (frameFinished){
-				if (packet.pts == frameIndices.at(frameNo).pts){
+				if (packet.pkt_pts == frameIndices.at(frameNo).pkt_pts){
 					moreFrames = false;
 					if(img_convert_ctx == NULL){
 						if (tmp_picture->linesize[0] != width){ //Hack for padding
