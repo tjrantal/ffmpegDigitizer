@@ -442,7 +442,7 @@ int VideoReader::readFrameFromDisk(int frameNo){
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 			&packet);
 			if (frameFinished){
-				if (packet.pkt_pts == frameIndices.at(frameNo).pkt_pts){
+				if (packet.pts == frameIndices.at(frameNo).pkt_pts){
 					moreFrames = false;
 					if(img_convert_ctx == NULL){
 						if (tmp_picture->linesize[0] != width){ //Hack for padding
