@@ -490,8 +490,13 @@ int VideoReader::readFrameFromDisk(int frameNo){
 	}
 	bool moreFrames = true;
 	int frameFinished;
+	int readReturn;
 	while (moreFrames){
-		av_read_frame( pFormatCtx, &packet );
+		readReturn = av_read_frame( pFormatCtx, &packet );
+		//Already at the end of file
+		if (readReturn <0){
+		 break;
+		}
 		if(packet.stream_index==videoStream)
 		{
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
@@ -531,6 +536,59 @@ int VideoReader::readFrameFromDisk(int frameNo){
 	
 		
 	}
+	
+	printf("Null frames?\n");
+	/*Feed null frames need to get a delayed frame*/
+	if (moreFrames){
+		printf("Going for a delayed frame %d\n",lastFrame+1);
+		fflush(stdout);
+		while (1){
+			packet.data = NULL;
+			packet.size = 0;
+			if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+					&packet) >=0){
+			
+				if (frameFinished){
+					if (packet.pts == frameIndices.at(frameNo).pkt_pts){
+						if(img_convert_ctx == NULL){
+							if (tmp_picture->linesize[0] != width){ //Hack for padding
+								for (int zzz = 0; zzz < height;zzz++){
+									memcpy(decodedFrame+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+								}
+							} else {
+								memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
+							}
+						}else{//If pixel_fmt is not targetFormat
+							sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
+							  0, height, picture->data, picture->linesize);
+					
+							if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
+								printf("%d memcpy hack\n",picture->linesize[0]);
+								for (int zzz = 0; zzz < height;zzz++){
+									memcpy(decodedFrame+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+								}
+							} else {
+								memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
+								
+							}
+						}
+						printf("Got a delayed Frame\n");
+						fflush(stdout);
+						break;
+					}
+
+				}else{
+					printf("Didn't get a frame anymore %d\n",lastFrame+1);
+					fflush(stdout);
+					break;				
+				}
+				
+			}else{
+				break;
+			}
+		}
+	}
+	
 	lastFrame = frameNo;
 	return frameNo;
 }	
