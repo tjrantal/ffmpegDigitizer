@@ -34,21 +34,11 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		#include <libavutil/imgutils.h>	/*av_image_alloc*/
 	}
 	
-	/**Struct to store packets and the latest keyframe*/
-	typedef struct{
-		AVPacket packet;	/**< Packet*/
-		int lastKeyframePacket;	/**< Latest keyframe, packets from this to the frame of interest need to be decoded to get a full frame*/
-		int packetNo;		/**< Number of the packet in series*/
-		int 	frameNo;	/**< Number of picture in series*/
-		/*ADD tstamp -> use timestamp for searching in addition to packete number*/
-	} framePacket;
-	
-		/**Struct to store packets and the latest keyframe*/
+	/**Struct to store frame indices and corresponding time stamps*/
 	typedef struct{
 		int 	frameNo;	/**< Number of picture in series*/
 		int64_t	pts;	/**< TimeStamp of the frame */
 		int64_t	pkt_pts;	/**< TimeStamp of the packet */
-		/*ADD tstamp -> use timestamp for searching in addition to packete number*/
 	} frameIndice;
 	
 	
@@ -74,11 +64,9 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
-		std::vector<framePacket> packets;
 		std::vector<frameIndice> frameIndices;
 		int videoFrames;
 		long fileSize;
-		int lastPacket;	/*Index of last decoded packet*/
 		int lastFrame;	/*Index of last decoded frame*/
 	
 		public:
@@ -95,12 +83,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		unsigned char *decodedFrame;	/**< Current decoded frame*/
 
 		//Class function declarations
-		int readFrames();	/**< Read next "frames" frames or to the end of the video*/
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
-		int readPackets();	/**< Read all packets to packets vector, not suitable for large files (i.e. if in risk of running out of memory)*/
-		int getNumberOfPackets();	/**< Returns the number of video packets*/
-		int decodeNextFrame();			/**< Decodes next packet from <framePacket> packets*/
-		int decodeFrame(int frameNo);	/**< Decodes frame frameNo from <framePacket> packets*/
 		int readIndices();				/**< Read frame indices and timeStamps from disk, needs to be run first, othewise will miss any frames that have been read already */
 		int readNextFrameFromDisk();	/**< Reads the next package in series */
 		int readFrameFromDisk(int frameNo);	/**< Reads the @param frameNo frame from the file */

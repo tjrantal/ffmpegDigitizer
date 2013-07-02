@@ -167,145 +167,6 @@ VideoReader::VideoReader(const char* file, int fram)
 }
 
 /*Read all of the packets to memory, might need to check whether the video is small enough to fit into memory..*/
-int VideoReader::readPackets(){
-	int frameFinished;
-	int lastKeyFramePacket = 0;
-	packets = std::vector<framePacket>();
-	int currentPacket = 0;
-	int endOfFile = 0;
-	lastPacket = -1;	/*Set last packet to -1, since none have been decoded*/
-	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
-	int frameNo = -1;
-	printf("\n");
-	while(1) /*Read all frames to memory*/
-	{
-		AVPacket tempPacket;
-		av_init_packet(&tempPacket);
-		tempPacket.data = NULL;
-		tempPacket.size = 0;
-		endOfFile = av_read_frame(pFormatCtx, &tempPacket); 
-		if (endOfFile<0){
-			printf("got to EOF\n");
-			fflush(stdout);
-			return 1;
-		}
-		printf("%d\n",frameNo);
-
-	    if(tempPacket.stream_index==videoStream)		 // Is this a packet from the video stream?
-	    {	
-			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
-	            &tempPacket);
-	        if (frameFinished){
-				if (tmp_picture->key_frame == 1){
-					lastKeyFramePacket = currentPacket;
-				}
-				++frameNo;
-			}
-			framePacket lastPacket = {tempPacket,lastKeyFramePacket,currentPacket,frameNo};
-			packets.push_back(lastPacket);
-			++currentPacket;
-	    }else{
-	    	av_free_packet(&packet);
-	    }
-	}
-
-	return 1;
-
-}
-
-/* Decodes next packet from <framePacket> packets*/
-int VideoReader::decodeNextFrame(){
-	int frameFinished = 0;
-	while (!frameFinished){
-		if (packets.size()< (unsigned int)(lastPacket+1)){
-			printf("No more packets, packet %d\n",lastPacket);
-			return 0;
-		}
-		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
-		++lastPacket;
-		if(frameFinished)	            // Did we get a video frame?
-		{
-			if(img_convert_ctx == NULL){
-				/*No conversion necessary*/
-				if (tmp_picture->linesize[0] != width || tmp_picture->linesize[0] != width*3){ //Hack for padding
-					for (int zzz = 0; zzz < height;zzz++){
-						memcpy(decodedFrame+zzz*sizeof(unsigned char)*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0],width*sizeof(unsigned char)*3);
-					}
-				} else {
-					memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
-				}
-			}else{//If pixel_fmt is not targetFormat
-				sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
-				  0, height, picture->data, picture->linesize);
-		
-				if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
-					printf("%d memcpy hack\n",picture->linesize[0]);
-					for (int zzz = 0; zzz < height;zzz++){
-						memcpy(decodedFrame+zzz*sizeof(unsigned char)*width*3,picture->data[0]+zzz*tmp_picture->linesize[0],width*sizeof(unsigned char)*3);
-					}
-				} else {
-					memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
-				}
-			}
-		}
-	}
-	lastFrame = packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
-	printf("Frame %d\n",lastFrame);
-	fflush(stdout);
-	return lastFrame;
-}
-
-/* Decodes frame frameNo from <framePacket> packets*/
-int VideoReader::decodeFrame(int frameNo){
-	/*If next in order, just decode the next frame and return*/
-	if (frameNo == lastFrame+1){
-		decodeNextFrame();
-		return 1;
-	}
-	lastPacket = packets.at(frameNo).lastKeyframePacket;
-	int frameFinished = 0;
-	int currentFrame = -1;
-	
-	
-	while (!frameFinished && currentFrame!= frameNo){
-		if (packets.size()<(unsigned int) (lastPacket+1)){
-			return 0;
-		}
-		avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packets.at(lastPacket+1).packet);            // Decode video frame
-		++lastPacket;
-		if(frameFinished)	            // Did we get a video frame?
-		{
-			currentFrame = packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;
-		}
-	}
-	/*Convert the image*/
-	if(img_convert_ctx == NULL){
-		/*No conversion necessary*/
-		if (tmp_picture->linesize[0] != width || tmp_picture->linesize[0] != width*3){ //Hack for padding
-			for (int zzz = 0; zzz < height;zzz++){
-				memcpy(decodedFrame+zzz*sizeof(unsigned char)*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0],width*sizeof(unsigned char)*3);
-			}
-		} else {
-			memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
-		}
-	}else{//If pixel_fmt is not targetFormat
-		sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
-		  0, height, picture->data, picture->linesize);
-
-		if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
-			printf("%d memcpy hack\n",picture->linesize[0]);
-			for (int zzz = 0; zzz < height;zzz++){
-				memcpy(decodedFrame+zzz*sizeof(unsigned char)*width*3,picture->data[0]+zzz*tmp_picture->linesize[0],width*sizeof(unsigned char)*3);
-			}
-		} else {
-			memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
-		}
-	}
-	lastFrame =packets.at(lastPacket).frameNo;//tmp_picture->coded_picture_number;//tmp_picture->display_picture_number;display_picture_number;
-	return lastFrame;
-}	
-
-/*Read all of the packets to memory, might need to check whether the video is small enough to fit into memory..*/
 int VideoReader::readIndices(){
 	int frameFinished;
 	frameIndices = std::vector<frameIndice>();
@@ -593,127 +454,20 @@ int VideoReader::readFrameFromDisk(int frameNo){
 	return frameNo;
 }	
 
-int VideoReader::readFrames(){
-
-	int frameja2 = 0;
-	int frameFinished;
-
-	if (tstamp[0] != 0){ //Have to seek in order to start from the last key frame prior to the time stamp of interest
-		printf("\nSeek\n");
-		int64_t targetPosition = tstamp[2];
-		printf("Tstamp prior to search %ld\n", (long)tstamp[0]);
-		int success = av_seek_frame(pFormatCtx,videoStream,tstamp[2],AVSEEK_FLAG_BACKWARD);
-		if (success < 0){
-			printf("Seek failes %d\n",success);
-			return 1;
-		}
-		bool moreFrames = true;
-		while (moreFrames){
-			av_read_frame( pFormatCtx, &packet );
-			if(packet.stream_index==videoStream)
-			{
-				avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
-	            &packet);
-				targetPosition = packet.pts;
-				if (targetPosition == tstamp[0]){
-					moreFrames = false;
-				}
-			}
-		
-			av_free_packet( &packet );
-		}
-		 printf("Tstamp after seek %ld packet %ld\n",(long)targetPosition,(long)packet.pts);
-	}
-
-	while(av_read_frame(pFormatCtx, &packet)>=0 && frameja2 < frames )
-	{
-	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
-	    {
-	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
-	        if(frameFinished)	            // Did we get a video frame?
-	        {
-				if(img_convert_ctx == NULL){
-					if (tmp_picture->linesize[0] != width){ //Hack for padding
-						for (int zzz = 0; zzz < height;zzz++){
-							memcpy(video[frameja2]+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
-						}
-					} else {
-						memcpy(video[frameja2],tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
-					}
-				}else{//If pixel_fmt is not targetFormat
-					sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
-	                  0, height, picture->data, picture->linesize);
-			
-					if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
-						printf("%d memcpy hack\n",picture->linesize[0]);
-						for (int zzz = 0; zzz < height;zzz++){
-							memcpy(video[frameja2]+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
-						}
-					} else {
-						memcpy(video[frameja2],picture->data[0],width*height*sizeof(unsigned char)*3);
-					}
-				}
-				frameja2++;
-				tstamp.insert(tstamp.begin(),packet.pts);
-				//printf("tStamp %ld",(long) packet.pts);
-				tstamp.pop_back();
-			}
-	    }
-	    // Free the packet that was allocated by av_read_frame
-	    av_free_packet(&packet);
-	}
-	frames = frameja2;
-	return 1;
-}
-
 VideoReader::~VideoReader(){
 	// Close the video file
-	printf("Closing avcodec\n");		//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 	avcodec_close(pCodecCtx);
-	printf("\nClosing avformat\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 	avformat_close_input(&pFormatCtx);
-	printf("Set format and codec to null\n");		//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 	pFormatCtx = NULL;
 	pCodecCtx =NULL;
-	
 	//Attempt to free pictures
-	printf("free tmp_picture\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING AVFrame
 	avcodec_free_frame(&tmp_picture);
-	//av_free(&tmp_picture);
-	
-	/*
-	AVFrame* tempPointer = (AVFrame*) &tmp_picture;
-	 av_frame_free(&tempPointer);
-	 */
-
-	//av_freep(&picture_buf[0]);
-	printf("free picture->data\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 	av_freep(&picture->data[0]);
-	printf("free picture\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 	avcodec_free_frame(&picture);
-	printf("free  buffer\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
-	//av_free(&picture_buf[0]);
-	/*
-	tempPointer = (AVFrame*) &picture;
-	 av_frame_free(&tempPointer);
-	 */
-	//Free memory
-	
-	printf("free memory\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 
-	if (&packets != NULL){
-		packets.clear();
+	if (&frameIndices != NULL){
+		frameIndices.clear();
 	}
-	printf("packets cleared\n");	//DEBUGGING
-	fflush(stdout);			//DEBUGGING
 }
 
 int VideoReader::getNumberOfFrames(){
@@ -730,10 +484,6 @@ int VideoReader::getNumberOfFrames(){
 	printf("Stream DID NOT return the number of frames %d\n",(int) (duration/frameInterval));
 
 	return (int) (duration/timeBase);
-}
-
-int VideoReader::getNumberOfPackets(){
-	return packets.size();
 }
 
 int VideoReader::getNumberOfIndices(){
