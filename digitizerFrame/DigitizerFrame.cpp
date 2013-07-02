@@ -168,6 +168,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
+			delete slider;
+			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint(300,470),wxSize(400,40));
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
