@@ -19,27 +19,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 //Constructor
 VideoReader::VideoReader(const char* file, int fram)
 {
-	/*Check file size, if less than 1G the file packages will be read into memory, otherwise nothing happens*/
-	try{
-		FILE* tempFile = fopen(file,"rb");
-		fseek(tempFile,0,SEEK_END);
-		fileSize = ftell(tempFile);
-		fclose(tempFile);
-		printf("Got filesize %d MB\n",(int) fileSize/1024/1024);
-		
-	}catch (int e){
-		printf("Couldn't get file size\n");
-	}
-	
 	videoOpen = false;
 	av_register_all();	//Register formats
 	filename = file;		//File to open
 	frames = fram;	//Number of frames to be read
 	videoFrames = frames;
 	varattu = frames;
-	for (int lll = 0;lll<2;++lll){
-		tstamp.push_back(0);
-	}
 	
 	// Open video file
 	pFormatCtx = NULL;
@@ -50,10 +35,7 @@ VideoReader::VideoReader(const char* file, int fram)
 		fflush(stdout);			//DEBUGGING
 		return;
 	}
-				//return -1; // Couldn't open file
-	// Retrieve stream information
-	printf("findStreams\n");
-	fflush(stdout);			//DEBUGGING
+
 	if(avformat_find_stream_info(pFormatCtx,NULL)<0){
 		printf("Coudln't find stream\n");
 		fflush(stdout);			//DEBUGGING
@@ -63,7 +45,6 @@ VideoReader::VideoReader(const char* file, int fram)
 	av_dump_format(pFormatCtx, 0, filename, 0);
 	fflush(stdout);			//DEBUGGING
 			// Find the first video stream
-	
 	  /* retrieve stream information */
 	videoStream=-1;
 	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++){
@@ -78,8 +59,6 @@ VideoReader::VideoReader(const char* file, int fram)
 		fflush(stdout);			//DEBUGGING
 		return;
 	}
-	printf("find_stream_info\n");
-	fflush(stdout);			//DEBUGGING
 	
 	videoStream = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 	//Look for videostream index and open codec context
@@ -88,14 +67,12 @@ VideoReader::VideoReader(const char* file, int fram)
 		fflush(stdout);			//DEBUGGING
         return;
 	}	
-		printf("videoStreamIndex\n");
-	fflush(stdout);			//DEBUGGING
 	// Get a pointer to the codec context for the video stream
 	pCodecCtx=pFormatCtx->streams[videoStream]->codec;
 	width = pCodecCtx->width;
 	height = pCodecCtx->height;
 
-		// Find the decoder for the video stream
+	// Find the decoder for the video stream
 	pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
 	if(pCodec==NULL){
 		printf("No suitable codec\n");
@@ -110,19 +87,12 @@ VideoReader::VideoReader(const char* file, int fram)
 	if(pCodecCtx->time_base.num>1000 && pCodecCtx->time_base.den==1)
 		pCodecCtx->time_base.den=1000;
 	
-
-
-	
 	tmp_picture=avcodec_alloc_frame();
 	if (!tmp_picture){
 		printf("Coulnd't alloc frame\n");
 		fflush(stdout);			//DEBUGGING
 		return;
 	}
-	
-	//Reserve memory for frames
-	printf("Reserve Memory\n");
-	fflush(stdout);			//DEBUGGING
 
 	img_convert_ctx = NULL;
 	/*PIX_FMT_YUV420P*/
@@ -139,7 +109,7 @@ VideoReader::VideoReader(const char* file, int fram)
 						 pCodecCtx->width, pCodecCtx->height,
 						 PIX_FMT_RGB24, 1);
 		if (ret < 0) {
-			fprintf(stderr, "Could not allocate raw video buffer\n");
+			printf("Could not allocate raw video buffer\n");
 			return;
 		}
 		
@@ -153,15 +123,16 @@ VideoReader::VideoReader(const char* file, int fram)
 											 PIX_FMT_RGB24
 											 , SWS_BICUBIC, NULL, NULL, NULL);
 			if (img_convert_ctx == NULL) {
-				fprintf(stderr, "Cannot initialize the conversion context\n");
+				printf("Cannot initialize the conversion context\n");
 				return;
 			}
 		}
 	}
-	videoOpen = true;
+	
 	av_init_packet(&packet);
 	packet.data = NULL;
 	packet.size = 0;
+	videoOpen = true;
 	//Reserve memory for a frame
 	decodedFrame = new unsigned char [width*height*3*sizeof(unsigned char)];
 }

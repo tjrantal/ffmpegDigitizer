@@ -59,14 +59,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		uint8_t *picture_buf2[4];
 		int		buf2Linesize[4];
 		int bufSize2;
-		std::vector<int64_t> tstamp;
 		struct SwsContext *img_convert_ctx;
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
 		std::vector<frameIndice> frameIndices;
 		int videoFrames;
-		long fileSize;
 		int lastFrame;	/*Index of last decoded frame*/
 	
 		public:
@@ -79,7 +77,6 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		double duration;	/**< ffmpeg duration of the file in s*/
 		long startTime;		/**< ffmpeg startTime*/
 		bool videoOpen;		/**< true, if video was opened successfully*/
-		unsigned char **video;	/**< Pointer to the frames read from the video*/
 		unsigned char *decodedFrame;	/**< Current decoded frame*/
 
 		//Class function declarations
