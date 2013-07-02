@@ -370,8 +370,13 @@ int VideoReader::readNextFrameFromDisk(){
 	int readMore = 1;
 	while(readMore ==1 && frameFinished==0) //C(pFormatCtx, &packet)>=0
 	{
-		printf("In while %d\n",av_read_frame(pFormatCtx, &packet)); /*Is the stream open?*/
+		int readReturn = av_read_frame(pFormatCtx, &packet);
+		printf("In while %d\n",readReturn); /*Is the stream open?*/
 		fflush(stdout);			//DEBUGGING
+		//Already at the end of file
+		if (readReturn <0){
+		 break;
+		}
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {
 	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
@@ -410,6 +415,56 @@ int VideoReader::readNextFrameFromDisk(){
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
+	printf("Null frames? %d\n",readMore);
+	/*Feed null frames need to get a delayed frame*/
+	if (readMore ==1){
+		printf("Going for a delayed frame %d\n",lastFrame+1);
+		fflush(stdout);
+		while (1){
+			packet.data = NULL;
+			packet.size = 0;
+			if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
+					&packet) >=0){
+			
+				if (frameFinished){
+					if(img_convert_ctx == NULL){
+						if (tmp_picture->linesize[0] != width){ //Hack for padding
+							for (int zzz = 0; zzz < height;zzz++){
+								memcpy(decodedFrame+zzz*width*3,tmp_picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+							}
+						} else {
+							memcpy(decodedFrame,tmp_picture->data[0],width*height*sizeof(unsigned char)*3);
+						}
+					}else{//If pixel_fmt is not targetFormat
+						sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize,
+						  0, height, picture->data, picture->linesize);
+				
+						if (picture->linesize[0] != width && picture->linesize[0] != width*3){//Hack for padding (probably not needed...
+							printf("%d memcpy hack\n",picture->linesize[0]);
+							for (int zzz = 0; zzz < height;zzz++){
+								memcpy(decodedFrame+zzz*width*3,picture->data[0]+zzz*tmp_picture->linesize[0]*3,width*sizeof(unsigned char)*3);
+							}
+						} else {
+							memcpy(decodedFrame,picture->data[0],width*height*sizeof(unsigned char)*3);
+							
+						}
+					}
+					printf("Got a delayed Frame\n");
+					fflush(stdout);
+					break;
+				}else{
+					printf("Didn't get a frame anymore %d\n",lastFrame+1);
+					fflush(stdout);
+					break;				
+				}
+				
+			}else{
+				break;
+			}
+		}
+	}
+	
+	
 	++lastFrame;
 	return lastFrame;
 }
