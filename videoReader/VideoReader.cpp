@@ -154,7 +154,6 @@ int VideoReader::readIndices(){
 	        if (frameFinished){
 				++frameNo;
 				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
-				printf("%d %ld %ld\n",frameNo,(long int) lastIndice.pts,(long int) lastIndice.pkt_pts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}
@@ -163,8 +162,6 @@ int VideoReader::readIndices(){
 	    }
 	}
 	/*Check whether null frames need to be fed in to get the remaining data*/
-	printf("Lisalehdykoille %d\n",frameNo);
-	fflush(stdout);
 	while (1){
 		packet.data = NULL;
 		packet.size = 0;
@@ -176,10 +173,9 @@ int VideoReader::readIndices(){
 				frameIndice lastIndice = {frameNo,tmp_picture->pts,tmp_picture->pkt_pts};
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
-				printf("Lisalehdilla %d  %ld %ld\n",frameNo,(long int) lastIndice.pts,(long int) lastIndice.pkt_pts);
-				fflush(stdout);
 			}else{
 				printf("Didn't get a frame anymore %d\n",frameNo);
+				fflush(stdout);
 				break;				
 			}
 			
@@ -187,24 +183,19 @@ int VideoReader::readIndices(){
 			break;
 		}
 	}
-	
-	
-	av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0).pts,AVSEEK_FLAG_BACKWARD); /*Rewind the file*/
+	/*Rewind the file*/
+	av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0).pts,AVSEEK_FLAG_BACKWARD); 
 	return frameNo;
 
 }
 
 
 int VideoReader::readNextFrameFromDisk(){
-	printf("In reader\n");
-	fflush(stdout);			//DEBUGGING
 	int frameFinished = 0;
 	int readMore = 1;
 	while(readMore ==1 && frameFinished==0) //C(pFormatCtx, &packet)>=0
 	{
 		int readReturn = av_read_frame(pFormatCtx, &packet);
-		printf("In while %d\n",readReturn); /*Is the stream open?*/
-		fflush(stdout);			//DEBUGGING
 		//Already at the end of file
 		if (readReturn <0){
 		 break;
@@ -212,14 +203,9 @@ int VideoReader::readNextFrameFromDisk(){
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {
 	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
-				printf("Decoded %d\n",frameFinished);
-						fflush(stdout);			//DEBUGGING
 	        if(frameFinished)	            // Did we get a video frame?
 	        {
 				readMore = 0;
-				printf("Decoded %d tStamp %ld pTStap %ld codedPNo %d\n",tmp_picture->display_picture_number, (long int) tmp_picture->pts,(long int) tmp_picture->pkt_pts,tmp_picture->coded_picture_number);
-						fflush(stdout);			//DEBUGGING
-				
 				if(img_convert_ctx == NULL){
 					if (tmp_picture->linesize[0] != width){ //Hack for padding
 						for (int zzz = 0; zzz < height;zzz++){
@@ -247,11 +233,8 @@ int VideoReader::readNextFrameFromDisk(){
 	    // Free the packet that was allocated by av_read_frame
 	    av_free_packet(&packet);
 	}
-	printf("Null frames? %d\n",readMore);
 	/*Feed null frames need to get a delayed frame*/
 	if (readMore ==1){
-		printf("Going for a delayed frame %d\n",lastFrame+1);
-		fflush(stdout);
 		while (1){
 			packet.data = NULL;
 			packet.size = 0;
@@ -281,12 +264,8 @@ int VideoReader::readNextFrameFromDisk(){
 							
 						}
 					}
-					printf("Got a delayed Frame\n");
-					fflush(stdout);
 					break;
 				}else{
-					printf("Didn't get a frame anymore %d\n",lastFrame+1);
-					fflush(stdout);
 					break;				
 				}
 				
@@ -295,8 +274,6 @@ int VideoReader::readNextFrameFromDisk(){
 			}
 		}
 	}
-	
-	
 	++lastFrame;
 	return lastFrame;
 }
@@ -369,11 +346,8 @@ int VideoReader::readFrameFromDisk(int frameNo){
 		
 	}
 	
-	printf("Null frames?\n");
 	/*Feed null frames need to get a delayed frame*/
 	if (moreFrames){
-		printf("Going for a delayed frame %d\n",lastFrame+1);
-		fflush(stdout);
 		while (1){
 			packet.data = NULL;
 			packet.size = 0;
@@ -404,15 +378,11 @@ int VideoReader::readFrameFromDisk(int frameNo){
 								
 							}
 						}
-						printf("Got a delayed Frame\n");
-						fflush(stdout);
-						break;
+						break;	/*Got a delayed frame*/
 					}
 
 				}else{
-					printf("Didn't get a frame anymore %d\n",lastFrame+1);
-					fflush(stdout);
-					break;				
+					break;	/*Couldn't find a delayed frame*/
 				}
 				
 			}else{
@@ -454,7 +424,7 @@ int VideoReader::getNumberOfFrames(){
 	}
 	printf("Stream DID NOT return the number of frames %d\n",(int) (duration/frameInterval));
 
-	return (int) (duration/timeBase);
+	return (int) (duration/timeBase);	/*THIS IS INCORRECT*/
 }
 
 int VideoReader::getNumberOfIndices(){
