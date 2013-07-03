@@ -145,14 +145,35 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		}
 		printf("construct video reader\n");
 		fflush(stdout);			//DEBUGGING
-		videoReader = new VideoReader(openFileDialog.GetPath().char_str(),10);
+		wxString videoFilePath = openFileDialog.GetPath();
+		videoReader = new VideoReader(videoFilePath.char_str());
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
 			SetStatusText(_("Wait while reading packet indices to memory. Requires decoding the whole file, will take a while ..."));
 			printf("Read indices\n");
 			fflush(stdout);			//DEBUGGING
-			int gotPackets = videoReader->readIndices();			
+			/*Check whether the video has already been indexed, if not index the video*/
+			wxConfig *config = new wxConfig(_("digitizerConfig"));
+			wxString* indexFileName;
+			int gotPackets = 0;
+			if (config->Read(videoFilePath,indexFileName)){
+				//Read indices from file here
+			}else{
+				/*Index the file and save the index file name to config*/
+				gotPackets = videoReader->readIndices();
+				if (!wxDir::Exists(_("videoIndices"))){
+					wxMkDir("videoIndices",0777);
+				}
+				*indexFileName = wxString::Format(wxT("%s/%s"),_("videoIndices"),_("testi.ind"));
+				wxFile* indiceFile = new wxFile(indexFileName->wc_str(),wxFile::write);
+				//Write indices to file here
+				indiceFile->Close();
+				delete indiceFile;
+				//videoReader->writeIndicesToFile();					
+				config->Write(videoFilePath, *indexFileName);
+				delete config;
+			}		
 			printf("Got indices %d\n", gotPackets);
 			fflush(stdout);			//DEBUGGING
 			printf("Reading frame\n");
