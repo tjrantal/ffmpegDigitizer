@@ -58,7 +58,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
 	markerSelector = NULL;
-	debug = freopen("debug.log","w",stdout);
+	//debug = freopen("debug.log","w",stdout);
 }
 
 /*Button event handling*/
@@ -91,7 +91,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	}
 	printf("Nearly done\n");
 	fflush(stdout);	//DEBUGGING
-	fclose(debug);	//DEBUGGING
+	//fclose(debug);	//DEBUGGING
  	wxWindow::Destroy();
 	//event.Skip();
 }
@@ -147,6 +147,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		fflush(stdout);			//DEBUGGING
 		wxString videoFilePath = openFileDialog.GetPath();
 		videoReader = new VideoReader(videoFilePath.char_str());
+		wxFileName videoFileName(videoFilePath);
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
@@ -155,23 +156,74 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			fflush(stdout);			//DEBUGGING
 			/*Check whether the video has already been indexed, if not index the video*/
 			wxConfig *config = new wxConfig(_("digitizerConfig"));
-			wxString* indexFileName;
+			wxString indexFileName;
 			int gotPackets = 0;
-			if (config->Read(videoFilePath,indexFileName)){
+			if (config->Read(videoFilePath,&indexFileName)){
 				//Read indices from file here
+				printf("Reading from conf\n");
+				fflush(stdout);			//DEBUGGING
+				wxTextFile* indexFile = new wxTextFile();
+				indexFile->Open(indexFileName,wxConvUTF8); /*Open the file for reading*/
+				wxString temp;
+				std::vector<frameIndice> tempFrameIndices= std::vector<frameIndice>();
+				/*Read indices from the file*/
+				if (indexFile->IsOpened()){
+					for (temp = indexFile->GetFirstLine(); !indexFile ->Eof(); temp = indexFile->GetNextLine()){
+						wxStringTokenizer tkz(temp, wxT("\t"));
+						std::vector<wxString>* tokens = new std::vector<wxString>();
+						while ( tkz.HasMoreTokens() )
+						{
+							tokens->push_back(tkz.GetNextToken());
+						}
+						int temp1 = wxAtoi(tokens->at(0));
+						long temp2;
+						long temp3;
+						tokens->at(1).ToLong(&temp2);
+						tokens->at(2).ToLong(&temp3);
+						frameIndice tempIndice = { temp1,temp2 ,temp3};
+						tempFrameIndices.push_back(tempIndice);
+						tokens->clear();
+						delete tokens;									
+					}
+	
+				}
+				indexFile->Close();
+				delete indexFile;
+				delete config;
+				videoReader->frameIndices = tempFrameIndices;
 			}else{
 				/*Index the file and save the index file name to config*/
 				gotPackets = videoReader->readIndices();
+				printf("Indices read\n");
+				fflush(stdout);			//DEBUGGING
 				if (!wxDir::Exists(_("videoIndices"))){
 					wxMkDir("videoIndices",0777);
+					printf("Dir created\n");
+					fflush(stdout);			//DEBUGGING
 				}
-				*indexFileName = wxString::Format(wxT("%s/%s"),_("videoIndices"),_("testi.ind"));
-				wxFile* indiceFile = new wxFile(indexFileName->wc_str(),wxFile::write);
+				printf("Create file name\n");
+					fflush(stdout);			//DEBUGGING
+				wxFileName temp(wxT("videoIndices"));
+				wxString indexFileName = temp.GetPathWithSep();
+				indexFileName.Append(videoFileName.GetName());
+				indexFileName.append(wxT(".ind"));
+				printf("%s\n",indexFileName.wc_str());
+					fflush(stdout);			//DEBUGGING
+				wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);
+				printf("File isOpened %b\n",indiceFile->IsOpened());
+					fflush(stdout);
+							//DEBUGGING
 				//Write indices to file here
+				for (int i = 0; i<videoReader->frameIndices.size();++i){
+					indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
+														,videoReader->frameIndices.at(i).pts
+														,videoReader->frameIndices.at(i).pkt_pts)
+														,wxConvUTF8);
+				}
 				indiceFile->Close();
 				delete indiceFile;
 				//videoReader->writeIndicesToFile();					
-				config->Write(videoFilePath, *indexFileName);
+				config->Write(videoFilePath, indexFileName);
 				delete config;
 			}		
 			printf("Got indices %d\n", gotPackets);
