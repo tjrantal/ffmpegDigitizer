@@ -43,6 +43,10 @@ The plan is to:
 	
 	Apply the distortion correction and use standard DLT to get marker 3D trajectories with Octave/Matlab
 
+NOTES I made on  my latest setting up of my Windows development environment at Deakin Uni
+download mingw-w64
+
+
 	
 NOTES I made when I was settin up my developement environment on a Windows machine
 
@@ -52,28 +56,42 @@ Get MSYS from here http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS
 
 Add minGW/bin to path
 
+Get gettext-runtime (gtk.org)
+./configure --prefix=/mingw --enable-static --enableshared --build=x86_64-w64-mingw32
+
 Get pkg-config http://www.gtk.org/download/win32.php
+./configure --prefix=/mingw --enable-static --disable-shared --build=x86_64-w64-mingw32
 
 Install lib SDL and x264 (for ffplay and x264 codec..)
+./configure --prefix=/mingw --enable-static --host=x86_64-w64-mingw32
 
 Install libFAAC http://www.audiocoding.com/downloads.html
 modify the Makefile.. http://kemovitra.blogspot.fi/2009/08/mingw-to-compile-ffmpeg.html and run bootstrap (requires automake and libtool, just install from mingw/msys external)
+./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32 --with-mp4v2=no
 
-libvpx
-./configure --prefix=/libvpx --target=x86-win32-gcc
-CFLAGS="-fno-tree-vectorize" ./configure --prefix=/libvpx --target=x86-win32-gcc --cpu=i686
 
-wxWidgets
+--host=x86_64-w64-mingw32 
+
+
+libvpx (http://www.webmproject.org/code/)
+CFLAGS="-fno-tree-vectorize" ./configure --prefix=/mingw --enable-static --target=x86_64-win64-gcc
+
+wxWidgets (use --build type)
+./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32 --extra-ldflags='-L/mingw/lib'
 make requires the flag CXXFLAGS="-fno-keep-inline-dllexport", i.e.
-make CXXFLAGS="-fno-keep-inline-dllexport"
+make CXXFLAGS="-fno-keep-inline-dllexport" --host=x86_64-w64-mingw32
 
+gettext
+./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32
 
 Mingw ffmpeg compilation guide
+Configure git checkout line feed (forgot to pick up the webpage with the instruction)
 http://ffmpeg.org/trac/ffmpeg/wiki/MingwCompilationGuide
 #FFMPEG configure tries to execute a file from the /tmp, which does not work in university network -> direct TEMP to some other place, where executing is allowed..
 export TEMP=/home/tjrantal/TEMP
 export TMP=$TEMP
-/c/MyTemp/oma/Timon/tyo/AquaLoading2012/ffmpegDigitizer/src/ffmpeg/configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --prefix=/ffmpeg --cpu=i686
+
+./configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --extra-ldflags='-L/mingw/lib' --extra-cflags=-I/mingw/include --prefix=/mingw
 
 Test wether ffmpeg works with the decoding_encoding example
 gcc decoding_encoding.c -o decoding_encoding -static -IffmpegDev32\include -LffmpegDev32\lib -lavformat -lavcodec -lavutil -lswscale -lwsock32 -lgdi32 -lmingw32
