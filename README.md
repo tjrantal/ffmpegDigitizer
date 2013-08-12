@@ -95,10 +95,7 @@ wxWidgets (use --build type) Downloaded 2.9.4.7 version
 export "CXXFLAGS=-fpermissive"
 export "LDFLAGS=-L/mingw/lib"
 export "CPPFLAGS=-I/mingw/include"
-mkdir testBuild
-cd testBuild
-../configure --disable-shared --disable-debug --disable-threads --enable-monolithic --enable-unicode --without-expat --without-regex --enable-graphics_ctx --build=x86_64-w64-mingw32
-./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32
+./configure --disable-shared --disable-debug --disable-threads --enable-monolithic --enable-unicode --without-expat --without-regex --enable-graphics_ctx --build=x86_64-w64-mingw32
 make CXXFLAGS="-fno-keep-inline-dllexport"
 
 
