@@ -55,6 +55,7 @@ copy 64-bit version of yasm (http://yasm.tortall.net/Download.html) to your ming
 Add library path and pkg-config path to your ~/.profile so that pkg-config works properly
 export LIBRARY_PATH=/mingw/lib
 export PKG_CONFIG_PATH=/mingw/lib/pkgconfig
+export CPATH=/mingw/include
 
 Compile and Install x264 codec
 ./configure --prefix=/mingw --enable-static --host=x86_64-w64-mingw32
