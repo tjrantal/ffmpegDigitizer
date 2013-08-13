@@ -83,6 +83,8 @@ export TEMP=/home/tjrantal/TEMP
 export TMP=$TEMP
 
 ./configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --prefix=/mingw --extra-ldflags='-L/mingw/lib' --extra-cflags=-I/mingw/include --arch=x86_64
+make
+make install
 
 Test wether ffmpeg works with the decoding_encoding example
 gcc decoding_encoding.c -o decoding_encoding -static -IffmpegDev32\include -LffmpegDev32\lib -lavformat -lavcodec -lavutil -lswscale -lwsock32 -lgdi32 -lmingw32
@@ -92,63 +94,11 @@ Configure git checkout line feed (forgot to pick up the webpage with the instruc
 http://ffmpeg.org/trac/ffmpeg/wiki/MingwCompilationGuide
 
 
-wxWidgets (use --build type) Downloaded 2.9.4.7 version
-export "CXXFLAGS=-fpermissive"
-export "LDFLAGS=-L/mingw/lib"
-export "CPPFLAGS=-I/mingw/include"
-./configure --disable-shared --disable-debug --disable-threads --enable-monolithic --enable-unicode --without-expat --without-regex --enable-graphics_ctx --build=x86_64-w64-mingw32
-make CXXFLAGS="-fno-keep-inline-dllexport"
-
-
-OLD NOTES
-	
-NOTES I made when I was settin up my developement environment on a Windows machine
-
-Setting up the dev environment:
-Get MinGW from here http://sourceforge.net/projects/mingw-w64/files/
-Get MSYS from here http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS
-
-Add minGW/bin to path
-
-Get gettext-runtime (gtk.org)
-./configure --prefix=/mingw --enable-static --enableshared --build=x86_64-w64-mingw32
-
-Get pkg-config http://www.gtk.org/download/win32.php
-./configure --prefix=/mingw --enable-static --disable-shared --build=x86_64-w64-mingw32
-
-Install lib SDL and x264 (for ffplay and x264 codec..)
-./configure --prefix=/mingw --enable-static --host=x86_64-w64-mingw32
-
-Install libFAAC http://www.audiocoding.com/downloads.html
-modify the Makefile.. http://kemovitra.blogspot.fi/2009/08/mingw-to-compile-ffmpeg.html and run bootstrap (requires automake and libtool, just install from mingw/msys external)
-./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32 --with-mp4v2=no
-
-
---host=x86_64-w64-mingw32 
-
-
-libvpx (http://www.webmproject.org/code/)
-CFLAGS="-fno-tree-vectorize" ./configure --prefix=/mingw --enable-static --target=x86_64-win64-gcc
-
-wxWidgets (use --build type). Got help for -fpermissive from http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw64_how_to.html
-export "CXXFLAGS=-fpermissive"
-export "LDFLAGS=-L/mingw/lib"
-export "CPPFLAGS=-I/mingw/include"
-./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32
-make requires the flag CXXFLAGS="-fno-keep-inline-dllexport", i.e.
-make CXXFLAGS="-fno-keep-inline-dllexport"
-
-gettext
-./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32
-
-Mingw ffmpeg compilation guide
-Configure git checkout line feed (forgot to pick up the webpage with the instruction)
-http://ffmpeg.org/trac/ffmpeg/wiki/MingwCompilationGuide
-#FFMPEG configure tries to execute a file from the /tmp, which does not work in university network -> direct TEMP to some other place, where executing is allowed..
-export TEMP=/home/tjrantal/TEMP
-export TMP=$TEMP
-
-./configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --extra-ldflags='-L/mingw/lib' --extra-cflags=-I/mingw/include --prefix=/mingw
-
-Test wether ffmpeg works with the decoding_encoding example
-gcc decoding_encoding.c -o decoding_encoding -static -IffmpegDev32\include -LffmpegDev32\lib -lavformat -lavcodec -lavutil -lswscale -lwsock32 -lgdi32 -lmingw32
+wxWidgets (use --build type) Downloaded 2.8.12 version
+applied patch from http://code.google.com/p/mingw-w64-dgn/source/browse/trunk/patch/wxWidgets-2.8.12-w64.patch?r=146
+(download the file as raw file from the right side of the page -> tabs etc. need to be preserved
+apply the patch from msys with: patch -p0 < path/to/patchfile)
+ 
+./configure --disable-shared --disable-debug --build=x86_64-w64-mingw32
+make 
+make install
