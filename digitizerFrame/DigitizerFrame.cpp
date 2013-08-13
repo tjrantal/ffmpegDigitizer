@@ -197,7 +197,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				printf("Indices read\n");
 				fflush(stdout);			//DEBUGGING
 				if (!wxDir::Exists(_("videoIndices"))){
-					wxMkDir("videoIndices",0777);
+					wxMkDir("videoIndices");//,0777);
 					printf("Dir created\n");
 					fflush(stdout);			//DEBUGGING
 				}
@@ -207,9 +207,9 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				wxString indexFileName = temp.GetPathWithSep();
 				indexFileName.Append(videoFileName.GetName());
 				indexFileName.append(wxT(".ind"));
-				printf("%s\n",indexFileName.wc_str());
+				printf("%s\n",indexFileName.ToAscii());
 					fflush(stdout);			//DEBUGGING
-				wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);
+				wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);
 				printf("File isOpened %b\n",indiceFile->IsOpened());
 					fflush(stdout);
 							//DEBUGGING

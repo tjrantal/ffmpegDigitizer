@@ -12,12 +12,12 @@ else ifneq (, $(findstring mingw, $(SYS)))
    # Do mingw things w64
    CC=x86_64-w64-mingw32-g++.exe
    CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-   LDFLAGS= -static -static-libgcc -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2			
+   LDFLAGS= -static -static-libgcc -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) #-lpthreadGC2			
 else ifneq (, $(findstring cygwin, $(SYS)))
    # Do cygwin things, haven't tested this copied mingw
    CC=g++
    CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-   LDFLAGS= -static -static-libgcc -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2			
+   LDFLAGS= -static -static-libgcc -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) #-lpthreadGC2			
 else
    # Do things for others, haven't tested this, copied linux
    CC=g++
