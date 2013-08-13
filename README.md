@@ -99,6 +99,6 @@ applied patch from http://code.google.com/p/mingw-w64-dgn/source/browse/trunk/pa
 (download the file as raw file from the right side of the page -> tabs etc. need to be preserved
 apply the patch from msys with: patch -p0 < path/to/patchfile)
  
-./configure --disable-shared --disable-debug --build=x86_64-w64-mingw32
+./configure --disable-shared --disable-debug --prefix=/mingw --build=x86_64-w64-mingw32
 make 
 make install
