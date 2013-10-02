@@ -74,7 +74,6 @@ private:
 	void AdjustSearchRadius(wxScrollEvent &event);
 	void AdjustMarkerRadius(wxScrollEvent &event);
 	void SelectMarker(wxCommandEvent &event);
-	EVT_COMBOBOX(id, func)
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };
