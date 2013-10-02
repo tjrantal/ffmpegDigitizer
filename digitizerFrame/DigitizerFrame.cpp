@@ -108,6 +108,8 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
 			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
+			/*Connect event listener to the drop down menu for when the selection is cahnged*/
+			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandle(DigitizerFrame::SelectMarker), NULL,this);
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
 		}
@@ -270,6 +272,17 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 }
 
+
+/**Select marker from the drop down list*/
+void DigitizerFrame::SelectMarker(wxCommandEvent &event){
+	markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	int selectedMarker = searchRadius->GetValue();	/*Get the value from the slider*/
+	int currentSearchRadius = markerSelector.markers.get(selectedMarker).searchRadius;	/*Save the slider value as the new marker radius*/
+	int currentMarkerRadius = markerSelector.markers.get(selectedMarker).markerRadius;	/*Save the slider value as the new marker radius*/
+	searchRadius->SetValue(currentSearchRadius);
+	markerRadius->SetValue(currentMarkerRadius);
+}
+
 /**Adjust marker size*/
 void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 	//Set the values for the current marker
@@ -285,6 +298,7 @@ void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
 	int currentVal = markerRadius->GetValue();	/*Get the value from the slider*/
 	markerSelector.markers.get(currentVal).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 }
+
 
 /*Event table*/
 BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
