@@ -44,3 +44,6 @@ $(EXECUTABLE): $(OBJECTS)
 	
 clean:
 	rm *.o imagePanel/*.o videoReader/*.o digitizerFrame/*.o markerSelector/*.o $(EXECUTABLE)
+	
+doxygen:
+	doxygen
