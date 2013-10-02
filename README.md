@@ -43,37 +43,62 @@ The plan is to:
 	
 	Apply the distortion correction and use standard DLT to get marker 3D trajectories with Octave/Matlab
 
-	
-NOTES I made when I was settin up my developement environment on a Windows machine
+NOTES I made on  my latest setting up of my Windows development environment at Deakin Uni
 
-Setting up the dev environment:
-Get MinGW from here http://sourceforge.net/projects/mingw-w64/files/
-Get MSYS from here http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS
+MINGW64 and MSYS
+download mingw-w64 + mingw-w64 msys, the most inclusive versions, so you also get package config
+mingw-w64 http://mingw-w64.sourceforge.net/download.php#mingw-builds
+msys http://sourceforge.net/apps/trac/mingw-w64/wiki/MSYS select the mingw-builds version
 
-Add minGW/bin to path
+copy 64-bit version of yasm (http://yasm.tortall.net/Download.html) to your mingw64/bin, rename it to yasm.exe
 
-Get pkg-config http://www.gtk.org/download/win32.php
+Add library path and pkg-config path to your ~/.profile so that pkg-config works properly
+export LIBRARY_PATH=/mingw/lib
+export PKG_CONFIG_PATH=/mingw/lib/pkgconfig
+export CPATH=/mingw/include
 
-Install lib SDL and x264 (for ffplay and x264 codec..)
+Compile and Install x264 codec
+./configure --prefix=/mingw --enable-static --host=x86_64-w64-mingw32
+make
+make install
 
-Install libFAAC http://www.audiocoding.com/downloads.html
-modify the Makefile.. http://kemovitra.blogspot.fi/2009/08/mingw-to-compile-ffmpeg.html and run bootstrap (requires automake and libtool, just install from mingw/msys external)
+Compile and Install lib SDL 
+./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32
+make
+make install
 
-libvpx
-./configure --prefix=/libvpx --target=x86-win32-gcc
-CFLAGS="-fno-tree-vectorize" ./configure --prefix=/libvpx --target=x86-win32-gcc --cpu=i686
+Compile and Install libFAAC (mp4v2 will not work in windows for some reason)
+./configure --prefix=/mingw --with-mp4v2=no --enable-static --build=x86_64-w64-mingw32 
+make
+make install
 
-wxWidgets
-make requires the flag CXXFLAGS="-fno-keep-inline-dllexport", i.e.
-make CXXFLAGS="-fno-keep-inline-dllexport"
+Compile and Install gnu scientific library (gsl)
+./configure --prefix=/mingw --enable-static --build=x86_64-w64-mingw32 
+make
+make install
 
-
-Mingw ffmpeg compilation guide
-http://ffmpeg.org/trac/ffmpeg/wiki/MingwCompilationGuide
+FFMPEG (depends on libsdl and libfaac)
 #FFMPEG configure tries to execute a file from the /tmp, which does not work in university network -> direct TEMP to some other place, where executing is allowed..
 export TEMP=/home/tjrantal/TEMP
 export TMP=$TEMP
-/c/MyTemp/oma/Timon/tyo/AquaLoading2012/ffmpegDigitizer/src/ffmpeg/configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --prefix=/ffmpeg --cpu=i686
+
+./configure --enable-memalign-hack --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 --prefix=/mingw --extra-ldflags='-L/mingw/lib' --extra-cflags=-I/mingw/include --arch=x86_64
+make
+make install
 
 Test wether ffmpeg works with the decoding_encoding example
 gcc decoding_encoding.c -o decoding_encoding -static -IffmpegDev32\include -LffmpegDev32\lib -lavformat -lavcodec -lavutil -lswscale -lwsock32 -lgdi32 -lmingw32
+
+
+Configure git checkout line feed (forgot to pick up the webpage with the instruction)
+http://ffmpeg.org/trac/ffmpeg/wiki/MingwCompilationGuide
+
+
+wxWidgets (use --build type) Downloaded 2.8.12 version
+applied patch from http://code.google.com/p/mingw-w64-dgn/source/browse/trunk/patch/wxWidgets-2.8.12-w64.patch?r=146
+(download the file as raw file from the right side of the page -> tabs etc. need to be preserved
+apply the patch from msys with: patch -p0 < path/to/patchfile)
+ 
+./configure --disable-shared --disable-debug --prefix=/mingw --build=x86_64-w64-mingw32
+make 
+make install

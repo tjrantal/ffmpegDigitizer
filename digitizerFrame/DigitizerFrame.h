@@ -24,6 +24,13 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/filedlg.h>		//For selecting a file to read
 #include <wx/file.h>		//For reading a file
 #include <wx/slider.h>		//For slider
+#include <wx/config.h> 		//to let wxWidgets choose a wxConfig class for your platform)
+#include <wx/confbase.h>	//Base config
+#include <wx/fileconf.h>	//For file config; used to contain video indexing info
+#include <wx/dir.h>			//Check whether a folder exists
+#include <wx/filefn.h>		//Create a folder
+#include <wx/filename.h>	//For saving frame indices
+#include <wx/tokenzr.h>		//For splitting a string to tokens
 
 /*Forward declare classes that are pointed to*/
 class ImagePanel;

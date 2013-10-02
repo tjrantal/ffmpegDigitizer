@@ -17,14 +17,11 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include "VideoReader.h"
 #endif
 //Constructor
-VideoReader::VideoReader(const char* file, int fram)
+VideoReader::VideoReader(const char* file)
 {
 	videoOpen = false;
 	av_register_all();	//Register formats
 	filename = file;		//File to open
-	frames = fram;	//Number of frames to be read
-	videoFrames = frames;
-	varattu = frames;
 	
 	// Open video file
 	pFormatCtx = NULL;

@@ -63,21 +63,18 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
-		std::vector<frameIndice> frameIndices;
-		int videoFrames;
 		int lastFrame;	/*Index of last decoded frame*/
 	
 		public:
 		const char *filename; /**< Name of the video file*/
-		int frames;			/**< Number of frames read to memory*/
 		int width;			/**< Width of the video frame*/
 		int height;		/**< Height of the video frame*/
-		int varattu;		/**< does nothing*/
 		double timeBase;	/**< ffmpeg timeBase*/
 		double duration;	/**< ffmpeg duration of the file in s*/
 		long startTime;		/**< ffmpeg startTime*/
 		bool videoOpen;		/**< true, if video was opened successfully*/
 		unsigned char *decodedFrame;	/**< Current decoded frame*/
+		std::vector<frameIndice> frameIndices;	/**< frame indices and timestamps*/
 
 		//Class function declarations
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/
@@ -91,7 +88,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		@param file file to open
 		@param fram number of frames to read at a time
 		*/
-		VideoReader(const char* file, int fram); 
+		VideoReader(const char* file); 
 		
 		/**Deconstructor*/
 		~VideoReader();	/**< Close the video file and release memory*/
