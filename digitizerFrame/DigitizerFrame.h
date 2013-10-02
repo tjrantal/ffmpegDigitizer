@@ -59,6 +59,7 @@ private:
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;			//videoReader
 	MarkerSelector	*markerSelector;		//Marker selector
+	TrackingParameters	*trackingParameters;	//Marker tracking parameters
     void OnQuit(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent& event);
     void OnAbout(wxCommandEvent &event);
