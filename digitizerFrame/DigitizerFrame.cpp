@@ -113,6 +113,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Add sliders for markers*/
 			markerRadius = new wxSlider(this,ID_markerRadius,0,10,50,wxPoint(10,300),wxSize(100,40));
 			searchRadius = new wxSlider(this,ID_searchRadius,0,30,100,wxPoint(10,350),wxSize(100,40));
+			toggleTrack = new wxToggleButton(this,ID_toggleTracking,"ToggleTracking",wxPoint(10,400));
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
 		}
@@ -298,8 +299,13 @@ void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 }
 
+/**Turn auto-tracking on and off*/
+void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
+	trackOn = toggleTrack->GetValue();
+}
 
-/*Event table*/
+
+/**Event table*/
 BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
 	EVT_CLOSE(DigitizerFrame::OnQuit)
     EVT_MENU(ID_Quit,  		DigitizerFrame::OnQuit)
@@ -307,6 +313,7 @@ BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
 	EVT_COMMAND_SCROLL(ID_slider,	DigitizerFrame::ScrollVideo)
 	EVT_COMMAND_SCROLL(ID_searchRadius,	DigitizerFrame::AdjustSearchRadius)	
 	EVT_COMMAND_SCROLL(ID_markerRadius,	DigitizerFrame::AdjustMarkerRadius)
+	EVT_TOGGLEBUTTON(ID_toggleTracking, DigitizerFrame::ToggleTracking)
 END_EVENT_TABLE()
 /*
 		

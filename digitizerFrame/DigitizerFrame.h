@@ -31,6 +31,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/filefn.h>		//Create a folder
 #include <wx/filename.h>	//For saving frame indices
 #include <wx/tokenzr.h>		//For splitting a string to tokens
+#include <wx/tglbtn.h>		//Toggle button for starting and stopping auto tracking
 
 /*Forward declare classes that are pointed to*/
 class ImagePanel;
@@ -61,6 +62,8 @@ private:
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;			//videoReader
 	MarkerSelector	*markerSelector;		//Marker selector
+	wxToggleButton	*toggleTrack;				//Begin/stop tracking
+	bool			trackOn;
 	
     void OnQuit(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent& event);
@@ -74,6 +77,7 @@ private:
 	void AdjustSearchRadius(wxScrollEvent &event);
 	void AdjustMarkerRadius(wxScrollEvent &event);
 	void SelectMarker(wxCommandEvent &event);
+	void ToggleTracking(wxCommandEvent &event);
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };
@@ -90,6 +94,7 @@ enum
 	ID_markerRadius,
 	ID_panel,
 	ID_markers,
+	ID_toggleTracking,
 };
 
 
