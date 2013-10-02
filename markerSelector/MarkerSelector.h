@@ -33,7 +33,7 @@ class MarkerSelector : public wxComboBox{
 			wxString markerName;				/**< Marker name*/
 			std::vector<int> xCoordinates;	/**< X-coordinates*/
 			std::vector<int> yCoordinates;	/**< Y-coordinates*/
-			int lbpRadius;				/**< Size of LBP box*/
+			int markerRadius;				/**< radius of the marker*/
 			unsigned char colorImage;			/**< Color or BW image*/
 			int searchRadius;				/**< The radius of the search window*/
 			unsigned char trackMarker;	/**< Is the marker being tracked*/

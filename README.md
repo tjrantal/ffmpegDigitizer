@@ -34,6 +34,7 @@ The plan is to:
 [TO DO]
 		Digitize all markers
 			Start automatic tracking using just RGB thresholds and sufficient number of suitable pixels in a circular region (select the best match, with a certain minimum match goodness)
+				Give each marker a marker radius and a search radius. Using sliders for that...
 			Track all markers simultaneously, allow stopping the autotrack
 			Stop if marker is lost, ask to digitize the marker manually (allow disabling the marker)
 		

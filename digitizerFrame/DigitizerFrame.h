@@ -56,8 +56,8 @@ private:
 	wxButton 		*openVideoFile;		//Pick a file to save to
 	wxFile 			*openVideo;
 	wxSlider		*slider;				//Slider
-	wxSlider		*searchRadius;				//Slider
-	wxSlider		*markerRadius;				//Slider
+	wxSlider		*searchRadius;				//Search radius from frame to next
+	wxSlider		*markerRadius;				//Radius of the marker
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;			//videoReader
 	MarkerSelector	*markerSelector;		//Marker selector
@@ -71,6 +71,8 @@ private:
 	void OpenFile(wxCommandEvent &event);
 	void OpenVideo(wxCommandEvent &event);
 	void ScrollVideo(wxScrollEvent &event);
+	void AdjustSearchRadius(wxScrollEvent &event);
+	void AdjustMarkerRadius(wxScrollEvent &event);
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };
@@ -83,6 +85,8 @@ enum
 	ID_picker,
 	ID_video,
 	ID_slider,
+	ID_searchRadius,
+	ID_markerRadius,
 	ID_panel,
 	ID_markers,
 };

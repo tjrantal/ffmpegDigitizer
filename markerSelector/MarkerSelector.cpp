@@ -35,7 +35,7 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 			tempMarker.markerName 	= temp;					/* Marker name*/
 			tempMarker.xCoordinates	= std::vector<int>();	/* X-coordinates*/
 			tempMarker.yCoordinates	= std::vector<int>();	/* Y-coordinates*/
-			tempMarker.lbpRadius	= 10;					/* Size of LBP box*/
+			tempMarker.markerRadius	= 10;					/* Size of LBP box*/
 			tempMarker.colorImage	= (unsigned char) 1;	/* Color or BW image*/
 			tempMarker.searchRadius	= 30;					/* The radius of the search window*/
 			tempMarker.trackMarker	= (unsigned char) 1;	/* Is the marker being tracked*/
