@@ -9,12 +9,12 @@ ifneq (, $(findstring linux, $(SYS)))
    LDFLAGS= -O2 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264)
 else ifneq (, $(findstring mingw, $(SYS)))
    CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-   LDFLAGS= -static -static-libgcc -O2 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2			
+   LDFLAGS= -static -static-libgcc -O2 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264)	
    # Do mingw things
 else ifneq (, $(findstring cygwin, $(SYS)))
    # Do cygwin things, haven't tested this copied mingw
    CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-   LDFLAGS= -static -static-libgcc -O2 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthreadGC2			
+   LDFLAGS= -static -static-libgcc -O2 -march=i686 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264)			
 else
    # Do things for others, haven't tested this, copied linux
    CFLAGS=-c -Wall $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
