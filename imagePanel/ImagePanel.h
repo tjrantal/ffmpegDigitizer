@@ -19,21 +19,24 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <wx/wx.h> /*Include all wx headers*/
 	#include <wx/sizer.h>
 	#include <wx/image.h>
+	#include <math.h>       /* ceil */
 
 	class ImagePanel : public wxPanel{
 			wxBitmap	imageOrig;
 			wxImage		imageCopy;
 			wxBitmap	resizedImage;
-			wxSize		size;
-			double		scaleFactor;
+			wxSize		size;			/**On-screen image size*/
+			double		scaleFactor;	/**Scaling from original to screen*/
 			public:
 			/*Constructor with an image loaded*/
 		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn);
 			/*Constructor without an image*/
 			ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn);
-		    void setImage(int width, int height, unsigned char* data,bool static_data=true);
+		    void setImage(int width, int height, unsigned char* data,bool static_data=true);	/**Set current image*/
+			void digitizeXY(int xCoordinate,int yCoordinate, double radius);	/**Draw a circle in the current image*/
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
+			double getScalingFactor(); /**Return the scaling from original image to screen*/
 		    
 		    void render(wxDC& dc);
 		    

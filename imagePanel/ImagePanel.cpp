@@ -57,6 +57,21 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 
 }
  
+ /**Draw a circle in the current image to highlight a digitized marker*/
+ void ImagePanel::digitizeXY(int xCoordinate,int yCoordinate, double radius){
+	wxImage tempImage = resizedImage.ConvertToImage();
+	/*draw to the image*/
+	double xAdd;
+	double yAdd;
+	for  (int i = 0; i<(int)ceil(2.0*M_PI*radius);++i){
+		xAdd = radius*cos(((double)i)/(radius));
+		yAdd = radius*sin(((double)i)/(radius));
+		tempImage.SetRGB(xCoordinate+(int)xAdd,yCoordinate+(int)yAdd,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
+	}
+	resizedImage = *(new wxBitmap(tempImage));
+	Refresh();
+} 
+ 
 /*
  * Called by the system of by wxWidgets when the panel needs
  * to be redrawn. You can also trigger this call by
@@ -93,6 +108,12 @@ void ImagePanel::paintNow()
 void ImagePanel::render(wxDC&  dc)
 {
     dc.DrawBitmap( resizedImage, 0, 0, false );
+}
+
+
+double ImagePanel::getScalingFactor()
+{
+	return scaleFactor;
 }
 
 /*EVENT TABLE*/

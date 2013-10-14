@@ -47,14 +47,19 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
 	//Connect(ID_slider,EVT_SCROLL,wxCommandEventHandler(DigitizerFrame::ScrollVideo),NULL,this);
 	/*Connect button click events*/
+	/*
 	resultsText->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	resultsText->Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
+	*/
 	/*Connect events to the main frame*/
+	/*
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
-	
+	*/
 	//imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
+	/*Connect the mouse listener to digitize points on screen*/
+	imagePanel->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	videoReader = NULL;
 	markerSelector = NULL;
@@ -62,8 +67,12 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 }
 
 /*Button event handling*/
-void DigitizerFrame::LeftButtonDown(wxMouseEvent& WXUNUSED(event)){
-	//does nothing
+/*Digitizing markers*/
+void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
+	long xCoordinate = event.GetX();
+	long yCoordinate = event.GetY();
+	double radius = (double)  markerRadius->GetValue();
+	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
