@@ -120,8 +120,8 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
-			markerRadius = new wxSlider(this,ID_markerRadius,0,10,50,wxPoint(10,300),wxSize(100,40));
-			searchRadius = new wxSlider(this,ID_searchRadius,0,30,100,wxPoint(10,350),wxSize(100,40));
+			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,300),wxSize(100,40));
+			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,350),wxSize(100,40));
 			toggleTrack = new wxToggleButton(this,ID_toggleTracking,"ToggleTracking",wxPoint(10,400));
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
