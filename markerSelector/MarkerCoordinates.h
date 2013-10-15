@@ -42,6 +42,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		unsigned char trackMarker;	/**< Is the marker being tracked*/
 		unsigned char predictive;	/**< Trying to predict the marker trajectory*/
 		int notFound;	/**< Was marker not found in the current frame*/
+		double** histogram; 		/**<To store the colour histograms to look for*/
 		/**Constructor*/
 		marker(wxString markerNameIn):markerName(markerNameIn){
 			/*Insert default values*/
@@ -52,7 +53,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			trackMarker	= (unsigned char) 1;	/* Is the marker being tracked*/
 			predictive	= (unsigned char) 1;	/* Trying to predict the marker trajectory*/
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
-			
+			histogram	=NULL;
 		}
 	};
 #endif

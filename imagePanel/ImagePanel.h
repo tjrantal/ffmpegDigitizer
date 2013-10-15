@@ -19,7 +19,9 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <wx/wx.h> /*Include all wx headers*/
 	#include <wx/sizer.h>
 	#include <wx/image.h>
-	#include <math.h>       /* ceil */
+	#include <math.h>       /* ceil floor round*/
+	#include <vector>
+	
 
 	class ImagePanel : public wxPanel{
 			wxBitmap	imageOrig;
@@ -37,6 +39,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
 			double getScalingFactor(); /**Return the scaling from original image to screen*/
+			double** getHistogram(int xCoordinate,int yCoordinate, double radius);	/**Get the histogram of the current marker*/
 		    
 		    void render(wxDC& dc);
 		    

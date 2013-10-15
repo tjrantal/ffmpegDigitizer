@@ -71,7 +71,47 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 	resizedImage = *(new wxBitmap(tempImage));
 	Refresh();
 } 
- 
+
+/**Get the histogram of the current marker*/
+double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, double radius){
+	/*Calculate the circular sampling*/
+	std::vector<int*> samplingCoordinates = std::vector<int*>();
+	for (int i = (int) floor(radius); i<(int) ceil(radius); ++i){
+		for (int j = (int) floor(radius); j<(int) ceil(radius); ++j){
+			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
+				int* tempCoords = new int[2];
+				tempCoords[0] = i;
+				tempCoords[1] = j;
+				samplingCoordinates.push_back(tempCoords);
+			}
+		}
+	}
+	/*Get the histogram*/
+	double** histogram;
+	histogram = new double*[3];	/*Color figure comprises 3 different colors...*/
+	for (int i = 0; i<3;++i){
+		histogram[i] = new double[256](); /*256 possible intensities of a given color, the () initialises the values to zero*/
+	}
+	/*get the colorvalues for the histograms*/
+	wxImage tempImage = resizedImage.ConvertToImage();
+	for (int i = 0; i<samplingCoordinates.size(); ++i){
+		if (xCoordinate+samplingCoordinates[i][0] >=0 && xCoordinate+samplingCoordinates[i][0] < size.GetWidth()
+			&& xCoordinate+samplingCoordinates[i][1] >=0 && xCoordinate+samplingCoordinates[i][1] < size.GetHeight()
+			){
+			histogram[0][tempImage.GetRed(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]		+= 1;
+			histogram[1][tempImage.GetGreen(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+			histogram[2][tempImage.GetBlue(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+		}
+	}
+	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
+	for (int j = 0;j<3;++j){
+		for (int i = 0;i<256;++i){
+			histogram[j][i] /= ((double) samplingCoordinates.size());
+		}
+	}
+	return histogram;
+}	
+
 /*
  * Called by the system of by wxWidgets when the panel needs
  * to be redrawn. You can also trigger this call by
