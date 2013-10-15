@@ -46,6 +46,13 @@ class MarkerSelector : public wxComboBox{
 		@param marker the indice of the marker to get
 		@param frameNo the frame for which the coordinate is to be looked up for*/
 		coordinate getCoordinate(int marker, int frameNo);	/**< Get the coordinate at a specific frame*/
+		
+		/**Calculate histogram closeness
+			@param histo1 First histogram for the closeness
+			@param histo2 Second histogram for the closeness
+		*/
+		double getCloseness(double** histo1,double** histo2);	/**compare a histogram to the histogram of the marker*/
+		
 		/**Consructor
 		@param fileIn file to open
 		@param parent Parent window to insert the dropdown menu to

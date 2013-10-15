@@ -80,6 +80,20 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo){
 	/*If the frame didn't have a marker, or the marker didn't exist return void*/
 	return coordinate(-1,-1,-1);
 }
+
+/**compare a histogram to the histogram of the marker*/
+double getCloseness(double** histo1,double** histo2){
+	double closeness = 0;
+	for (int j = 0;j<3;++j){
+		for (int i = 0;i<256;++i){
+			closeness+= (histo1[j][i]<histo2[j][i]) ? histo1[j][i] : histo2[j][i];
+		}
+	}
+	return closeness;
+}
+
+double min(){}
+
 /*
 MarkerSelector::~MarkerSelector(){
 	markers.clear();
