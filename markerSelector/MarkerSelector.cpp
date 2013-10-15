@@ -78,7 +78,7 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo){
 		}
 	}
 	/*If the frame didn't have a marker, or the marker didn't exist return void*/
-	return void;
+	return coordinate(-1,-1,-1);
 }
 /*
 MarkerSelector::~MarkerSelector(){

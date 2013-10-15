@@ -291,7 +291,10 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	if (markerSelector != NULL){
 		for (int i = 0; i<markerSelector->markers.size();++i){
 			coordinate tempCoordinate = markerSelector->getCoordinate(i,currentVal);
-			imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
+			/*If not found, all fields have -1 as the value*/
+			if (tempCoordinate.xCoordinate != -1 && tempCoordinate.yCoordinate != -1 && tempCoordinate.frame != -1){
+				imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
+			}
 		}
 	}
 	
