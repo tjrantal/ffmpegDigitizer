@@ -14,9 +14,11 @@ GNU General Public License for more details.
 For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>.
 */
 
+/*Include dependent classess and structs*/
 #include "DigitizerFrame.h"
 #include "../imagePanel/ImagePanel.h"
 #include "../videoReader/VideoReader.h"
+#include "../markerSelector/MarkerCoordinates.h"
 #include "../markerSelector/MarkerSelector.h"
 
 
@@ -285,6 +287,14 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	//int displayPictureNumber = videoReader->decodeNextFrame();
 	//int displayPictureNumber = videoReader->decodeFrame(currentVal);
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
+	/*Check whether markers exist, if so add them to the image*/
+	if (markerSelector != NULL){
+		for (int i = 0; i<markerSelector->markers.size();++i){
+			coordinate tempCoordinate = markerSelector->getCoordinate(i,currentVal);
+			imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
+		}
+	}
+	
 	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
 }
