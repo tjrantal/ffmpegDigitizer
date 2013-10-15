@@ -31,16 +31,8 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 	/*Read markers from the list and add them to the dropdown menu*/
 	if (markerFile->IsOpened()){
 		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
-			marker tempMarker;
-			tempMarker.markerName 	= temp;					/* Marker name*/
-			tempMarker.xCoordinates	= std::vector<int>();	/* X-coordinates*/
-			tempMarker.yCoordinates	= std::vector<int>();	/* Y-coordinates*/
-			tempMarker.markerRadius	= 10;					/* Size of LBP box*/
-			tempMarker.colorImage	= (unsigned char) 1;	/* Color or BW image*/
-			tempMarker.searchRadius	= 30;					/* The radius of the search window*/
-			tempMarker.trackMarker	= (unsigned char) 1;	/* Is the marker being tracked*/
-			tempMarker.predictive	= (unsigned char) 1;	/* Trying to predict the marker trajectory*/
-			tempMarker.notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
+			marker tempMarker(temp);	/* Marker name*/
+			//tempMarker.markerName 	= temp;					/* Marker name*/
 			markers.push_back(tempMarker);			
 			Append((const wxString) temp);
 		}
@@ -51,6 +43,43 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 	delete markerFile;
 }
 
+/**< Assign a value to a marker at a specific frame*/
+void MarkerSelector::setCoordinate(int marker,double xCoordinate, double yCoordinate, int frameNo){
+	/*Check that there is at least frameNo markers*/
+	if (markers.size() > marker){
+		/*Check whether the frame has coordinates already*/
+		bool exists = false;
+		for (int j = 0; j<markers[marker].coordinates.size();++j){
+			if (frameNo == markers[marker].coordinates[j].frame){
+				exists = true;
+				markers[marker].coordinates[j].frame = frameNo;
+				markers[marker].coordinates[j].xCoordinate = xCoordinate;
+				markers[marker].coordinates[j].yCoordinate = yCoordinate;
+			}
+		}
+		/*If the frame didn't have a coordinate yet, add*/
+		if (exists == false){
+			markers[marker].coordinates.push_back(coordinate(xCoordinate,yCoordinate,frameNo));
+		}
+		/*Sort the marker coordinates according to the frameNo*/
+		std::sort(markers[marker].coordinates.begin(),markers[marker].coordinates.end());
+	}
+}
+
+/**< Get the coordinate at a specific frame*/
+coordinate MarkerSelector::getCoordinate(int marker, int frameNo){
+	/*Check that there is at least frameNo markers*/
+	if (markers.size() > marker){
+		/*Check whether the frame has coordinates associated with it*/
+		for (int j = 0; j<markers[marker].coordinates.size();++j){
+			if (frameNo == markers[marker].coordinates[j].frame){
+				return markers[marker].coordinates[j];
+			}
+		}
+	}
+	/*If the frame didn't have a marker, or the marker didn't exist return void*/
+	return void;
+}
 /*
 MarkerSelector::~MarkerSelector(){
 	markers.clear();

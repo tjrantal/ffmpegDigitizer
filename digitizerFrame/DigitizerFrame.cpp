@@ -69,10 +69,15 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 /*Button event handling*/
 /*Digitizing markers*/
 void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
-	long xCoordinate = event.GetX();
-	long yCoordinate = event.GetY();
+	double xCoordinate = (double) event.GetX();
+	double yCoordinate = (double) event.GetY();
 	double radius = (double)  markerRadius->GetValue();
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
+	//Get active marker and set the coordinates for the marker
+
+	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
+	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
+	
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
@@ -123,8 +128,10 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,300),wxSize(100,40));
 			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,350),wxSize(100,40));
 			toggleTrack = new wxToggleButton(this,ID_toggleTracking,"ToggleTracking",wxPoint(10,400));
+			trackOn = false;
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
+			trackOn = false;
 		}
 		if (markerSelector == NULL)
 		{
@@ -311,6 +318,10 @@ void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
 /**Turn auto-tracking on and off*/
 void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
 	trackOn = toggleTrack->GetValue();
+	/*Switch tracking on*/
+	if (trackOn){
+	
+	}
 }
 
 
