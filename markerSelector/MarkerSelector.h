@@ -32,6 +32,7 @@ class MarkerSelector : public wxComboBox{
 
 		/*Variables*/
 		std::vector<marker> markers;	/**< Markers read from the file*/
+		int currentMarker;
 		/*Functions*/
 		/**Reset marker list dropdown 
 		@param fileIn file to open*/
@@ -60,6 +61,8 @@ class MarkerSelector : public wxComboBox{
 		@param size size of the menu
 		*/
 		MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize);
+		/**Deconstructor*/
+		~MarkerSelector();
 };
 
 #endif

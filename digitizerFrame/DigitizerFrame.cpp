@@ -20,6 +20,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include "../videoReader/VideoReader.h"
 #include "../markerSelector/MarkerCoordinates.h"
 #include "../markerSelector/MarkerSelector.h"
+#include "../trackingThread/TrackingThread.h"
 
 
 DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -306,6 +307,7 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 /**Select marker from the drop down list*/
 void DigitizerFrame::SelectMarker(wxCommandEvent &event){
 	int selectedMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	markerSelector->currentMarker = selectedMarker;
 	int currentSearchRadius = markerSelector->markers.at(selectedMarker).searchRadius;	/*Save the slider value as the new marker radius*/
 	int currentMarkerRadius = markerSelector->markers.at(selectedMarker).markerRadius;	/*Save the slider value as the new marker radius*/
 	searchRadius->SetValue(currentSearchRadius);
@@ -315,7 +317,7 @@ void DigitizerFrame::SelectMarker(wxCommandEvent &event){
 /**Adjust marker size*/
 void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 	//Set the values for the current marker
-	int currentMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = searchRadius->GetValue();	/*Get the value from the slider*/
 	markerSelector->markers.at(currentMarker).searchRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 }
@@ -323,7 +325,7 @@ void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 /**Adjust search radius*/
 void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
 	//Set the values for the current marker
-	int currentMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = markerRadius->GetValue();	/*Get the value from the slider*/
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 }
@@ -333,8 +335,17 @@ void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
 	trackOn = toggleTrack->GetValue();
 	/*Switch tracking on*/
 	if (trackOn){
-	
+		std::thread trackThread();	/*Init and run trackingThread*/
+		
+	}else{ /*Stop the tracking thread*/
+		trackThread.join();	/**/
 	}
+}
+
+/**Trigger trackThread*/
+void DigitizerFrame::trackThread(){
+	/*Do the tracking*/
+	TrackingThread trackingThread
 }
 
 

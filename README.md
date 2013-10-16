@@ -24,6 +24,8 @@ Dependencies (I may or may not update this list)
 	gsl	(http://www.gnu.org/software/gsl/)		for marker tracking	 (not needed 2.7.2013)
 	obviously any dependencies the above have
 	
+	Has to be compiled with a ISO C++ 2011 standard supporting compiler (e.g. Gnu C++ compiler version 4.7 or higher) due to threading using pthreads.
+	
 The plan is to:
 
 	Write digitizer for 2D-images:

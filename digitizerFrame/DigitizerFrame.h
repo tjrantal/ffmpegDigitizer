@@ -32,6 +32,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/filename.h>	//For saving frame indices
 #include <wx/tokenzr.h>		//For splitting a string to tokens
 #include <wx/tglbtn.h>		//Toggle button for starting and stopping auto tracking
+#include <thread>			//For threading, tracking opens up a new thread
 /*Forward declare classes that are pointed to*/
 class ImagePanel;
 class VideoReader;

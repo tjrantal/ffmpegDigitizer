@@ -38,6 +38,7 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 		}
 	
 	}
+	currentMarker = 0;
 	SetSelection(0);	//Select the first item on the list
 	markerFile->Close();
 	delete markerFile;
@@ -94,9 +95,11 @@ double getCloseness(double** histo1,double** histo2){
 
 double min(){}
 
-/*
+
 MarkerSelector::~MarkerSelector(){
+	for (int j = 0; j<markers[marker].size();++j){
+		markers[marker].coordinates.clear();
+	}
 	markers.clear();
-	delete &markers;
 }
-*/
+
