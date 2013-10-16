@@ -37,6 +37,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 class ImagePanel;
 class VideoReader;
 class MarkerSelector;
+class TrackingThread;
 
 class DigitizerFrame: public wxFrame
 {
@@ -63,6 +64,7 @@ private:
 	VideoReader		*videoReader;			//videoReader
 	MarkerSelector	*markerSelector;		//Marker selector
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
+	TrackingThread	*trackingThread;		//class for tracking, runs a thread
 	bool			trackOn;
 	
     void OnQuit(wxCommandEvent &event);
