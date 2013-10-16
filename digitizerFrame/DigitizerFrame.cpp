@@ -335,19 +335,13 @@ void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
 	trackOn = toggleTrack->GetValue();
 	/*Switch tracking on*/
 	if (trackOn){
-		std::thread trackThread();	/*Init and run trackingThread*/
+		trackingThread = new TrackingThread(this);
+		trackingThread->startThread();
 		
 	}else{ /*Stop the tracking thread*/
-		trackThread.join();	/**/
+		/*Implement here*/
 	}
 }
-
-/**Trigger trackThread*/
-void DigitizerFrame::trackThread(){
-	/*Do the tracking*/
-	TrackingThread trackingThread
-}
-
 
 /**Event table*/
 BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)

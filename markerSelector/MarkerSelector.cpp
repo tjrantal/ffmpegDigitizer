@@ -97,8 +97,8 @@ double min(){}
 
 
 MarkerSelector::~MarkerSelector(){
-	for (int j = 0; j<markers[marker].size();++j){
-		markers[marker].coordinates.clear();
+	for (int j = 0; j<markers.size();++j){
+		markers[j].coordinates.clear();
 	}
 	markers.clear();
 }
