@@ -25,8 +25,14 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int frame;				/**< frame number of the coordinate*/
 		/**Constructor*/
 		coordinate(double xCIn, double yCIn, int frameIn):xCoordinate(xCIn),yCoordinate(yCIn),frame(frameIn){
-			
 		}
+		/**Constructor overload*/
+		coordinate(){			
+			xCoordinate	= -1;
+			yCoordinate	= -1;
+			frame		= -1;
+		}
+		
 		/** Enable sorting a vector with coordinate structs based on frame number*/
 		bool operator < (const coordinate& coordinateToCompareTo) const {
 			return (frame < coordinateToCompareTo.frame);

@@ -68,9 +68,9 @@ void MarkerSelector::setCoordinate(int marker,double xCoordinate, double yCoordi
 }
 
 /**< Get the coordinate at a specific frame*/
-coordinate MarkerSelector::getCoordinate(int marker, int frameNo){
+coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 	/*Check that there is at least frameNo markers*/
-	if (markers.size() > marker){
+	if (markers.size() > marker && frameNo>-1){
 		/*Check whether the frame has coordinates associated with it*/
 		for (int j = 0; j<markers[marker].coordinates.size();++j){
 			if (frameNo == markers[marker].coordinates[j].frame){
@@ -78,8 +78,9 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo){
 			}
 		}
 	}
-	/*If the frame didn't have a marker, or the marker didn't exist return void*/
-	return coordinate(-1,-1,-1);
+	/*If the frame didn't have a marker throw and exception, int in this case*/
+	throw(1);
+	//return coordinate(-1,-1,-1);
 }
 
 /**compare a histogram to the histogram of the marker*/

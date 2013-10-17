@@ -269,6 +269,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
 			delete slider;
 			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint(300,470),wxSize(400,40));
+			currentFrame = 0;
 		}else{
 			SetStatusText(_("Could not open video!"));
 			resultsText->ChangeValue(_("Could not open video!"));
@@ -279,28 +280,29 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
-	int currentVal = slider->GetValue();
-	//int gotFrame = videoReader->decodeFrame(currentVal);
-	printf("Reading frame scroller %d\n",currentVal);
-	fflush(stdout);			//DEBUGGING
-	//int displayPictureNumber = videoReader->readNextFrameFromDisk();
-	int displayPictureNumber = videoReader->readFrameFromDisk(currentVal);
-	//int displayPictureNumber = videoReader->decodeNextFrame();
-	//int displayPictureNumber = videoReader->decodeFrame(currentVal);
+	currentFrame = slider->GetValue();
+	int displayPictureNumber = videoReader->readFrameFromDisk(currentFrame);
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 	/*Check whether markers exist, if so add them to the image*/
 	if (markerSelector != NULL){
 		for (int i = 0; i<markerSelector->markers.size();++i){
-			coordinate tempCoordinate = markerSelector->getCoordinate(i,currentVal);
+			try{
+				coordinate tempCoordinate = markerSelector->getCoordinate(i,currentFrame);
+				imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
+			} catch (int err){
+			
+			}
 			/*If not found, all fields have -1 as the value*/
+			/*
 			if (tempCoordinate.xCoordinate != -1 && tempCoordinate.yCoordinate != -1 && tempCoordinate.frame != -1){
 				imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
 			}
+			*/
 		}
 	}
 	
-	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
-	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentVal,displayPictureNumber));
+	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
+	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 }
 
 
@@ -337,6 +339,8 @@ void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
 	if (trackOn){
 		trackingThread = new TrackingThread(this);
 		trackingThread->startThread();
+		//debugging
+		//trackingThread->tThread.join();	/*Wait for the tracking thread to finish*/
 		
 	}else{ /*Stop the tracking thread*/
 		/*Implement here*/

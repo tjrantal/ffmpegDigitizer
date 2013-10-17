@@ -33,7 +33,8 @@ wxPanel(parent,id,pos,sizeIn)
     }else{ //No scaling needed
     	resizedImage = *(new wxBitmap(imageOrig));
     }
-    
+	currentImage = resizedImage.ConvertToImage();
+	currentClearImage = currentImage;    
 }
 
 ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn) :
@@ -53,22 +54,22 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
     }else{ //No scaling needed
     	resizedImage = *(new wxBitmap(imageOrig));
     }
+	currentImage = resizedImage.ConvertToImage();
+	currentClearImage = currentImage;
     Refresh();
-
 }
  
  /**Draw a circle in the current image to highlight a digitized marker*/
  void ImagePanel::digitizeXY(int xCoordinate,int yCoordinate, double radius){
-	wxImage tempImage = resizedImage.ConvertToImage();
 	/*draw to the image*/
 	double xAdd;
 	double yAdd;
 	for  (int i = 0; i<(int)ceil(2.0*M_PI*radius);++i){
 		xAdd = radius*cos(((double)i)/(radius));
 		yAdd = radius*sin(((double)i)/(radius));
-		tempImage.SetRGB(xCoordinate+(int)xAdd,yCoordinate+(int)yAdd,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
+		currentImage.SetRGB(xCoordinate+(int)xAdd,yCoordinate+(int)yAdd,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
-	resizedImage = *(new wxBitmap(tempImage));
+	resizedImage = *(new wxBitmap(currentImage));
 	Refresh();
 } 
 
@@ -93,14 +94,13 @@ double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, double radius
 		histogram[i] = new double[256](); /*256 possible intensities of a given color, the () initialises the values to zero*/
 	}
 	/*get the colorvalues for the histograms*/
-	wxImage tempImage = resizedImage.ConvertToImage();
 	for (int i = 0; i<samplingCoordinates.size(); ++i){
 		if (xCoordinate+samplingCoordinates[i][0] >=0 && xCoordinate+samplingCoordinates[i][0] < size.GetWidth()
 			&& xCoordinate+samplingCoordinates[i][1] >=0 && xCoordinate+samplingCoordinates[i][1] < size.GetHeight()
 			){
-			histogram[0][tempImage.GetRed(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]		+= 1;
-			histogram[1][tempImage.GetGreen(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
-			histogram[2][tempImage.GetBlue(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]		+= 1;
+			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/

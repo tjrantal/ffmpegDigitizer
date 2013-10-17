@@ -46,7 +46,7 @@ class MarkerSelector : public wxComboBox{
 		/** Get the coordinates of a given marker in a specific frame
 		@param marker the indice of the marker to get
 		@param frameNo the frame for which the coordinate is to be looked up for*/
-		coordinate getCoordinate(int marker, int frameNo);	/**< Get the coordinate at a specific frame*/
+		coordinate getCoordinate(int marker, int frameNo) throw(int);	/**< Get the coordinate at a specific frame*/
 		
 		/**Calculate histogram closeness
 			@param histo1 First histogram for the closeness

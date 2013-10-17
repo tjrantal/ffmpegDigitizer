@@ -42,6 +42,16 @@ class TrackingThread;
 class DigitizerFrame: public wxFrame
 {
 public:
+	/**These variables need to be public for tracking*/
+	ImagePanel		*imagePanel;			//ImagePanel
+	VideoReader		*videoReader;			//videoReader
+	MarkerSelector	*markerSelector;		//Marker selector
+	wxSlider		*slider;				//Slider
+	wxSlider		*searchRadius;				//Search radius from frame to next
+	wxSlider		*markerRadius;				//Radius of the marker
+	wxToggleButton	*toggleTrack;				//Begin/stop tracking
+	int currentFrame;						//index of currentFrame
+	
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 private:
 	//DEBUG
@@ -57,13 +67,6 @@ private:
 	wxFile 			*openFile;
 	wxButton 		*openVideoFile;		//Pick a file to save to
 	wxFile 			*openVideo;
-	wxSlider		*slider;				//Slider
-	wxSlider		*searchRadius;				//Search radius from frame to next
-	wxSlider		*markerRadius;				//Radius of the marker
-	ImagePanel		*imagePanel;			//ImagePanel
-	VideoReader		*videoReader;			//videoReader
-	MarkerSelector	*markerSelector;		//Marker selector
-	wxToggleButton	*toggleTrack;				//Begin/stop tracking
 	TrackingThread	*trackingThread;		//class for tracking, runs a thread
 	bool			trackOn;
 	

@@ -18,11 +18,15 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 
 	#include "../digitizerFrame/DigitizerFrame.h"
 	#include "../markerSelector/MarkerCoordinates.h"
+	#include "../markerSelector/MarkerSelector.h"
+	#include "../imagePanel/ImagePanel.h"
 	#include <vector>
 	#include <algorithm>
 	#include <thread>			//For threading, tracking opens up a new thread, requires ISO C++ 2011 compliant compiler, e.g. g++ version 4.7 and up
 	#include <stdio.h>			//For output
 	#include <unistd.h>			//For sleep
+	#include <wx/image.h>		//For working with the image
+	#include <wx/bitmap.h>		//For working with the image
 	
 	class TrackingThread{
 		private:
@@ -33,6 +37,10 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void startThread();
 			/**Method to feed into the thread constructor*/
 			void run();
+			/**Look for the marker in the image*/
+			void getMarkerCoordinates(wxImage currentImage,int markerIndice,coordinate* returnCoordinate, coordinate coordinates, double** histogram);
+			/*Debugging*/
+			void getMarkerCoordinates(wxImage currentImage,int markerIndice, double** histogram);
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};
