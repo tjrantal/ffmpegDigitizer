@@ -30,7 +30,7 @@ void TrackingThread::run(){
 
 	/*Get the current image*/
 	wxImage currentImage = mainThread->imagePanel->currentClearImage;
-	int currentFrame = mainThread->currentFrame;
+	int currentFrame = mainThread->slider->GetValue();
 	
 	coordinate coordinatesReturned[mainThread->markerSelector->markers.size()];
 	mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Thread started, frame #"), currentFrame));
