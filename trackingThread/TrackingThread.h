@@ -20,6 +20,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include "../markerSelector/MarkerCoordinates.h"
 	#include "../markerSelector/MarkerSelector.h"
 	#include "../imagePanel/ImagePanel.h"
+	#include "../videoReader/VideoReader.h"
 	#include <vector>
 	#include <algorithm>
 	#include <thread>			//For threading, tracking opens up a new thread, requires ISO C++ 2011 compliant compiler, e.g. g++ version 4.7 and up
@@ -39,8 +40,6 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void run();
 			/**Look for the marker in the image*/
 			void getMarkerCoordinates(wxImage currentImage,int markerIndice,coordinate* returnCoordinate, coordinate coordinates, double** histogram);
-			/*Debugging*/
-			void getMarkerCoordinates(wxImage currentImage,int markerIndice, double** histogram);
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};

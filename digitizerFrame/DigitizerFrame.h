@@ -51,7 +51,12 @@ public:
 	wxSlider		*markerRadius;				//Radius of the marker
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
 	int currentFrame;						//index of currentFrame
-	
+	bool			trackOn;
+	/**Constructor
+		@param title the name for the window
+		@param pos position of the window (0,0) = left upper corner at the left upper corner
+		@param size size of the window
+	*/
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 private:
 	//DEBUG
@@ -68,7 +73,7 @@ private:
 	wxButton 		*openVideoFile;		//Pick a file to save to
 	wxFile 			*openVideo;
 	TrackingThread	*trackingThread;		//class for tracking, runs a thread
-	bool			trackOn;
+	
 	
     void OnQuit(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent& event);
