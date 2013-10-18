@@ -48,6 +48,21 @@ class MarkerSelector : public wxComboBox{
 		@param frameNo the frame for which the coordinate is to be looked up for*/
 		coordinate getCoordinate(int marker, int frameNo) throw(int);	/**< Get the coordinate at a specific frame*/
 		
+		/**Set relative sampling coordinate
+			@param radius of the circular sampling area
+		*/
+		std::vector<int*> getRelativeSamplingCoordinates(double radius);	/**Set sampling area*/
+		
+		/**Set marker radius
+			@param radius of the marker
+		*/
+		void setMarkerRadius(int markerNo, double radius);	/**Set marker radiu*/
+		
+		/**Set search radius
+			@param radius of the search area
+		*/
+		void setSearchRadius(int markerNo, double radius);	/**Set search*/
+		
 		/**Calculate histogram closeness
 			@param histo1 First histogram for the closeness
 			@param histo2 Second histogram for the closeness

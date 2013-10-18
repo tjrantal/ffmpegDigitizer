@@ -42,7 +42,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
 			double getScalingFactor(); /**Return the scaling from original image to screen*/
-			double** getHistogram(int xCoordinate,int yCoordinate, double radius);	/**Get the histogram of the current marker*/
+			double** getHistogram(int xCoordinate,int yCoordinate, std::vector<int*> samplingCoordinates);	/**Get the histogram of the current marker*/
 		    
 		    void render(wxDC& dc);
 		    

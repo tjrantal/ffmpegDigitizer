@@ -80,7 +80,8 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
 	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
-	
+	/*Take the histogrma for the marker*/
+	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
@@ -322,6 +323,7 @@ void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = searchRadius->GetValue();	/*Get the value from the slider*/
 	markerSelector->markers.at(currentMarker).searchRadius =	currentVal;	/*Save the slider value as the new marker radius*/
+	markerSelector->markers.at(currentMarker).searchCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
 }
 
 /**Adjust search radius*/
@@ -330,6 +332,7 @@ void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = markerRadius->GetValue();	/*Get the value from the slider*/
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
+	markerSelector->markers.at(currentMarker).radiusCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
 }
 
 /**Turn auto-tracking on and off*/

@@ -74,19 +74,8 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 } 
 
 /**Get the histogram of the current marker*/
-double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, double radius){
-	/*Calculate the circular sampling*/
-	std::vector<int*> samplingCoordinates = std::vector<int*>();
-	for (int i = (int) floor(radius); i<(int) ceil(radius); ++i){
-		for (int j = (int) floor(radius); j<(int) ceil(radius); ++j){
-			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
-				int* tempCoords = new int[2];
-				tempCoords[0] = i;
-				tempCoords[1] = j;
-				samplingCoordinates.push_back(tempCoords);
-			}
-		}
-	}
+double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<int*> samplingCoordinates){
+
 	/*Get the histogram*/
 	double** histogram;
 	histogram = new double*[3];	/*Color figure comprises 3 different colors...*/

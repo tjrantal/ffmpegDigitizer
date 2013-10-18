@@ -32,6 +32,8 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 	if (markerFile->IsOpened()){
 		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
 			marker tempMarker(temp);	/* Marker name*/
+			tempMarker.radiusCoordinates = getRelativeSamplingCoordinates((double) tempMarker.markerRadius);
+			tempMarker.searchCoordinates = getRelativeSamplingCoordinates((double) tempMarker.searchRadius);
 			//tempMarker.markerName 	= temp;					/* Marker name*/
 			markers.push_back(tempMarker);			
 			Append((const wxString) temp);
@@ -67,6 +69,20 @@ void MarkerSelector::setCoordinate(int marker,double xCoordinate, double yCoordi
 	}
 }
 
+/**Set marker radius
+	@param radius of the marker
+*/
+void MarkerSelector::setMarkerRadius(int markerNo, double radius){
+	markers[markerNo].radiusCoordinates = getRelativeSamplingCoordinates(radius);
+}
+
+/**Set search radius
+	@param radius of the search area
+*/
+void MarkerSelector::setSearchRadius(int markerNo, double radius){
+	markers[markerNo].searchCoordinates = getRelativeSamplingCoordinates(radius);
+}
+
 /**< Get the coordinate at a specific frame*/
 coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 	/*Check that there is at least frameNo markers*/
@@ -81,6 +97,23 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 	/*If the frame didn't have a marker throw and exception, int in this case*/
 	throw(1);
 	//return coordinate(-1,-1,-1);
+}
+
+/**Get relative sampling coordinate*/
+std::vector<int*> MarkerSelector::getRelativeSamplingCoordinates(double radius){
+	/*Calculate sampling coordinates for circular sampling*/
+	std::vector<int*> samplingCoordinates = std::vector<int*>();
+	for (int i = (int) floor(radius); i<(int) ceil(radius); ++i){
+		for (int j = (int) floor(radius); j<(int) ceil(radius); ++j){
+			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
+				int* tempCoords = new int[2];
+				tempCoords[0] = i;
+				tempCoords[1] = j;
+				samplingCoordinates.push_back(tempCoords);
+			}
+		}
+	}
+	return samplingCoordinates;
 }
 
 /**compare a histogram to the histogram of the marker*/
