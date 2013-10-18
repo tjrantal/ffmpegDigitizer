@@ -74,7 +74,7 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 } 
 
 /**Get the histogram of the current marker*/
-double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<int*> samplingCoordinates){
+double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<coordinate> *samplingCoordinates){
 
 	/*Get the histogram*/
 	double** histogram;
@@ -83,19 +83,19 @@ double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<i
 		histogram[i] = new double[256](); /*256 possible intensities of a given color, the () initialises the values to zero*/
 	}
 	/*get the colorvalues for the histograms*/
-	for (int i = 0; i<samplingCoordinates.size(); ++i){
-		if (xCoordinate+samplingCoordinates[i][0] >=0 && xCoordinate+samplingCoordinates[i][0] < size.GetWidth()
-			&& xCoordinate+samplingCoordinates[i][1] >=0 && xCoordinate+samplingCoordinates[i][1] < size.GetHeight()
+	for (int i = 0; i<samplingCoordinates->size(); ++i){
+		if (xCoordinate+(*(samplingCoordinates))[i].xCoordinate >=0 && xCoordinate+(*(samplingCoordinates))[i].xCoordinate < size.GetWidth()
+			&& yCoordinate+(*(samplingCoordinates))[i].yCoordinate >=0 && yCoordinate+(*(samplingCoordinates))[i].yCoordinate < size.GetHeight()
 			){
-			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]		+= 1;
-			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
-			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+			histogram[0][currentImage.GetRed(xCoordinate+(*(samplingCoordinates))[i].xCoordinate,yCoordinate+(*(samplingCoordinates))[i].yCoordinate)]		+= 1;
+			histogram[1][currentImage.GetGreen(xCoordinate+(*(samplingCoordinates))[i].xCoordinate,yCoordinate+(*(samplingCoordinates))[i].yCoordinate)]	+= 1;
+			histogram[2][currentImage.GetBlue(xCoordinate+(*(samplingCoordinates))[i].xCoordinate,yCoordinate+(*(samplingCoordinates))[i].yCoordinate)]	+= 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
 	for (int j = 0;j<3;++j){
 		for (int i = 0;i<256;++i){
-			histogram[j][i] /= ((double) samplingCoordinates.size());
+			histogram[j][i] /= ((double) samplingCoordinates->size());
 		}
 	}
 	return histogram;

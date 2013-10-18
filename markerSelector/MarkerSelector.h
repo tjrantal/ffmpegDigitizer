@@ -51,12 +51,12 @@ class MarkerSelector : public wxComboBox{
 		/**Set relative sampling coordinate
 			@param radius of the circular sampling area
 		*/
-		std::vector<int*> getRelativeSamplingCoordinates(double radius);	/**Set sampling area*/
+		std::vector<coordinate> *getRelativeSamplingCoordinates(double radius);	/**Set sampling area*/
 		
 		/**Set marker radius
 			@param radius of the marker
 		*/
-		void setMarkerRadius(int markerNo, double radius);	/**Set marker radiu*/
+		void setMarkerRadius(int markerNo, double radius);	/**Set marker radius*/
 		
 		/**Set search radius
 			@param radius of the search area

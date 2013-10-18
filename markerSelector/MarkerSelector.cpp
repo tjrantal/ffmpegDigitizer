@@ -100,16 +100,13 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 }
 
 /**Get relative sampling coordinate*/
-std::vector<int*> MarkerSelector::getRelativeSamplingCoordinates(double radius){
+std::vector<coordinate> *MarkerSelector::getRelativeSamplingCoordinates(double radius){
 	/*Calculate sampling coordinates for circular sampling*/
-	std::vector<int*> samplingCoordinates = std::vector<int*>();
-	for (int i = (int) floor(radius); i<(int) ceil(radius); ++i){
-		for (int j = (int) floor(radius); j<(int) ceil(radius); ++j){
+	std::vector<coordinate> *samplingCoordinates = new std::vector<coordinate>();
+	for (int i = (int) -floor(radius); i<(int) ceil(radius); ++i){
+		for (int j = (int) -floor(radius); j<(int) ceil(radius); ++j){
 			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
-				int* tempCoords = new int[2];
-				tempCoords[0] = i;
-				tempCoords[1] = j;
-				samplingCoordinates.push_back(tempCoords);
+				samplingCoordinates->push_back(coordinate(i,j,-1));
 			}
 		}
 	}

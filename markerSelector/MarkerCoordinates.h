@@ -16,6 +16,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef MARKERCOORDINATES_H
 #define MARKERCOORDINATES_H
 #include <vector>
+	
 	/**A struct to contain the information for a coordinate. Needs to be in a separate coordinate
 		to create sortable vector...
 	*/
@@ -48,8 +49,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		unsigned char trackMarker;	/**< Is the marker being tracked*/
 		unsigned char predictive;	/**< Trying to predict the marker trajectory*/
 		int notFound;	/**< Was marker not found in the current frame*/
-		std::vector<int*> radiusCoordinates;	/**<Relative sampling coordinates around the marker*/
-		std::vector<int*> searchCoordinates;		/**<Relative sampling coordinates for track search area*/
+		std::vector<coordinate> *radiusCoordinates;	/**<Relative sampling coordinates around the marker*/
+		std::vector<coordinate> *searchCoordinates;		/**<Relative sampling coordinates for track search area*/
 		double** histogram; 		/**<To store the colour histograms to look for*/
 		/**Constructor*/
 		marker(wxString markerNameIn):markerName(markerNameIn){

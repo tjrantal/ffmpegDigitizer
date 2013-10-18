@@ -28,32 +28,35 @@ void TrackingThread::startThread(){
 
 void TrackingThread::run(){
 
-	/*Get the current image*/
-	wxImage currentImage = mainThread->imagePanel->currentClearImage;
 	int currentFrame = mainThread->slider->GetValue();
-	
 	//coordinate coordinatesReturned[mainThread->markerSelector->markers.size()];
-	mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Thread started, frame #"), currentFrame));
+	//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Thread started, frame #"), currentFrame));
 	//Go through the frames in the video
 	while (mainThread->trackOn == true && currentFrame < mainThread->videoReader->getNumberOfIndices()){
-		mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
+		/*Get the current image*/
+		wxImage currentImage = mainThread->imagePanel->currentClearImage;
+		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
 			//Look for coordinate in the previous image/
-			coordinate* coordinatesReturned;
+			
 			try{
 				coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
-				getMarkerCoordinates(currentImage,i,coordinatesReturned, initCoordinate, mainThread->markerSelector->markers[i].histogram);
-				mainThread->markerSelector->setCoordinate(i,coordinatesReturned[i].xCoordinate, coordinatesReturned[i].yCoordinate, currentFrame);
+				coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+				//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current-1 "), i));
+				//	sleep(1);
+				mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
 				//Digitize the marker
-				mainThread->imagePanel->digitizeXY(coordinatesReturned[i].xCoordinate,coordinatesReturned[i].yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
+				mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
 			} catch (int err){	//Didn't have marker in previous frame, check the current frame
 				try{
 					coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
-					getMarkerCoordinates(currentImage,i,coordinatesReturned, initCoordinate, mainThread->markerSelector->markers[i].histogram);
-					mainThread->markerSelector->setCoordinate(i,coordinatesReturned[i].xCoordinate, coordinatesReturned[i].yCoordinate, currentFrame);
+					coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
+					//sleep(1);
+					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
 					//Digitize the marker
-					mainThread->imagePanel->digitizeXY(coordinatesReturned[i].xCoordinate,coordinatesReturned[i].yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
+					mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
 				}
@@ -74,31 +77,33 @@ void TrackingThread::run(){
 }
 
 /**Look for the marker in the image*/
-void TrackingThread::getMarkerCoordinates(wxImage currentImage,int markerIndice,coordinate* returnCoordinate, coordinate coordinates, double** histogram){
+coordinate TrackingThread::getMarkerCoordinates(wxImage currentImage,int markerIndice, coordinate coordinates, double** histogram){
 	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
 	Digitize the closest match, provided that it is above the threshold.*/
 	double** markerHistogram = mainThread->markerSelector->markers[markerIndice].histogram;
 	std::vector<coordinateCloseness> checkClose;
-	std::vector<int*> samplingCoordinates = mainThread->markerSelector->markers[markerIndice].radiusCoordinates;
-	std::vector<int*> searchCoordinates = mainThread->markerSelector->markers[markerIndice].searchCoordinates;
+	std::vector<coordinate> samplingCoordinates = *(mainThread->markerSelector->markers[markerIndice].radiusCoordinates);
+	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
+
 	for (int i = 0;i<searchCoordinates.size();++i){
-		double x = coordinates.xCoordinate+searchCoordinates[i][0];
-		double y = coordinates.yCoordinate+searchCoordinates[i][1];
-		double closeness = mainThread->markerSelector->getCloseness(markerHistogram,getHistogram(currentImage,coordinates,samplingCoordinates));
+		double x = coordinates.xCoordinate+searchCoordinates[i].xCoordinate;
+		double y = coordinates.yCoordinate+searchCoordinates[i].yCoordinate;
+		coordinate check(x,y,-1);
+		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
+		double closeness = mainThread->markerSelector->getCloseness(markerHistogram,getHistogram(currentImage,check,samplingCoordinates));
+		
 		checkClose.push_back(coordinateCloseness(x,y,closeness));
 	}
 	
 	std::sort(checkClose.begin(),checkClose.end());	//Sort the closeness values to ascending order, best closeness is the last
 	coordinateCloseness bestMatch = checkClose.back();
-	returnCoordinate = new coordinate(bestMatch.x,bestMatch.y,-1);
-	/*
-	mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("looking for marker coordinate marker #"), markerIndice));
-	sleep(1);
-	*/
+	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
+	//sleep(1);
+	return coordinate(bestMatch.x,bestMatch.y,-1);
 }
 
 /**Get the histogram of the current marker*/
-double** TrackingThread::getHistogram(wxImage currentImage,coordinate coordinates, std::vector<int*> samplingCoordinates){
+double** TrackingThread::getHistogram(wxImage currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates){
 
 	/*Get the histogram*/
 	double** histogram;
@@ -110,12 +115,12 @@ double** TrackingThread::getHistogram(wxImage currentImage,coordinate coordinate
 	int yCoordinate = coordinates.yCoordinate;
 	/*get the colorvalues for the histograms*/
 	for (int i = 0; i<samplingCoordinates.size(); ++i){
-		if (xCoordinate+samplingCoordinates[i][0] >=0 && xCoordinate+samplingCoordinates[i][0] < currentImage.GetWidth()
-			&& xCoordinate+samplingCoordinates[i][1] >=0 && xCoordinate+samplingCoordinates[i][1] < currentImage.GetHeight()
+		if (xCoordinate+samplingCoordinates[i].xCoordinate >=0 && xCoordinate+samplingCoordinates[i].xCoordinate < currentImage.GetWidth()
+			&& yCoordinate+samplingCoordinates[i].yCoordinate >=0 && yCoordinate+samplingCoordinates[i].yCoordinate < currentImage.GetHeight()
 			){
-			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]		+= 1;
-			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
-			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i][0],yCoordinate+samplingCoordinates[i][1])]	+= 1;
+			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
+			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]	+= 1;
+			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
