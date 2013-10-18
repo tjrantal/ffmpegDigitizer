@@ -28,6 +28,28 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <unistd.h>			//For sleep
 	#include <wx/image.h>		//For working with the image
 	#include <wx/bitmap.h>		//For working with the image
+
+	/**Struct used to store coordinates for the closeness measure*/
+	struct coordinateCloseness{
+		double x;
+		double y;
+		double closeness;
+		/**Constructor*/
+		coordinateCloseness(double xIn, double yIn, double closenessIn):x(xIn),y(yIn),closeness(closenessIn){
+		}
+		/**Constructor overload*/
+		coordinateCloseness(){			
+			x			= -1.0;
+			y			= -1.0;
+			closeness	= -1.0;
+		}
+	
+		/** Enable sorting a vector with coordinateCloseness structs based on frame number*/
+		bool operator < (const coordinateCloseness& coordinateClosenessToCompareTo) const {
+			return (closeness < coordinateClosenessToCompareTo.closeness);
+		}
+	};
+
 	
 	class TrackingThread{
 		private:
@@ -40,6 +62,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void run();
 			/**Look for the marker in the image*/
 			void getMarkerCoordinates(wxImage currentImage,int markerIndice,coordinate* returnCoordinate, coordinate coordinates, double** histogram);
+			/**Get the histogram of the current marker*/
+			double** getHistogram(wxImage currentImage,coordinate coordinates, std::vector<int*> samplingCoordinates);
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};

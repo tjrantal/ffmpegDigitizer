@@ -117,7 +117,7 @@ std::vector<int*> MarkerSelector::getRelativeSamplingCoordinates(double radius){
 }
 
 /**compare a histogram to the histogram of the marker*/
-double getCloseness(double** histo1,double** histo2){
+double MarkerSelector::getCloseness(double** histo1,double** histo2){
 	double closeness = 0;
 	for (int j = 0;j<3;++j){
 		for (int i = 0;i<256;++i){
