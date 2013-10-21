@@ -118,9 +118,9 @@ double** TrackingThread::getHistogram(wxImage *currentImage,coordinate coordinat
 		if (xCoordinate+samplingCoordinates[i].xCoordinate >=0 && xCoordinate+samplingCoordinates[i].xCoordinate < currentImage->GetWidth()
 			&& yCoordinate+samplingCoordinates[i].yCoordinate >=0 && yCoordinate+samplingCoordinates[i].yCoordinate < currentImage->GetHeight()
 			){
-			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
-			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]	+= 1;
-			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
+			histogram[0][currentImage->GetRed(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
+			histogram[1][currentImage->GetGreen(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]	+= 1;
+			histogram[2][currentImage->GetBlue(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
