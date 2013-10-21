@@ -131,7 +131,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Add sliders for markers*/
 			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,300),wxSize(100,40));
 			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,350),wxSize(100,40));
-			toggleTrack = new wxToggleButton(this,ID_toggleTracking,"ToggleTracking",wxPoint(10,400));
+			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("ToggleTracking"),wxPoint(10,400));
 			trackOn = false;
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
@@ -224,7 +224,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				printf("Indices read\n");
 				fflush(stdout);			//DEBUGGING
 				if (!wxDir::Exists(_("videoIndices"))){
-					wxMkDir("videoIndices");//,0777);
+					wxMkDir("videoIndices",0777);
 					printf("Dir created\n");
 					fflush(stdout);			//DEBUGGING
 				}
@@ -234,9 +234,9 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				wxString indexFileName = temp.GetPathWithSep();
 				indexFileName.Append(videoFileName.GetName());
 				indexFileName.append(wxT(".ind"));
-				printf("%s\n",indexFileName.ToAscii());
+				//printf("%s\n",indexFileName.ToAscii());
 					fflush(stdout);			//DEBUGGING
-				wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);
+				wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);
 				printf("File isOpened %b\n",indiceFile->IsOpened());
 					fflush(stdout);
 							//DEBUGGING
