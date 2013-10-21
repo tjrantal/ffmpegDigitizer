@@ -224,8 +224,11 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				printf("Indices read\n");
 				fflush(stdout);			//DEBUGGING
 				if (!wxDir::Exists(_("videoIndices"))){
-					wxMkDir("videoIndices");
-					//wxMkDir("videoIndices",0777);	//Linux
+					#ifdef __linux__
+						wxMkDir("videoIndices",0777);	//Linux
+					#else
+						wxMkDir("videoIndices");		//Windows
+					#endif
 					printf("Dir created\n");
 					fflush(stdout);			//DEBUGGING
 				}
@@ -236,8 +239,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				indexFileName.Append(videoFileName.GetName());
 				indexFileName.append(wxT(".ind"));
 				//printf("%s\n",indexFileName.ToAscii());
-					fflush(stdout);			//DEBUGGING
-				wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);	//new wxFile(indexFileName.wc_str(),wxFile::write);
+				fflush(stdout);			//DEBUGGING
+				/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
+				#ifdef __linux__
+					new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
+				#else
+					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
+				#endif
 				printf("File isOpened %b\n",indiceFile->IsOpened());
 					fflush(stdout);
 							//DEBUGGING
