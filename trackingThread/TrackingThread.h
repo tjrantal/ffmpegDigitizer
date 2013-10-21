@@ -61,9 +61,9 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			/**Method to feed into the thread constructor*/
 			void run();
 			/**Look for the marker in the image*/
-			coordinate getMarkerCoordinates(wxImage currentImage,int markerIndice, coordinate coordinates, double** histogram);
+			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
 			/**Get the histogram of the current marker*/
-			double** getHistogram(wxImage currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
+			double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};

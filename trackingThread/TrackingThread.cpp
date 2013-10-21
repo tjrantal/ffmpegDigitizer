@@ -34,7 +34,7 @@ void TrackingThread::run(){
 	//Go through the frames in the video
 	while (mainThread->trackOn == true && currentFrame < mainThread->videoReader->getNumberOfIndices()){
 		/*Get the current image*/
-		wxImage currentImage = mainThread->imagePanel->currentClearImage;
+		wxImage *currentImage = $(mainThread->imagePanel->currentClearImage);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
@@ -77,7 +77,7 @@ void TrackingThread::run(){
 }
 
 /**Look for the marker in the image*/
-coordinate TrackingThread::getMarkerCoordinates(wxImage currentImage,int markerIndice, coordinate coordinates, double** histogram){
+coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram){
 	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
 	Digitize the closest match, provided that it is above the threshold.*/
 	double** markerHistogram = mainThread->markerSelector->markers[markerIndice].histogram;
@@ -103,7 +103,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage currentImage,int markerI
 }
 
 /**Get the histogram of the current marker*/
-double** TrackingThread::getHistogram(wxImage currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates){
+double** TrackingThread::getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates){
 
 	/*Get the histogram*/
 	double** histogram;
@@ -115,12 +115,12 @@ double** TrackingThread::getHistogram(wxImage currentImage,coordinate coordinate
 	int yCoordinate = coordinates.yCoordinate;
 	/*get the colorvalues for the histograms*/
 	for (int i = 0; i<samplingCoordinates.size(); ++i){
-		if (xCoordinate+samplingCoordinates[i].xCoordinate >=0 && xCoordinate+samplingCoordinates[i].xCoordinate < currentImage.GetWidth()
-			&& yCoordinate+samplingCoordinates[i].yCoordinate >=0 && yCoordinate+samplingCoordinates[i].yCoordinate < currentImage.GetHeight()
+		if (xCoordinate+samplingCoordinates[i].xCoordinate >=0 && xCoordinate+samplingCoordinates[i].xCoordinate < currentImage->GetWidth()
+			&& yCoordinate+samplingCoordinates[i].yCoordinate >=0 && yCoordinate+samplingCoordinates[i].yCoordinate < currentImage->GetHeight()
 			){
-			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
-			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]	+= 1;
-			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i].xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
+			histogram[0][currentImage.GetRed(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
+			histogram[1][currentImage.GetGreen(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]	+= 1;
+			histogram[2][currentImage.GetBlue(xCoordinate+samplingCoordinates[i]->xCoordinate,yCoordinate+samplingCoordinates[i].yCoordinate)]		+= 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
