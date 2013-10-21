@@ -34,7 +34,7 @@ void TrackingThread::run(){
 	//Go through the frames in the video
 	while (mainThread->trackOn == true && currentFrame < mainThread->videoReader->getNumberOfIndices()){
 		/*Get the current image*/
-		wxImage *currentImage = $(mainThread->imagePanel->currentClearImage);
+		wxImage *currentImage = &(mainThread->imagePanel->currentClearImage);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
