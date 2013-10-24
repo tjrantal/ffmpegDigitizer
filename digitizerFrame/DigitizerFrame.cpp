@@ -242,7 +242,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				fflush(stdout);			//DEBUGGING
 				/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
 				#ifdef __linux__
-					new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
+					wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
 				#else
 					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
 				#endif
