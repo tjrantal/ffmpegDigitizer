@@ -60,8 +60,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void startThread();
 			/**Method to feed into the thread constructor*/
 			void run();
-			/**Look for the marker in the image*/
+			/**Look for the marker in the image based on histograms*/
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
+			
+			/**Look for the marker in the image based on region growing*/
+			coordinate getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
+			
 			/**Get the histogram of the current marker*/
 			double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 			/**Constructor*/
