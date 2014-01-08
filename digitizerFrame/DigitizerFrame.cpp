@@ -82,6 +82,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
 	/*Take the histogram for the marker*/
 	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
+	markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){

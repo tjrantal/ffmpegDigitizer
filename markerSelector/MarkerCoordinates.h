@@ -37,7 +37,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		/** Enable sorting a vector with coordinate structs based on frame number*/
 		bool operator < (const coordinate& coordinateToCompareTo) const {
 			return (frame < coordinateToCompareTo.frame);
-		}			
+		}
 	};
 	/**Structure for marker trajectories*/
 	struct marker{
@@ -52,6 +52,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		std::vector<coordinate> *radiusCoordinates;	/**<Relative sampling coordinates around the marker*/
 		std::vector<coordinate> *searchCoordinates;		/**<Relative sampling coordinates for track search area*/
 		double** histogram; 		/**<To store the colour histograms to look for*/
+		unsigned char*	fourBitColors;		/**<To store the 4 highest bits of marker color for region grow*/
 		/**Constructor*/
 		marker(wxString markerNameIn):markerName(markerNameIn){
 			/*Insert default values*/
@@ -63,6 +64,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			predictive	= (unsigned char) 1;	/* Trying to predict the marker trajectory*/
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
 			histogram	=NULL;
+			fourBitColors = NULL;
 		}
 	};
 #endif

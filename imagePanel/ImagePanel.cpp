@@ -99,6 +99,18 @@ double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<c
 		}
 	}
 	return histogram;
+}
+
+/**Get the color of the current marker*/
+unsigned char* ImagePanel::getColor(int xCoordinate,int yCoordinate){
+	/*Get the histogram*/
+	unsigned char* colour;
+	colour = new unsigned char[3];	/*Color figure comprises 3 different colors...*/
+	/*get the color values*/
+	colour[0] = currentImage.GetRed(xCoordinate,yCoordinate);
+	colour[1] = currentImage.GetGreen(xCoordinate,yCoordinate);
+	colour[2] = currentImage.GetBlue(xCoordinate,yCoordinate);
+	return colour;
 }	
 
 /*

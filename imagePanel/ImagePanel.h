@@ -44,7 +44,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		    void paintNow();
 			double getScalingFactor(); /**Return the scaling from original image to screen*/
 			double** getHistogram(int xCoordinate,int yCoordinate, std::vector<coordinate> *samplingCoordinates);	/**Get the histogram of the current marker*/
-		    
+			unsigned char* getColor(int xCoordinate,int yCoordinate);	/**Get the color of the current marker*/
 		    void render(wxDC& dc);
 		    
 		    // some useful events
