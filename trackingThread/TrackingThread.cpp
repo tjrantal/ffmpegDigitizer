@@ -178,7 +178,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
             if (coordinates[0] >= 0 && coordinates[0] < imageWidth && coordinates[1] >=0 && coordinates[1] < imageHeight){ 
 				//Add to queue if the neighbour has not been visited, and is of marker color
 				unsigned char* pixelColor =  getColor(currentImage,coordinates[0], coordinates[1]);
-				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (byte) 0 && 
+				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (unsigned char) 0 && 
 					((int)pixelColor[0]-(int)markerColor[0]) < 17 && ((int)pixelColor[0]-(int)markerColor[0]) > -17 &&
 					((int)pixelColor[1]-(int)markerColor[1]) < 17 && ((int)pixelColor[1]-(int)markerColor[1]) > -17 &&
 					((int)pixelColor[2]-(int)markerColor[2]) < 17 && ((int)pixelColor[2]-(int)markerColor[2]) > -17		

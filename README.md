@@ -105,3 +105,6 @@ apply the patch from msys with: patch -p0 < path/to/patchfile)
 ./configure --disable-shared --disable-debug --prefix=/mingw --build=x86_64-w64-mingw32
 make 
 make install
+
+
+./configure --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264 
