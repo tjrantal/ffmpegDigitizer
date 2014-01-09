@@ -33,13 +33,14 @@ void TrackingThread::run(){
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Thread started, frame #"), currentFrame));
 	//Go through the frames in the video
 	while (mainThread->trackOn == true && currentFrame < mainThread->videoReader->getNumberOfIndices()){
-		/*Get the current image*/
-		wxImage *currentImage = &(mainThread->imagePanel->currentClearImage);
+		/*Make a copy of the current image*/
+		printf("Track Started\n");
+		wxImage *currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
 			//Look for coordinate in the previous image/
-			
+			printf("Marker %d\n",i);
 			try{
 				coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
@@ -50,17 +51,23 @@ void TrackingThread::run(){
 				//Digitize the marker
 				mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
 			} catch (int err){	//Didn't have marker in previous frame, check the current frame
+				printf("Tried getting previous frame marker, caught %d\n",err);
 				try{
 					coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
 					//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+					printf("Got init %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 					coordinate coordinatesReturned = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					printf("Got coordinate %d %d\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
 					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
 					//sleep(1);
 					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
+					printf("Set coordinate\n");
 					//Digitize the marker
 					mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
+					printf("Digitized coordinate\n");
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
+					printf("Tried getting this frame marker and digitizing, caught %d\n",err);
 				}
 
 			}
@@ -115,19 +122,21 @@ coordinate TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,
 		double y = coordinates.yCoordinate+searchCoordinates[i].yCoordinate;
 		/*Check whether color matches, if it does, grow region to confirm that the marker is big enough*/
 		unsigned char* pixelColor = getColor(currentImage,(int) x, (int) y);
+		
 		if(	/*If color match is close enough, do region growing*/
 			((int)pixelColor[0]-(int)markerColor[0]) < 17 && ((int)pixelColor[0]-(int)markerColor[0]) > -17 &&
 			((int)pixelColor[1]-(int)markerColor[1]) < 17 && ((int)pixelColor[1]-(int)markerColor[1]) > -17 &&
 			((int)pixelColor[2]-(int)markerColor[2]) < 17 && ((int)pixelColor[2]-(int)markerColor[2]) > -17			
 			)
 		{
+			printf("Marker %d %d %d pixel %d %d %d\n",markerColor[0],markerColor[1],markerColor[2],pixelColor[0],pixelColor[1],pixelColor[2]);
 			if (growRegion(currentImage,x,y,markerColor) >= M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
 				return coordinate(x,y,-1);								/*First sufficiently large marker returned... */
 				
 			}
 		}
 	}
-	throw 1;	/*No marker found, throw error. Implement missing marker at some point...*/
+	throw 2;	/*No marker found, throw error. Implement missing marker at some point...*/
 	//return coordinates;	/*No marker found, shouldn't get here*/
 }
 
@@ -178,7 +187,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
             if (coordinates[0] >= 0 && coordinates[0] < imageWidth && coordinates[1] >=0 && coordinates[1] < imageHeight){ 
 				//Add to queue if the neighbour has not been visited, and is of marker color
 				unsigned char* pixelColor =  getColor(currentImage,coordinates[0], coordinates[1]);
-				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (byte) 0 && 
+				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (unsigned char) 0 && 
 					((int)pixelColor[0]-(int)markerColor[0]) < 17 && ((int)pixelColor[0]-(int)markerColor[0]) > -17 &&
 					((int)pixelColor[1]-(int)markerColor[1]) < 17 && ((int)pixelColor[1]-(int)markerColor[1]) > -17 &&
 					((int)pixelColor[2]-(int)markerColor[2]) < 17 && ((int)pixelColor[2]-(int)markerColor[2]) > -17		

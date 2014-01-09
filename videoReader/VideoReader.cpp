@@ -400,8 +400,11 @@ VideoReader::~VideoReader(){
 	pCodecCtx =NULL;
 	//Attempt to free pictures
 	avcodec_free_frame(&tmp_picture);
+	//av_free(&tmp_picture);
+
 	av_freep(&picture->data[0]);
 	avcodec_free_frame(&picture);
+	//av_free(&picture);
 
 	if (&frameIndices != NULL){
 		frameIndices.clear();

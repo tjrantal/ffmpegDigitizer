@@ -118,7 +118,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
 
 	/*Open marker file*/
-	wxFileDialog openFileDialog(this, _("Open TAB file"), _(""), _(""),
+	wxFileDialog openFileDialog(this, _("Open TAB file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
 	_("TAB files (*.tab)|*.tab"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
@@ -154,7 +154,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 	/*Open marker file*/
-		wxFileDialog openFileDialog(this, _("Open video file"), _(""), _(""),
+		wxFileDialog openFileDialog(this, _("Open video file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
 	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
