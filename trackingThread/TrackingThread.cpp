@@ -32,28 +32,51 @@ void TrackingThread::run(){
 	//coordinate coordinatesReturned[mainThread->markerSelector->markers.size()];
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Thread started, frame #"), currentFrame));
 	//Go through the frames in the video
+	bool gotMarker;
+	int markersFound;
+	coordinate initCoordinate;
 	while (mainThread->trackOn == true && currentFrame < mainThread->videoReader->getNumberOfIndices()){
 		/*Make a copy of the current image*/
 		printf("Track Started\n");
 		wxImage *currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
+		markersFound = 0;
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
 			//Look for coordinate in the previous image/
 			printf("Marker %d\n",i);
+			gotMarker = false;
 			try{
-				coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
+				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
+				printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
+				gotMarker = true;
+			} catch (int err){	//Didn't have marker in previous frame, check the current frame
+				printf("Tried getting previous frame marker, caught %d\n",err);
+				try{
+					initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
+					gotMarker = true;
+					printf("Got init current %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
+					
+				} catch (int err){
+					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
+					printf("Tried getting this frame marker and digitizing, caught %d\n",err);
+				}
+
+			}
+			//Digitize if we've got an init coordinate...
+			if (gotMarker){
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
 				std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
 				//Calculate the mean of the area coordinates..
-				double* meanCoord = new double[2]();	//init to zero
+				double meanCoord[2] = {0,0};	//init to zero
 				double meanSize = areaCoordinates.size();
 				for (int j = 0; j < areaCoordinates.size();++j){
 					meanCoord[0] += areaCoordinates[j].xCoordinate/meanSize;
 					meanCoord[1] += areaCoordinates[j].yCoordinate/meanSize;
+					//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
 				}
 				coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
-				printf("Got coordinate %d %d\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
+				printf("Got coordinate %f %f\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
 				//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
 				//sleep(1);
 				mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
@@ -61,42 +84,20 @@ void TrackingThread::run(){
 				//Digitize the marker
 				mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 				printf("Digitized coordinate\n");
-			} catch (int err){	//Didn't have marker in previous frame, check the current frame
-				printf("Tried getting previous frame marker, caught %d\n",err);
-				try{
-					coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
-					//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
-					printf("Got init %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
-					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
-					//Calculate the mean of the area coordinates..
-					double* meanCoord = new double[2]();	//init to zero
-					double meanSize = areaCoordinates.size();
-					for (int j = 0; j < areaCoordinates.size();++j){
-						meanCoord[0] += areaCoordinates[j].xCoordinate/meanSize;
-						meanCoord[1] += areaCoordinates[j].yCoordinate/meanSize;
-					}
-					coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
-					printf("Got coordinate %d %d\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
-					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
-					//sleep(1);
-					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
-					printf("Set coordinate\n");
-					//Digitize the marker
-					mainThread->imagePanel->digitizeXYArea(areaCoordinates);
-					printf("Digitized coordinate\n");
-				} catch (int err){
-					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
-					printf("Tried getting this frame marker and digitizing, caught %d\n",err);
-				}
-
+				++markersFound;
 			}
 		}
 		
-		//Advance frame
-		currentFrame++;
-		mainThread->slider->SetValue(currentFrame);
-		mainThread->videoReader->readFrameFromDisk(currentFrame);
-		mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
+		//Advance frame if at least one marker was digitized
+		if (markersFound > 0){
+			currentFrame++;
+			mainThread->slider->SetValue(currentFrame);
+			mainThread->videoReader->readFrameFromDisk(currentFrame);
+			mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
+		}else{
+			mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
+			mainThread->trackOn == false;	/*Stop tracking*/
+		}
 	}
 	/*Digitize the last frame as well*/
 	if (mainThread->trackOn == true){

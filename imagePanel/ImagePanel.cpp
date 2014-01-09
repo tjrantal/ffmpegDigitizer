@@ -61,6 +61,7 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
  
  /**Draw a circle in the current image to highlight a digitized marker*/
  void ImagePanel::digitizeXY(int xCoordinate,int yCoordinate, double radius){
+ 	lockThread.lock();
 	/*draw to the image*/
 	double xAdd;
 	double yAdd;
@@ -71,16 +72,19 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 	}
 	resizedImage = *(new wxBitmap(currentImage));
 	Refresh();
+	lockThread.unlock();
 } 
 
 /**Draw a grown area in the current image to highlight a digitized marker*/
 void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
+	lockThread.lock();
 	/*draw to the image*/
 	for  (int i = 0; i<areaCoordinates.size();++i){
 		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate,(int) areaCoordinates[i].yCoordinate,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
 	resizedImage = *(new wxBitmap(currentImage));
 	Refresh();
+	lockThread.unlock();
 } 
 
 /**Get the histogram of the current marker*/
