@@ -23,13 +23,11 @@
 
 class DigitizerApp: public wxApp
 {
-	#ifdef __linux__
-		XInitThreads();
-	#endif
     virtual bool OnInit();
 };
 
-IMPLEMENT_APP(DigitizerApp)
+//IMPLEMENT_APP(DigitizerApp)
+IMPLEMENT_APP_NO_MAIN(DigitizerApp)
 
 bool DigitizerApp::OnInit()
 {
@@ -37,5 +35,15 @@ bool DigitizerApp::OnInit()
     frame->Show(true);
     SetTopWindow(frame);
     return true;
+}
+
+int main(int argc, char *argv[]){
+	#ifdef __linux__
+		XInitThreads();
+	#endif
+	wxEntryStart(argc,argv);
+	wxTheApp->CallOnInit();
+	wxTheApp->OnRun();
+	return 0;
 }
 
