@@ -16,9 +16,16 @@
 #ifndef VIDEOREADER_H
 	#include "videoReader/VideoReader.h"
 #endif
+#ifdef __linux__
+	#include <thread>
+	#include <X11/Xlib.h>
+#endif
 
 class DigitizerApp: public wxApp
 {
+	#ifdef __linux__
+		XInitThreads();
+	#endif
     virtual bool OnInit();
 };
 

@@ -83,6 +83,7 @@ void TrackingThread::run(){
 				printf("Set coordinate\n");
 				//Digitize the marker
 				mainThread->imagePanel->digitizeXYArea(areaCoordinates);
+				std::this_thread::sleep_for (std::chrono::milliseconds(100));
 				printf("Digitized coordinate\n");
 				++markersFound;
 			}
@@ -90,7 +91,7 @@ void TrackingThread::run(){
 		
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0){
-			std::this_thread::sleep_for (std::chrono::milliseconds(50));
+			std::this_thread::sleep_for (std::chrono::milliseconds(100));
 			currentFrame++;
 			mainThread->slider->SetValue(currentFrame);
 			mainThread->videoReader->readFrameFromDisk(currentFrame);
