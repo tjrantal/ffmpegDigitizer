@@ -103,6 +103,8 @@ void TrackingThread::run(){
 				mainThread->videoReader->readFrameFromDisk(currentFrame);
 				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
 			}else{
+				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
+				mainThread->trackOn == false;	/*Stop tracking*/
 				delete currentImage; /*Try to save mem...*/
 				break;
 			}
@@ -113,6 +115,8 @@ void TrackingThread::run(){
 		}
 		delete currentImage; /*Try to save mem...*/
 	}
+	mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
+	mainThread->trackOn == false;	/*Stop tracking*/
 	/*Done with automatic digitizing*/
 }
 
