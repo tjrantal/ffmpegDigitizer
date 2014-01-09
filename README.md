@@ -107,6 +107,7 @@ make
 make install
 
 
+
 UBUNTU LINUX SETTING UP THE DEVELOPEMENT ENVIRONMENT at Deakin Uni (after fresh Ubuntu 13.04 install )
 Install the dependencies:
 sudo aptitude install build-essential libavformat-dev libavcodec-dev libswscale-dev libx264-dev libwxgtk2.8-dev
@@ -116,3 +117,4 @@ sudo aptitude install build-essential yasm libx264-dev libwxgtk2.8-dev libsdl1.2
 ./configure --enable-libfaac --enable-nonfree --enable-gpl --enable-libx264
 make
 make install
+
