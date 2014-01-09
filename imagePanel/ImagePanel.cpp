@@ -73,6 +73,16 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 	Refresh();
 } 
 
+/**Draw a grown area in the current image to highlight a digitized marker*/
+void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
+	/*draw to the image*/
+	for  (int i = 0; i<areaCoordinates.size();++i){
+		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate,(int) areaCoordinates[i].yCoordinate,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
+	}
+	resizedImage = *(new wxBitmap(currentImage));
+	Refresh();
+} 
+
 /**Get the histogram of the current marker*/
 double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<coordinate> *samplingCoordinates){
 

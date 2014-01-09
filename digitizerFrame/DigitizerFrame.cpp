@@ -76,6 +76,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	double yCoordinate = (double) event.GetY();
 	double radius = (double)  markerRadius->GetValue();
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
+
 	//Get active marker and set the coordinates for the marker
 
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
@@ -83,6 +84,9 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	/*Take the histogram for the marker*/
 	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	//Highlight area...
+	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].maxError);
+	imagePanel->digitizeXYArea(areaCoordinates);
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){

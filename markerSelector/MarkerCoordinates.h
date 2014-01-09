@@ -53,6 +53,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		std::vector<coordinate> *searchCoordinates;		/**<Relative sampling coordinates for track search area*/
 		double** histogram; 		/**<To store the colour histograms to look for*/
 		unsigned char*	fourBitColors;		/**<To store the 4 highest bits of marker color for region grow*/
+		int maxError;	/**<Maximum color error in a given channel for region growing*/
 		/**Constructor*/
 		marker(wxString markerNameIn):markerName(markerNameIn){
 			/*Insert default values*/
@@ -65,6 +66,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
 			histogram	=NULL;
 			fourBitColors = NULL;
+			maxError = 30;
 		}
 	};
 #endif

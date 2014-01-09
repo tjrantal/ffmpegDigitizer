@@ -44,26 +44,45 @@ void TrackingThread::run(){
 			try{
 				coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
-				coordinate coordinatesReturned = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
-				//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current-1 "), i));
-				//	sleep(1);
+				std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+				//Calculate the mean of the area coordinates..
+				double* meanCoord = new double[2]();	//init to zero
+				double meanSize = areaCoordinates.size();
+				for (int j = 0; j < areaCoordinates.size();++j){
+					meanCoord[0] += areaCoordinates[j].xCoordinate/meanSize;
+					meanCoord[1] += areaCoordinates[j].yCoordinate/meanSize;
+				}
+				coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
+				printf("Got coordinate %d %d\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
+				//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
+				//sleep(1);
 				mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
+				printf("Set coordinate\n");
 				//Digitize the marker
-				mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
+				mainThread->imagePanel->digitizeXYArea(areaCoordinates);
+				printf("Digitized coordinate\n");
 			} catch (int err){	//Didn't have marker in previous frame, check the current frame
 				printf("Tried getting previous frame marker, caught %d\n",err);
 				try{
 					coordinate initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
 					//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
 					printf("Got init %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
-					coordinate coordinatesReturned = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					//Calculate the mean of the area coordinates..
+					double* meanCoord = new double[2]();	//init to zero
+					double meanSize = areaCoordinates.size();
+					for (int j = 0; j < areaCoordinates.size();++j){
+						meanCoord[0] += areaCoordinates[j].xCoordinate/meanSize;
+						meanCoord[1] += areaCoordinates[j].yCoordinate/meanSize;
+					}
+					coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
 					printf("Got coordinate %d %d\n",coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
 					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
 					//sleep(1);
 					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
 					printf("Set coordinate\n");
 					//Digitize the marker
-					mainThread->imagePanel->digitizeXY(coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate, (double) mainThread->markerSelector->markers[i].markerRadius);
+					mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 					printf("Digitized coordinate\n");
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
@@ -112,9 +131,10 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 }
 
 /**Look for the marker in the image based on region growing*/
-coordinate TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int){
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int){
 	/*Go through the search area, return the first continuous marker area found.*/
 	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
+	int maxError = mainThread->markerSelector->markers[markerIndice].maxError;
 	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
 	double markerRadius =  (double) (mainThread->markerSelector->markers[markerIndice].markerRadius);
 	for (int i = 0;i<searchCoordinates.size();++i){
@@ -124,14 +144,15 @@ coordinate TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,
 		unsigned char* pixelColor = getColor(currentImage,(int) x, (int) y);
 		
 		if(	/*If color match is close enough, do region growing*/
-			((int)pixelColor[0]-(int)markerColor[0]) < 17 && ((int)pixelColor[0]-(int)markerColor[0]) > -17 &&
-			((int)pixelColor[1]-(int)markerColor[1]) < 17 && ((int)pixelColor[1]-(int)markerColor[1]) > -17 &&
-			((int)pixelColor[2]-(int)markerColor[2]) < 17 && ((int)pixelColor[2]-(int)markerColor[2]) > -17			
+			(((int)pixelColor[0])-((int)markerColor[0])) < maxError && (((int)pixelColor[0])-((int)markerColor[0])) > -maxError &&
+			(((int)pixelColor[1])-((int)markerColor[1])) < maxError && (((int)pixelColor[1])-((int)markerColor[1])) > -maxError &&
+			(((int)pixelColor[2])-((int)markerColor[2])) < maxError && (((int)pixelColor[2])-((int)markerColor[2])) > -maxError			
 			)
 		{
 			printf("Marker %d %d %d pixel %d %d %d\n",markerColor[0],markerColor[1],markerColor[2],pixelColor[0],pixelColor[1],pixelColor[2]);
-			if (growRegion(currentImage,x,y,markerColor) >= M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
-				return coordinate(x,y,-1);								/*First sufficiently large marker returned... */
+			std::vector<coordinate> areaCoordinates = growRegion(currentImage,x,y,markerColor, maxError);
+			if (areaCoordinates.size() >= 5){// M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
+				return areaCoordinates;								/*First sufficiently large marker returned... */
 				
 			}
 		}
@@ -140,7 +161,7 @@ coordinate TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,
 	//return coordinates;	/*No marker found, shouldn't get here*/
 }
 
-int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor){
+std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int maxError){
 	int imageWidth =currentImage->GetWidth(); 
 	int imageHeight =currentImage->GetHeight();
 	int neighbourhoodSize = 4;
@@ -153,6 +174,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
 	//visited[(int) (x+imageWidth*y)] =1;	/*Set the init pixel to 1*/
 	int regionPixels = 0;
 	std::vector<coordinate> pixelQueue;
+	std::vector<coordinate> areaCoordinates;
 	pixelQueue.push_back(coordinate(x,y,-1));
 	coordinate nextPixel;
 	while (pixelQueue.size() > 0){ //Go through all cells in queue
@@ -164,6 +186,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
 			pixelQueue.erase(pixelQueue.begin());	/*remove the pixel from the queue*/
 		}
 		visited[(int) (nextPixel.xCoordinate+imageWidth*nextPixel.yCoordinate)] = 1;
+		areaCoordinates.push_back(nextPixel);
 		++regionPixels;        //Add the new pixel to the area
 		/*        Add 4-connected neighbourhood to the queue, unless the
 		neighbourhood pixels have already been visited or are part of the
@@ -188,10 +211,9 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
 				//Add to queue if the neighbour has not been visited, and is of marker color
 				unsigned char* pixelColor =  getColor(currentImage,coordinates[0], coordinates[1]);
 				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (unsigned char) 0 && 
-					((int)pixelColor[0]-(int)markerColor[0]) < 17 && ((int)pixelColor[0]-(int)markerColor[0]) > -17 &&
-					((int)pixelColor[1]-(int)markerColor[1]) < 17 && ((int)pixelColor[1]-(int)markerColor[1]) > -17 &&
-					((int)pixelColor[2]-(int)markerColor[2]) < 17 && ((int)pixelColor[2]-(int)markerColor[2]) > -17		
-			   
+					(((int)pixelColor[0])-((int)markerColor[0])) < maxError && (((int)pixelColor[0])-((int)markerColor[0])) > -maxError &&
+					(((int)pixelColor[1])-((int)markerColor[1])) < maxError && (((int)pixelColor[1])-((int)markerColor[1])) > -maxError &&
+					(((int)pixelColor[2])-((int)markerColor[2])) < maxError && (((int)pixelColor[2])-((int)markerColor[2])) > -maxError			
 					)
 				{
 					pixelQueue.push_back(coordinate((double) coordinates[0],(double)coordinates[1],-1));
@@ -201,7 +223,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
 
 		
 	}
-	return regionPixels;
+	return areaCoordinates;
 }
 
 /**Get the histogram of the current marker*/

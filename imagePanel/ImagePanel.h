@@ -40,6 +40,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn);
 		    void setImage(int width, int height, unsigned char* data,bool static_data=true);	/**Set current image*/
 			void digitizeXY(int xCoordinate,int yCoordinate, double radius);	/**Draw a circle in the current image*/
+			void digitizeXYArea(std::vector<coordinate> areaCoordinates);		/**Highlight grown region in the current image*/
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
 			double getScalingFactor(); /**Return the scaling from original image to screen*/
