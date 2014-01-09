@@ -21,6 +21,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <wx/image.h>
 	#include <math.h>       /* ceil floor round*/
 	#include <vector>
+	#include <mutex>		/*To use mutex to lock the thread (kept crashing when called from another thread, hope this helps...)*/
 	#include "../markerSelector/MarkerCoordinates.h"
 	
 
@@ -32,6 +33,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxImage currentImage;		/**Copy of the current image for drawing onto*/
 			wxSize		size;			/**On-screen image size*/
 			double		scaleFactor;	/**Scaling from original to screen*/
+			std::mutex	lockThread;		/**Try locking the thread...*/
 		public:
 			wxImage currentClearImage;	/**To access the current image without overlaid color*/
 			/*Constructor with an image loaded*/
@@ -40,6 +42,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn);
 		    void setImage(int width, int height, unsigned char* data,bool static_data=true);	/**Set current image*/
 			void digitizeXY(int xCoordinate,int yCoordinate, double radius);	/**Draw a circle in the current image*/
+			void digitizeXYArea(std::vector<coordinate> areaCoordinates);		/**Highlight grown region in the current image*/
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
 			double getScalingFactor(); /**Return the scaling from original image to screen*/

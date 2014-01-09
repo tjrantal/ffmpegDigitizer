@@ -16,13 +16,18 @@
 #ifndef VIDEOREADER_H
 	#include "videoReader/VideoReader.h"
 #endif
+#ifdef __linux__
+	#include <thread>
+	#include <X11/Xlib.h>
+#endif
 
 class DigitizerApp: public wxApp
 {
     virtual bool OnInit();
 };
 
-IMPLEMENT_APP(DigitizerApp)
+//IMPLEMENT_APP(DigitizerApp)
+IMPLEMENT_APP_NO_MAIN(DigitizerApp)
 
 bool DigitizerApp::OnInit()
 {
@@ -30,5 +35,15 @@ bool DigitizerApp::OnInit()
     frame->Show(true);
     SetTopWindow(frame);
     return true;
+}
+
+int main(int argc, char *argv[]){
+	#ifdef __linux__
+		XInitThreads();
+	#endif
+	wxEntryStart(argc,argv);
+	wxTheApp->CallOnInit();
+	wxTheApp->OnRun();
+	return 0;
 }
 

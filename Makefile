@@ -7,7 +7,7 @@ ifneq (, $(findstring linux, $(SYS)))
 	# Do linux things
 	CC=g++
    CFLAGS=-c -w -std=gnu++11 $(shell wx-config --cxxflags) $(shell pkg-config --cflags libavformat libavcodec libswscale x264)
-   LDFLAGS= -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lpthread -std=gnu++11
+   LDFLAGS= -O2 $(shell wx-config --libs) $(shell pkg-config --libs libavformat libavcodec libswscale x264) -lX11 -std=gnu++11
 else ifneq (, $(findstring mingw, $(SYS)))
    # Do mingw things w64
    CC=x86_64-w64-mingw32-g++.exe

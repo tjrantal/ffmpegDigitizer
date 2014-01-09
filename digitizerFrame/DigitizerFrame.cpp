@@ -76,6 +76,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	double yCoordinate = (double) event.GetY();
 	double radius = (double)  markerRadius->GetValue();
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
+
 	//Get active marker and set the coordinates for the marker
 
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
@@ -83,6 +84,9 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	/*Take the histogram for the marker*/
 	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	//Highlight area...
+	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].maxError);
+	imagePanel->digitizeXYArea(areaCoordinates);
 }
 
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
@@ -118,7 +122,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
 
 	/*Open marker file*/
-	wxFileDialog openFileDialog(this, _("Open TAB file"), _(""), _(""),
+	wxFileDialog openFileDialog(this, _("Open TAB file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
 	_("TAB files (*.tab)|*.tab"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
@@ -154,7 +158,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 	/*Open marker file*/
-		wxFileDialog openFileDialog(this, _("Open video file"), _(""), _(""),
+		wxFileDialog openFileDialog(this, _("Open video file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
 	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
