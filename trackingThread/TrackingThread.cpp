@@ -146,6 +146,7 @@ int TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigne
 	std::vector<coordinate> pixelQueue;
 	pixelQueue.push_back(coordinate(x,y,-1));
 	coordinate nextPixel;
+	printf("Start growing region");
 	while (pixelQueue.size() > 0){ //Go through all cells in queue
 		nextPixel = pixelQueue.front();        /*Get the pixel with the lowest cost and remove it from the queue*/
 		pixelQueue.erase(pixelQueue.begin());	/*remove the pixel from the queue*/
