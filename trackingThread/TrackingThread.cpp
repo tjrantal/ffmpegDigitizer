@@ -90,13 +90,16 @@ void TrackingThread::run(){
 		
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0){
+			std::this_thread::sleep_for (std::chrono::milliseconds(50));
 			currentFrame++;
 			mainThread->slider->SetValue(currentFrame);
 			mainThread->videoReader->readFrameFromDisk(currentFrame);
 			mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
+			
 		}else{
 			mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 			mainThread->trackOn == false;	/*Stop tracking*/
+			break;
 		}
 	}
 	/*Digitize the last frame as well*/

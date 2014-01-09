@@ -29,6 +29,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <wx/image.h>		//For working with the image
 	#include <wx/bitmap.h>		//For working with the image
 	#include <math.h>			//For M_PI
+	#include <thread>			//For sleeping
+	#include <chrono>			//For millisecodns sleep
 
 
 	/**Struct used to store coordinates for the closeness measure*/
