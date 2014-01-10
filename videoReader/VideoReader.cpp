@@ -405,7 +405,9 @@ VideoReader::~VideoReader(){
 	av_freep(&picture->data[0]);
 	avcodec_free_frame(&picture);
 	//av_free(&picture);
-
+	if (decodedFrame!=NULL){
+		delete decodedFrame;
+	}
 	if (&frameIndices != NULL){
 		frameIndices.clear();
 	}

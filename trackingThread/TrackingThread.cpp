@@ -234,11 +234,19 @@ std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double 
 				{
 					pixelQueue.push_back(coordinate((double) coordinates[0],(double)coordinates[1],-1));
 				}
+				delete pixelColor;	//Try to save memory..
             }
         }
 
 		
 	}
+	/*Release memory*/
+	delete visited;
+	for (int i = 0; i<4;++i){
+		delete neighbourhood[i];
+	}
+	delete neighbourhood;
+	
 	return areaCoordinates;
 }
 
