@@ -45,6 +45,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		std::vector<coordinate> coordinates;	/**<a vector for coordinates*/
 		int markerRadius;				/**< radius of the marker*/
 		unsigned char colorImage;			/**< Color or BW image*/
+		int colorTolerance;				/**< Color tolerance for marker region grow */
 		int searchRadius;				/**< The radius of the search window*/
 		unsigned char trackMarker;	/**< Is the marker being tracked*/
 		unsigned char predictive;	/**< Trying to predict the marker trajectory*/
@@ -66,7 +67,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
 			histogram	=NULL;
 			fourBitColors = NULL;
-			maxError = 30;
+			colorTolerance = 30;
 		}
 	};
 #endif

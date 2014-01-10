@@ -52,6 +52,7 @@ public:
 	wxSlider		*slider;				//Slider
 	wxSlider		*searchRadius;				//Search radius from frame to next
 	wxSlider		*markerRadius;				//Radius of the marker
+	wxSlider		*colorTolerance;			//Tolerance for marker region grow color
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
 	int currentFrame;						//index of currentFrame
 	bool			trackOn;
@@ -65,7 +66,7 @@ private:
 	//DEBUG
 	FILE *debug;
 	//Variables
-	wxTextCtrl		*resultsText;			//For displaying text in screen
+	wxTextCtrl		*resultsText;		/**For coordinates*/
 	clock_t			*clockCounts,initClock;	//For storing processor times
 	wxButton		*resetButton;			//For resetting the clock
 	float			elapsedTime;				//time since first click
@@ -89,6 +90,7 @@ private:
 	void ScrollVideo(wxScrollEvent &event);
 	void AdjustSearchRadius(wxScrollEvent &event);
 	void AdjustMarkerRadius(wxScrollEvent &event);
+	void AdjustColorTolerance(wxScrollEvent &event);
 	void SelectMarker(wxCommandEvent &event);
 	void ToggleTracking(wxCommandEvent &event);
     DECLARE_EVENT_TABLE()
@@ -105,6 +107,7 @@ enum
 	ID_slider,
 	ID_searchRadius,
 	ID_markerRadius,
+	ID_colorTolerance,
 	ID_panel,
 	ID_markers,
 	ID_toggleTracking,

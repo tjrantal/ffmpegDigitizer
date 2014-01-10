@@ -150,7 +150,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int){
 	/*Go through the search area, return the first continuous marker area found.*/
 	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
-	int maxError = mainThread->markerSelector->markers[markerIndice].maxError;
+	int colorTolerance = mainThread->markerSelector->markers[markerIndice].colorTolerance;
 	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
 	double markerRadius =  (double) (mainThread->markerSelector->markers[markerIndice].markerRadius);
 	for (int i = 0;i<searchCoordinates.size();++i){
@@ -160,13 +160,13 @@ std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *
 		unsigned char* pixelColor = getColor(currentImage,(int) x, (int) y);
 		
 		if(	/*If color match is close enough, do region growing*/
-			(((int)pixelColor[0])-((int)markerColor[0])) < maxError && (((int)pixelColor[0])-((int)markerColor[0])) > -maxError &&
-			(((int)pixelColor[1])-((int)markerColor[1])) < maxError && (((int)pixelColor[1])-((int)markerColor[1])) > -maxError &&
-			(((int)pixelColor[2])-((int)markerColor[2])) < maxError && (((int)pixelColor[2])-((int)markerColor[2])) > -maxError			
+			(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
+			(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
+			(((int)pixelColor[2])-((int)markerColor[2])) < colorTolerance && (((int)pixelColor[2])-((int)markerColor[2])) > -colorTolerance			
 			)
 		{
 			//printf("Marker %d %d %d pixel %d %d %d\n",markerColor[0],markerColor[1],markerColor[2],pixelColor[0],pixelColor[1],pixelColor[2]);
-			std::vector<coordinate> areaCoordinates = growRegion(currentImage,x,y,markerColor, maxError);
+			std::vector<coordinate> areaCoordinates = growRegion(currentImage,x,y,markerColor, colorTolerance);
 			if (areaCoordinates.size() >= 5){// M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
 				return areaCoordinates;								/*First sufficiently large marker returned... */
 				
@@ -177,7 +177,7 @@ std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *
 	//return coordinates;	/*No marker found, shouldn't get here*/
 }
 
-std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int maxError){
+std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int colorTolerance){
 	int imageWidth =currentImage->GetWidth(); 
 	int imageHeight =currentImage->GetHeight();
 	int neighbourhoodSize = 4;
@@ -227,9 +227,9 @@ std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double 
 				//Add to queue if the neighbour has not been visited, and is of marker color
 				unsigned char* pixelColor =  getColor(currentImage,coordinates[0], coordinates[1]);
 				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (unsigned char) 0 && 
-					(((int)pixelColor[0])-((int)markerColor[0])) < maxError && (((int)pixelColor[0])-((int)markerColor[0])) > -maxError &&
-					(((int)pixelColor[1])-((int)markerColor[1])) < maxError && (((int)pixelColor[1])-((int)markerColor[1])) > -maxError &&
-					(((int)pixelColor[2])-((int)markerColor[2])) < maxError && (((int)pixelColor[2])-((int)markerColor[2])) > -maxError			
+					(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
+					(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
+					(((int)pixelColor[2])-((int)markerColor[2])) < colorTolerance && (((int)pixelColor[2])-((int)markerColor[2])) > -colorTolerance			
 					)
 				{
 					pixelQueue.push_back(coordinate((double) coordinates[0],(double)coordinates[1],-1));
