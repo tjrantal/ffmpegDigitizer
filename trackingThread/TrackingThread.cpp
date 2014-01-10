@@ -47,20 +47,21 @@ void TrackingThread::run(){
 			//Look for coordinate in the previous image/
 			//printf("Marker %d\n",i);
 			gotMarker = false;
-			try{
-				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
+			/*Check out whether the current or the previous frame has the marker digitized*/
+			try{	
+				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 				gotMarker = true;
-			} catch (int err){	//Didn't have marker in previous frame, check the current frame
-				printf("Tried getting previous frame marker, caught %d\n",err);
+			} catch (int err){	//Didn't have marker in current frame, check the previous frame
+				printf("Tried getting current frame marker, caught %d\n",err);
 				try{
-					initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
+					initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
 					gotMarker = true;
 					//printf("Got init current %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 					
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
-					printf("Tried getting this frame marker, caught %d\n",err);
+					printf("Tried getting previous frame marker, caught %d\n",err);
 				}
 
 			}
