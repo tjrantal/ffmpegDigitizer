@@ -385,6 +385,7 @@ BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
 	EVT_COMMAND_SCROLL(ID_slider,	DigitizerFrame::ScrollVideo)
 	EVT_COMMAND_SCROLL(ID_searchRadius,	DigitizerFrame::AdjustSearchRadius)	
 	EVT_COMMAND_SCROLL(ID_markerRadius,	DigitizerFrame::AdjustMarkerRadius)
+	EVT_COMMAND_SCROLL(ID_colorTolerance,	DigitizerFrame::AdjustColorTolerance)
 	EVT_TOGGLEBUTTON(ID_toggleTracking, DigitizerFrame::ToggleTracking)
 END_EVENT_TABLE()
 /*
