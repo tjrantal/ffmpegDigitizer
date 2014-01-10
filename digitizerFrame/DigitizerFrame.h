@@ -62,37 +62,38 @@ public:
 		@param size size of the window
 	*/
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	void printCoordinates();	/**<Write the coordinates to resultsText*/
 private:
 	//DEBUG
 	FILE *debug;
 	//Variables
-	wxTextCtrl		*resultsText;		/**For coordinates*/
-	clock_t			*clockCounts,initClock;	//For storing processor times
-	wxButton		*resetButton;			//For resetting the clock
-	float			elapsedTime;				//time since first click
-	bool			timeRunning;				//to indicate whether the first click has passed
-	FILE			*resultFile;			//File to save to
-	wxButton 		*openMarkerFile;		//Pick a file to save to
-	wxFile 			*openFile;
-	wxButton 		*openVideoFile;		//Pick a file to save to
+	wxTextCtrl		*resultsText;		/**<For coordinates*/
+	clock_t			*clockCounts,initClock;	/**<For storing processor times*/
+	wxButton		*resetButton;			/**<For resetting the clock*/
+	float			elapsedTime;				/**<time since first click*/
+	bool			timeRunning;				/**<to indicate whether the first click has passed*/
+	FILE			*resultFile;			/**<File to manipulate*/
+	wxButton 		*openMarkerFile;		/**<Pick a file to read markers from*/
+	wxFile 			*openFile;				/**<File to manipulate*/
+	wxButton 		*openVideoFile;		/**<Button for picking the video to open*/
 	wxFile 			*openVideo;
-	TrackingThread	*trackingThread;		//class for tracking, runs a thread
+	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
 	
-    void OnQuit(wxCommandEvent &event);
-	void OnQuit(wxCloseEvent& event);
-    void OnAbout(wxCommandEvent &event);
-	void LeftButtonDown(wxMouseEvent &event);
-	void LeftButtonUp(wxMouseEvent &event);
-	void ResetClock(wxCommandEvent &event);
-	void OpenFile(wxCommandEvent &event);
-	void OpenVideo(wxCommandEvent &event);
-	void ScrollVideo(wxScrollEvent &event);
-	void AdjustSearchRadius(wxScrollEvent &event);
-	void AdjustMarkerRadius(wxScrollEvent &event);
-	void AdjustColorTolerance(wxScrollEvent &event);
-	void SelectMarker(wxCommandEvent &event);
-	void ToggleTracking(wxCommandEvent &event);
+    void OnQuit(wxCommandEvent &event);			/**< */
+	void OnQuit(wxCloseEvent& event);			/**< */
+    void OnAbout(wxCommandEvent &event);		/**< About*/
+	void LeftButtonDown(wxMouseEvent &event);	/**< Left button handling*/
+	void LeftButtonUp(wxMouseEvent &event);		/**< */
+	void ResetClock(wxCommandEvent &event);		/**< */
+	void OpenFile(wxCommandEvent &event);		/**< */
+	void OpenVideo(wxCommandEvent &event);		/**< */
+	void ScrollVideo(wxScrollEvent &event);		/**< */
+	void AdjustSearchRadius(wxScrollEvent &event);	/**< */
+	void AdjustMarkerRadius(wxScrollEvent &event);	/**< */
+	void AdjustColorTolerance(wxScrollEvent &event);	/**< */
+	void SelectMarker(wxCommandEvent &event);			/**< */
+	void ToggleTracking(wxCommandEvent &event);			/**< */
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };

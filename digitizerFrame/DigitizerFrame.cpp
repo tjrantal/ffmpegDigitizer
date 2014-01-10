@@ -319,6 +319,43 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 }
 
+/**<Write the coordinates to resultsText*/
+void DigitizerFrame::printCoordinates(){
+	wxString tempString("");
+	/*Create HeaderLine*/
+	tempString+="Frame#\t";
+	for (int m = 0; m<markerSelector->markers.size();++m){
+		tempString+=markerSelector->GetString(m);
+		tempString+="\t";
+	}
+	tempString+="\n";
+	
+	if (markerSelector != NULL){
+		/*Loop through frames*/
+		for (int i = 0; i<videoReader->getNumberOfFrames();++i){
+			//Loop through markers
+			tempString+=i;
+			tempString+="\t";
+			for (int m = 0; m<markerSelector->markers.size();++m){
+				try{	
+					coordinate markerCoordinate = markerSelector->getCoordinate(m, i);
+					tempString+=markerCoordinate.xCoordinate;
+					tempString+="\t";
+					tempString+=markerCoordinate.yCoordinate;
+					tempString+="\t";
+				} catch (int err){	//Didn't have marker in current frame, check the previous frame
+					//Print NaN or -1 for missing
+					tempString+=0x7ff0000080000001LL;;
+					tempString+="\t";
+					tempString+=0x7ff0000080000001LL;;
+					tempString+="\t";
+				}
+			}
+		}
+		tempString+="\n";
+	}
+	resultsText->ChangeValue(tempString);
+}	
 
 /**Select marker from the drop down list*/
 void DigitizerFrame::SelectMarker(wxCommandEvent &event){
