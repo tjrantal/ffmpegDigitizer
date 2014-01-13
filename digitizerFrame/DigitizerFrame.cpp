@@ -339,7 +339,7 @@ void DigitizerFrame::printCoordinates(){
 		}
 
 		/*Set Column labels*/
-		resultsGrid->SetColLabelSize(25);
+		
 		for (int m = 0; m<columnHeadings.size();++m){
 			//for (int c = 0;c<2;++c){
 				resultsGrid->SetColLabelValue(m,columnHeadings[m]);
