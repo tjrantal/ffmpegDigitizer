@@ -112,19 +112,20 @@ void DigitizerFrame::KeyDown(wxKeyEvent& event){
 	//Keyboard short cuts
 	int charCode = event.GetKeyCode();
 	printf("Got keycode %c\n",(char) charCode);
+	wxCommandEvent emptyEvent = wxCommandEvent();
 	//m marker
 	if (charCode == 109 ||charCode == 77){
-		OpenFile(wxCommandEvent());
+		OpenFile(emptyEvent );
 		return;
 	}
 	//v = video
 	if (charCode == 118 ||charCode == 86){
-		OpenVideo(wxCommandEvent());
+		OpenVideo(emptyEvent);
 		return;
 	}
 	//c = coordinate
 	if (charCode == 99 ||charCode == 67){
-		OpenSave(wxCommandEvent());
+		OpenSave(emptyEvent);
 		return;
 	}
 	//n = next marker
