@@ -74,6 +74,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(1000,10),wxSize(200,200),wxTE_MULTILINE);
 	/*Key handling*/
 	Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown),NULL,this);
+	imagePanel->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown),NULL,this);
 	videoReader = NULL;
 	markerSelector = NULL;
 	//debug = freopen("debug.log","w",stdout);
@@ -112,11 +113,20 @@ void DigitizerFrame::KeyDown(wxKeyEvent& event){
 	int charCode = event.GetKeyCode();
 	printf("Got keycode %c\n",(char) charCode);
 	//m marker
-	
+	if (charCode == 109 ||charCode == 77){
+		OpenFile(wxCommandEvent());
+		return;
+	}
 	//v = video
-	
+	if (charCode == 118 ||charCode == 86){
+		OpenVideo(wxCommandEvent());
+		return;
+	}
 	//c = coordinate
-	
+	if (charCode == 99 ||charCode == 67){
+		OpenSave(wxCommandEvent());
+		return;
+	}
 	//n = next marker
 	if (charCode == 110 ||charCode == 78){
 		NextMarker();
