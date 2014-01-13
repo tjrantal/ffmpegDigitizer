@@ -29,9 +29,9 @@ wxPanel(parent,id,pos,sizeIn)
     scaleFactor = (double)imageOrig.GetWidth()/(double)size.GetWidth() > (double)imageOrig.GetHeight()/(double)size.GetHeight() ? (double)imageOrig.GetWidth()/(double)size.GetWidth() : (double)imageOrig.GetHeight()/(double)size.GetHeight();
     if (scaleFactor != 1){ //Scale to fit the panel
     	imageCopy.Rescale(imageOrig.GetWidth()/scaleFactor,imageOrig.GetHeight()/scaleFactor,wxIMAGE_QUALITY_HIGH);
-    	resizedImage = *(new wxBitmap(imageCopy));
+    	resizedImage = wxBitmap(imageCopy);//*(new wxBitmap(imageCopy));
     }else{ //No scaling needed
-    	resizedImage = *(new wxBitmap(imageOrig));
+    	resizedImage = wxBitmap(imageOrig);//*(new wxBitmap(imageOrig));
     }
 	currentImage = resizedImage.ConvertToImage();
 	currentClearImage = currentImage;    
@@ -46,13 +46,13 @@ wxPanel(parent,id,pos,sizeIn)
 
 /*Set image to show*/
 void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data){
-	imageCopy =*(new wxImage(width,height,data,static_data));
+	imageCopy =wxImage(width,height,data,static_data);//*(new wxImage(width,height,data,static_data));
 	scaleFactor = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
     if (scaleFactor != 1){ //Scale to fit the panel
     	imageCopy.Rescale(width/scaleFactor,height/scaleFactor,wxIMAGE_QUALITY_HIGH);
-    	resizedImage = *(new wxBitmap(imageCopy));
+    	resizedImage = wxBitmap(imageCopy);//*(new wxBitmap(imageCopy));
     }else{ //No scaling needed
-    	resizedImage = *(new wxBitmap(imageOrig));
+    	resizedImage = wxBitmap(imageOrig);//*(new wxBitmap(imageOrig));
     }
 	currentImage = resizedImage.ConvertToImage();
 	currentClearImage = currentImage;
@@ -70,7 +70,7 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 		yAdd = radius*sin(((double)i)/(radius));
 		currentImage.SetRGB(xCoordinate+(int)xAdd,yCoordinate+(int)yAdd,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
-	resizedImage = *(new wxBitmap(currentImage));
+	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
 	Refresh();
 	lockThread.unlock();
 } 
@@ -82,7 +82,7 @@ void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
 	for  (int i = 0; i<areaCoordinates.size();++i){
 		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate,(int) areaCoordinates[i].yCoordinate,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
-	resizedImage = *(new wxBitmap(currentImage));
+	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
 	Refresh();
 	lockThread.unlock();
 } 

@@ -102,13 +102,32 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 /**Get relative sampling coordinate*/
 std::vector<coordinate> *MarkerSelector::getRelativeSamplingCoordinates(double radius){
 	/*Calculate sampling coordinates for circular sampling*/
+	/*Expand from the centre of search area*/
 	std::vector<coordinate> *samplingCoordinates = new std::vector<coordinate>();
-	for (int i = (int) -floor(radius); i<(int) ceil(radius); ++i){
-		for (int j = (int) -floor(radius); j<(int) ceil(radius); ++j){
+	samplingCoordinates->push_back(coordinate(0,0,-1));
+	int targetRadius = (int) ceil(radius);
+	int currentRadius = 1;
+	int i, j;
+	/*check the next layer of surrounding pixels*/
+	while (currentRadius <= targetRadius){
+		/*Need to fill four sides, top left to right, right top to bottom, bottom left to right and left bottom to top*/
+		/*top and bottom left to right*/
+		j = currentRadius;
+		for (i = -currentRadius;i<=currentRadius;++i){
 			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
-				samplingCoordinates->push_back(coordinate(i,j,-1));
+				samplingCoordinates->push_back(coordinate(i,j,-1));		/*top*/
+				samplingCoordinates->push_back(coordinate(i,-j,-1));	/*bottom*/
 			}
 		}
+		/*Left and right top to bottom, ex top and bottom rows*/
+		i = currentRadius;
+		for (j = -currentRadius+1;j<currentRadius;++j){
+			if (((double) i)*((double) i)+((double) j)*((double) j)<=radius*radius){
+				samplingCoordinates->push_back(coordinate(i,j,-1));		/*right*/
+				samplingCoordinates->push_back(coordinate(-i,j,-1));	/*left*/
+			}
+		}
+		++currentRadius;
 	}
 	return samplingCoordinates;
 }

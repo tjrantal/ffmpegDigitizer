@@ -77,7 +77,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			static unsigned char* getColor(wxImage *currentImage,int xCoordinate,int yCoordinate);	
 			
 			/**Region grow algorithm*/
-			static std::vector<coordinate> growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int maxError);
+			static std::vector<coordinate> growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int colorTolerance);
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};
