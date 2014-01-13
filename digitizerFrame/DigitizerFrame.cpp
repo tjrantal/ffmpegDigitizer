@@ -122,7 +122,8 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	}
 	
 	/*Write out and close any open results file*/
-	if (openSave != NULL){
+	printf("openSave %d\n",openSave->IsOpened());
+	if (openSave != NULL && openSave->IsOpened()){
 		printCoordinates();
 		openSave->Write();
 		openSave->Close();
@@ -154,13 +155,19 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 		}
 		
 		try{
-			openSave = new wxTextFile();
+			openSave = new wxTextFile(openFileDialog.GetPath());
 			if (openSave->Exists()){
-				openSave->Open(openFileDialog.GetPath());
+				openSave->Open();
+				SetStatusText(wxString::Format(wxT("opened %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
+				printf("File exists, opened %d\n",openSave->IsOpened());
 			}else{
-				openSave->Create(openFileDialog.GetPath());
+				printf("File did not exist %d\n",openSave->IsOpened());
+				openSave->Create();
+				printf("File created %d\n",openSave->IsOpened());
+				openSave->Open();
+				SetStatusText(wxString::Format(wxT("created %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
+				printf("Created file opened %d\n",openSave->IsOpened());
 			}
-			SetStatusText(wxString::Format(wxT(" opened %s for makers"),openFileDialog.GetPath().c_str()));
 		}catch (int err){
 			SetStatusText(_("Could not open or create a res file"));
 		}
@@ -378,7 +385,7 @@ void DigitizerFrame::printCoordinates(){
 	if (markerSelector != NULL && videoReader !=NULL){
 		
 		resultsGrid->ClearGrid();	/*Clear the grid*/
-		resultsGrid->CreateGrid(videoReader->getNumberOfFrames(),2*markerSelector->markers.size());
+		resultsGrid->CreateGrid(videoReader->getNumberOfIndices(),2*markerSelector->markers.size());
 		std::vector<wxString> columnHeadings = std::vector<wxString>();
 		//Column headings
 		for (int m = 0; m<markerSelector->markers.size();++m){
@@ -394,7 +401,7 @@ void DigitizerFrame::printCoordinates(){
 			//}
 		}
 		/*Set row labels*/
-		for (int f = 0; f<videoReader->getNumberOfFrames();++f){
+		for (int f = 0; f<videoReader->getNumberOfIndices();++f){
 			resultsGrid->SetRowLabelValue(f,wxString::Format(wxT("%i"),f));
 		}
 		
@@ -420,7 +427,7 @@ void DigitizerFrame::printCoordinates(){
 		
 		/*Print the data*/
 		/*Loop through frames*/
-		for (int i = 0; i<videoReader->getNumberOfFrames();++i){
+		for (int i = 0; i<videoReader->getNumberOfIndices();++i){
 			/*Loop through markers*/
 			resultLine = wxString::Format(wxT("%i"),i);
 			resultLine+=_("\t");
