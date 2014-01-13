@@ -79,8 +79,6 @@ private:
 	wxFile 			*openFile;				/**<File to manipulate*/
 	wxButton 		*openVideoFile;		/**<Button for picking the video to open*/
 	wxFile 			*openVideo;
-	wxButton 		*openSaveFile;		/**<Button for picking the coordinate save file*/
-	wxTextFile		*openSave;
 	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
 	
@@ -90,9 +88,8 @@ private:
 	void LeftButtonDown(wxMouseEvent &event);	/**< Left button handling*/
 	void LeftButtonUp(wxMouseEvent &event);		/**< */
 	void ResetClock(wxCommandEvent &event);		/**< */
-	void OpenFile(wxCommandEvent &event);		/**< Open a marker file to read markers from*/
-	void OpenVideo(wxCommandEvent &event);		/**< Open a video for reading*/
-	void OpenSave(wxCommandEvent &event);		/**< Open a file for saving*/
+	void OpenFile(wxCommandEvent &event);		/**< */
+	void OpenVideo(wxCommandEvent &event);		/**< */
 	void ScrollVideo(wxScrollEvent &event);		/**< */
 	void AdjustSearchRadius(wxScrollEvent &event);	/**< */
 	void AdjustMarkerRadius(wxScrollEvent &event);	/**< */
@@ -110,7 +107,6 @@ enum
 	ID_Reset,
 	ID_picker,
 	ID_video,
-	ID_save,
 	ID_slider,
 	ID_searchRadius,
 	ID_markerRadius,
