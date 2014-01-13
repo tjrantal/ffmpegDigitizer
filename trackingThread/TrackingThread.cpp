@@ -53,7 +53,7 @@ void TrackingThread::run(){
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 				gotMarker = true;
 			} catch (int err){	//Didn't have marker in current frame, check the previous frame
-				printf("Tried getting current frame marker, caught %d\n",err);
+				//printf("Tried getting current frame marker, caught %d\n",err);
 				try{
 					initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
 					gotMarker = true;
@@ -61,7 +61,7 @@ void TrackingThread::run(){
 					
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
-					printf("Tried getting previous frame marker, caught %d\n",err);
+					//printf("Tried getting previous frame marker, caught %d\n",err);
 				}
 
 			}
@@ -79,7 +79,7 @@ void TrackingThread::run(){
 						//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
 					}
 					coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
-					printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
+					//printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
 					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
 					//sleep(1);
 					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
@@ -98,12 +98,13 @@ void TrackingThread::run(){
 		if (markersFound > 0){
 			/*Proceed to the next frame, if this was not the last frame*/
 			if (currentFrame < mainThread->videoReader->getNumberOfIndices()){
-				std::this_thread::sleep_for (std::chrono::milliseconds(50));
+				//std::this_thread::sleep_for (std::chrono::milliseconds(50));
 				currentFrame++;
 				mainThread->slider->SetValue(currentFrame);
 				mainThread->videoReader->readFrameFromDisk(currentFrame);
 				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
 			}else{
+				/*Stop the thread*/
 				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 				mainThread->trackOn == false;	/*Stop tracking*/
 				delete currentImage; /*Try to save mem...*/
@@ -111,6 +112,7 @@ void TrackingThread::run(){
 			}
 			
 		}else{
+			/*Stop the thread*/
 			mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 			mainThread->trackOn == false;	/*Stop tracking*/
 		}
