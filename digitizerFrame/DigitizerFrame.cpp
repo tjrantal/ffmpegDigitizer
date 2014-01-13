@@ -160,7 +160,7 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 			}else{
 				openSave->Create(openFileDialog.GetPath());
 			}
-			SetStatusText(wxString::Format(wxT(" opened %s for makers"),static_cast<const char*>(openFileDialog.GetPath().mb_str())));
+			SetStatusText(wxString::Format(wxT(" opened %s for makers"),openFileDialog.GetPath().c_str()));
 		}catch (int err){
 			SetStatusText(_("Could not open or create a res file"));
 		}
