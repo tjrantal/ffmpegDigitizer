@@ -43,10 +43,13 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(10,10),wxSize(180,130),wxTE_MULTILINE);
 	resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,130),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
 	/*Button for reading markers in*/
-	openMarkerFile 	= new wxButton(this,ID_picker,_("Open marker file"),wxPoint(10,150));
+	openMarkerFile 	= new wxButton(this,ID_picker,_("Open &marker file"),wxPoint(10,150));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
-	openVideoFile 	= new wxButton(this,ID_video,_("Open video file"),wxPoint(10,200));
+	openVideoFile 	= new wxButton(this,ID_video,_("Open &video file"),wxPoint(10,200));
 	Connect(ID_video,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenVideo),NULL,this);
+	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file (will be overwritten)"),wxPoint(10,250));
+	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
+	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/
 	slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
 	//Connect(ID_slider,EVT_SCROLL,wxCommandEventHandler(DigitizerFrame::ScrollVideo),NULL,this);
@@ -117,11 +120,58 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 		delete videoReader;
 		videoReader = NULL;
 	}
+	
+	/*Write out and close any open results file*/
+	if (openSave != NULL){
+		printCoordinates();
+		openSave->Write();
+		openSave->Close();
+		delete openSave;
+		openSave = NULL;
+	}
+	
 	printf("Nearly done\n");
 	fflush(stdout);	//DEBUGGING
 	//fclose(debug);	//DEBUGGING
  	wxWindow::Destroy();
 	//event.Skip();
+}
+
+void DigitizerFrame::OpenSave(wxCommandEvent& event){
+
+	/*Open coordinate file*/
+	wxFileDialog openFileDialog(this, _("Create/open a RES file. Will be overwritten"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
+	_("RES files (*.RES|*.res"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+	if (openFileDialog.ShowModal() == wxID_CANCEL){
+		SetStatusText(_("No marker file opened"));
+		//resultsText->ChangeValue(_("No marker file opened"));
+	}else{
+		//If marker list does not exist yet, create it, otherwise replace with the new list
+		if (openSave != NULL){
+			openSave->Write();
+			openSave->Close();
+			delete openSave;
+		}
+		
+		try{
+			openSave = new wxTextFile();
+			if (openSave->Exists()){
+				openSave->Open(openFileDialog.GetPath());
+			}else{
+				openSave->Create(openFileDialog.GetPath());
+			}
+			SetStatusText(wxString::Format(wxT(" opened %s for makers"),openFileDialog.GetPath().mb_str()));
+		}catch (int err){
+			SetStatusText(_("Could not open or create a res file"));
+		}
+		/*
+		if (openSave->IsOpened()){
+			SetStatusText(wxString::Format(wxT(" opened %s for makers"),openFileDialog.GetPath().mb_str()));
+		} else {
+			SetStatusText(_("Could not open the res file"));
+		}
+		*/
+	}
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
@@ -135,14 +185,14 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 	}else{
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
-			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,300));
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
-			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,350),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			colorTolerance = new wxSlider(this,ID_colorTolerance,30,0,255,wxPoint(10,400),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("ToggleTracking"),wxPoint(10,500));
+			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,350),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,400),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			colorTolerance = new wxSlider(this,ID_colorTolerance,30,0,255,wxPoint(10,450),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,500));
 			trackOn = false;
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
@@ -321,10 +371,37 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 }
 
-/**<Write the coordinates to resultsText*/
+/**<Write the coordinates to resultsText and to the results file (openSave)*/
 void DigitizerFrame::printCoordinates(){
+
+	/*
+					//Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...
+				#ifdef __linux__
+					wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
+				#else
+					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
+				#endif
+				printf("File isOpened %b\n",indiceFile->IsOpened());
+					fflush(stdout);
+							//DEBUGGING
+				//Write indices to file here
+				for (int i = 0; i<videoReader->frameIndices.size();++i){
+					indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
+														,videoReader->frameIndices.at(i).pts
+														,videoReader->frameIndices.at(i).pkt_pts)
+														,wxConvUTF8);
+				}
+				indiceFile->Close();
+				delete indiceFile;
+	
+	
+	
+	*/
+
+
 	/*Create result grid*/
 	if (markerSelector != NULL && videoReader !=NULL){
+		
 		resultsGrid->ClearGrid();	/*Clear the grid*/
 		resultsGrid->CreateGrid(videoReader->getNumberOfFrames(),2*markerSelector->markers.size());
 		std::vector<wxString> columnHeadings = std::vector<wxString>();
@@ -339,7 +416,6 @@ void DigitizerFrame::printCoordinates(){
 		}
 
 		/*Set Column labels*/
-		
 		for (int m = 0; m<columnHeadings.size();++m){
 			//for (int c = 0;c<2;++c){
 				resultsGrid->SetColLabelValue(m,columnHeadings[m]);
@@ -350,25 +426,63 @@ void DigitizerFrame::printCoordinates(){
 		for (int f = 0; f<videoReader->getNumberOfFrames();++f){
 			resultsGrid->SetRowLabelValue(f,wxString::Format(wxT("%i"),f));
 		}
+		
+		/*Get ready to print the results to file*/
+		wxString resultLine = wxString("");
+		if (openSave != NULL){
+			resultLine+="Frame #\t";
+			for (int m = 0; m<markerSelector->markers.size();++m){
+				resultLine+=markerSelector->GetString(m).Append(wxString(" X"));
+				resultLine+="\t";
+				if (m == markerSelector->markers.size()-1){	/*Don't print tab after the last column*/
+					resultLine+=markerSelector->GetString(m).Append(wxString(" Y"));
+				}else{
+					resultLine+=markerSelector->GetString(m).Append(wxString(" Y"));
+					resultLine+="\t";
+				}
+			}
+			openSave->Clear();
+			/*Write header line*/
+			openSave->AddLine(resultLine);
+		}
+		
+		
 		/*Print the data*/
 		/*Loop through frames*/
 		for (int i = 0; i<videoReader->getNumberOfFrames();++i){
 			/*Loop through markers*/
+			resultLine = wxString::Format(wxT("%i"),i);
+			resultLine+="\t";
 			for (int m = 0; m<markerSelector->markers.size();++m){
 				try{	
 					coordinate markerCoordinate = markerSelector->getCoordinate(m, i);
 					resultsGrid->SetCellValue(i,m*2+0,wxString::Format(wxT("%f"),markerCoordinate.xCoordinate));
 					resultsGrid->SetCellValue(i,m*2+1,wxString::Format(wxT("%f"),markerCoordinate.yCoordinate));
+					resultLine+=wxString::Format(wxT("%f"),markerCoordinate.xCoordinate);
+					resultLine+="\t";
+					resultLine+=wxString::Format(wxT("%f"),markerCoordinate.yCoordinate);
+					
 				} catch (int err){	//Didn't have marker in current frame
 					//Print NaN or -1 for missing
 					resultsGrid->SetCellValue(i,m*2+0,wxString("NaN"));
 					resultsGrid->SetCellValue(i,m*2+1,wxString("NaN"));
+					resultLine+="NaN";
+					resultLine+="\t";
+					resultLine+="NaN";
+				}
+				if (m == markerSelector->markers.size()-1){ /*Don't print tab after the last column*/
+				
+				}else{
+					resultLine+="\t";
 				}
 			}
+			if (openSave != NULL){
+				openSave->AddLine(resultLine);
+			}
 		}
-
-
-		
+		if (openSave != NULL){
+			openSave->Write();
+		}
 	}
 }	
 
