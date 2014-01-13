@@ -47,7 +47,7 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
 	openVideoFile 	= new wxButton(this,ID_video,_("Open &video file"),wxPoint(10,200));
 	Connect(ID_video,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenVideo),NULL,this);
-	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file (will be overwritten)"),wxPoint(10,250));
+	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file"),wxPoint(10,250));
 	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
 	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/

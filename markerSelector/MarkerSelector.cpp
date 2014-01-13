@@ -94,9 +94,8 @@ coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
 			}
 		}
 	}
-	/*If the frame didn't have a marker throw and exception, int in this case*/
+	/*If the frame didn't have a marker throw an exception*/
 	throw(1);
-	//return coordinate(-1,-1,-1);
 }
 
 /**Get relative sampling coordinate*/
