@@ -89,6 +89,8 @@ private:
     void OnAbout(wxCommandEvent &event);		/**< About*/
 	void LeftButtonDown(wxMouseEvent &event);	/**< Left button handling*/
 	void LeftButtonUp(wxMouseEvent &event);		/**< */
+	void RightButtonDown(wxMouseEvent& event);	/**< Right button handling*/
+	void KeyDown(wxKeyEvent& event);			/**< Key handling*/
 	void ResetClock(wxCommandEvent &event);		/**< */
 	void OpenFile(wxCommandEvent &event);		/**< Open a marker file to read markers from*/
 	void OpenVideo(wxCommandEvent &event);		/**< Open a video for reading*/
@@ -99,6 +101,9 @@ private:
 	void AdjustColorTolerance(wxScrollEvent &event);	/**< */
 	void SelectMarker(wxCommandEvent &event);			/**< */
 	void ToggleTracking(wxCommandEvent &event);			/**< */
+	void NextMarker();									/**< Proceed to Next marker*/
+	void PreviousMarker();									/**< Back to Previous marker*/
+	void GetMarkerValues(int marker);								/**< Get parameters of a given marker*/
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };

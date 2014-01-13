@@ -67,11 +67,13 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
 	/*Connect the mouse listener to digitize points on screen*/
 	imagePanel->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
+	imagePanel->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(DigitizerFrame::RightButtonDown), NULL,this);
 	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	
 	/*Text panel for digitized markers*/
 	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(1000,10),wxSize(200,200),wxTE_MULTILINE);
-	
+	/*Key handling*/
+	Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown),NULL,this);
 	videoReader = NULL;
 	markerSelector = NULL;
 	//debug = freopen("debug.log","w",stdout);
@@ -97,9 +99,37 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	imagePanel->digitizeXYArea(areaCoordinates);
 }
 
+void DigitizerFrame::RightButtonDown(wxMouseEvent& event){
+	NextMarker();
+}
+
 void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
 	//Does nothing
 }
+
+void DigitizerFrame::KeyDown(wxKeyEvent& event){
+	//Keyboard short cuts
+	int charCode = event.GetKeyCode();
+	printf("Got keycode %c\n",(char) charCode);
+	//m marker
+	
+	//v = video
+	
+	//c = coordinate
+	
+	//n = next marker
+	if (charCode == 110 ||charCode == 78){
+		NextMarker();
+		return;
+	}
+	//p = previous marker
+	if (charCode == 112||charCode == 80){
+		PreviousMarker();
+		return;
+	}
+	
+}
+
 
 void DigitizerFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
@@ -122,7 +152,6 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	}
 	
 	/*Write out and close any open results file*/
-	printf("openSave %d\n",openSave->IsOpened());
 	if (openSave != NULL && openSave->IsOpened()){
 		printCoordinates();
 		openSave->Write();
@@ -468,13 +497,41 @@ void DigitizerFrame::printCoordinates(){
 void DigitizerFrame::SelectMarker(wxCommandEvent &event){
 	int selectedMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
 	markerSelector->currentMarker = selectedMarker;
-	int currentSearchRadius = markerSelector->markers.at(selectedMarker).searchRadius;	/*Save the slider value as the new marker radius*/
-	int currentMarkerRadius = markerSelector->markers.at(selectedMarker).markerRadius;	/*Save the slider value as the new search radius*/
-	int currentTolerance = markerSelector->markers.at(selectedMarker).colorTolerance;	/*Save the slider value as the new marker tolerance*/
+	GetMarkerValues(selectedMarker);
+}
+
+/**Proceed to next marker*/
+void DigitizerFrame::NextMarker(){
+	int currentMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	if (currentMarker+1<markerSelector->GetCount()){
+		currentMarker+=1;
+		markerSelector->SetSelection(currentMarker);
+		markerSelector->currentMarker = currentMarker;
+	}
+	GetMarkerValues(currentMarker);
+}
+
+/**Back to previous marker*/
+void DigitizerFrame::PreviousMarker(){
+		int currentMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
+	if (currentMarker-1>=0){
+		currentMarker-=1;
+		markerSelector->SetSelection(currentMarker);
+		markerSelector->currentMarker = currentMarker;
+	}
+	GetMarkerValues(currentMarker);
+}
+
+
+void  DigitizerFrame::GetMarkerValues(int marker){
+	int currentSearchRadius = markerSelector->markers.at(marker).searchRadius;	/*Save the slider value as the new marker radius*/
+	int currentMarkerRadius = markerSelector->markers.at(marker).markerRadius;	/*Save the slider value as the new search radius*/
+	int currentTolerance = markerSelector->markers.at(marker).colorTolerance;	/*Save the slider value as the new marker tolerance*/
 	searchRadius->SetValue(currentSearchRadius);
 	markerRadius->SetValue(currentMarkerRadius);
 	colorTolerance->SetValue(currentTolerance);
 }
+
 
 /**Adjust marker size*/
 void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
@@ -486,6 +543,8 @@ void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 	SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), markerSelector->markers.at(currentMarker).searchCoordinates->size()));
 	
 }
+
+
 
 /**Adjust search radius*/
 void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
