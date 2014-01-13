@@ -40,7 +40,8 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
     CreateStatusBar();
     SetStatusText( _("Welcome to Digitizer!") );
 	/*Add text field for results*/
-	resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(10,10),wxSize(180,130),wxTE_MULTILINE);
+	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(10,10),wxSize(180,130),wxTE_MULTILINE);
+	resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,130),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
 	/*Button for reading markers in*/
 	openMarkerFile 	= new wxButton(this,ID_picker,_("Open marker file"),wxPoint(10,150));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
@@ -130,7 +131,7 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 	_("TAB files (*.tab)|*.tab"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
-		resultsText->ChangeValue(_("No marker file opened"));
+		//resultsText->ChangeValue(_("No marker file opened"));
 	}else{
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
@@ -150,10 +151,11 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		if (markerSelector == NULL)
 		{
 			SetStatusText(_("Could not open markers!"));
-			resultsText->ChangeValue(_("Could not open markers!"));
+			//resultsText->ChangeValue(_("Could not open markers!"));
 			openFile = NULL;
 		}else{
 			SetStatusText( _("Markers read"));
+			
 			
 		}
 	}
@@ -167,7 +169,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
-		resultsText->ChangeValue(_("No video file opened"));
+		//resultsText->ChangeValue(_("No video file opened"));
 	}else{
 		/*Close any pre-existing video*/
 		printf("Pre-existing videoReader?\n");
@@ -292,7 +294,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			currentFrame = 0;
 		}else{
 			SetStatusText(_("Could not open video!"));
-			resultsText->ChangeValue(_("Could not open video!"));
+			//resultsText->ChangeValue(_("Could not open video!"));
 		}
 	}
 	
@@ -315,46 +317,59 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 		}
 	}
 	
-	resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
+	//resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 }
 
 /**<Write the coordinates to resultsText*/
 void DigitizerFrame::printCoordinates(){
-	wxString tempString("");
-	/*Create HeaderLine*/
-	tempString+="Frame#\t";
-	for (int m = 0; m<markerSelector->markers.size();++m){
-		tempString+=markerSelector->GetString(m);
-		tempString+="\t";
-	}
-	tempString+="\n";
-	
-	if (markerSelector != NULL){
+	/*Create result grid*/
+	if (markerSelector != NULL && videoReader !=NULL){
+		resultsGrid->ClearGrid();	/*Clear the grid*/
+		resultsGrid->CreateGrid(videoReader->getNumberOfFrames(),2*markerSelector->markers.size());
+		std::vector<wxString> columnHeadings = std::vector<wxString>();
+		//Column headings
+		for (int m = 0; m<markerSelector->markers.size();++m){
+			//for (int c = 0;c<2;++c){
+				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(" X")));
+				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(" Y")));
+				//resultsGrid->SetColLabelValue(m*2+0,markerSelector->GetString(m).Append(wxString(" X")));
+				//resultsGrid->SetColLabelValue(m*2+1,markerSelector->GetString(m).Append(wxString(" Y")));
+			//}
+		}
+
+		/*Set Column labels*/
+		resultsGrid->SetColLabelSize(25);
+		for (int m = 0; m<columnHeadings.size();++m){
+			//for (int c = 0;c<2;++c){
+				resultsGrid->SetColLabelValue(m,columnHeadings[m]);
+				//printf("%s\t%s\n",std::string(columnHeadings[m].mb_str()).c_str(),resultsGrid->GetColLabelValue(m).mb_str());
+			//}
+		}
+		/*Set row labels*/
+		for (int f = 0; f<videoReader->getNumberOfFrames();++f){
+			resultsGrid->SetRowLabelValue(f,wxString::Format(wxT("%i"),f));
+		}
+		/*Print the data*/
 		/*Loop through frames*/
 		for (int i = 0; i<videoReader->getNumberOfFrames();++i){
-			//Loop through markers
-			tempString+=i;
-			tempString+="\t";
+			/*Loop through markers*/
 			for (int m = 0; m<markerSelector->markers.size();++m){
 				try{	
 					coordinate markerCoordinate = markerSelector->getCoordinate(m, i);
-					tempString+=markerCoordinate.xCoordinate;
-					tempString+="\t";
-					tempString+=markerCoordinate.yCoordinate;
-					tempString+="\t";
-				} catch (int err){	//Didn't have marker in current frame, check the previous frame
+					resultsGrid->SetCellValue(i,m*2+0,wxString::Format(wxT("%f"),markerCoordinate.xCoordinate));
+					resultsGrid->SetCellValue(i,m*2+1,wxString::Format(wxT("%f"),markerCoordinate.yCoordinate));
+				} catch (int err){	//Didn't have marker in current frame
 					//Print NaN or -1 for missing
-					tempString+=0x7ff0000080000001LL;;
-					tempString+="\t";
-					tempString+=0x7ff0000080000001LL;;
-					tempString+="\t";
+					resultsGrid->SetCellValue(i,m*2+0,wxString("NaN"));
+					resultsGrid->SetCellValue(i,m*2+1,wxString("NaN"));
 				}
 			}
 		}
-		tempString+="\n";
+
+
+		
 	}
-	resultsText->ChangeValue(tempString);
 }	
 
 /**Select marker from the drop down list*/

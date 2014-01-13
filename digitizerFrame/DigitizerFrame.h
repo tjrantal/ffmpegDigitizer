@@ -34,6 +34,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/tglbtn.h>		//Toggle button for starting and stopping auto tracking
 #include <thread>			//For threading, tracking opens up a new thread
 #include <vector>			//For region growing
+#include <wx/grid.h>		//For results grid
 
 /*Forward declare classes that are pointed to*/
 class ImagePanel;
@@ -67,7 +68,8 @@ private:
 	//DEBUG
 	FILE *debug;
 	//Variables
-	wxTextCtrl		*resultsText;		/**<For coordinates*/
+	//wxTextCtrl		*resultsText;		/**<For coordinates*/
+	wxGrid			*resultsGrid;		/**<For coordinates*/
 	clock_t			*clockCounts,initClock;	/**<For storing processor times*/
 	wxButton		*resetButton;			/**<For resetting the clock*/
 	float			elapsedTime;				/**<time since first click*/
