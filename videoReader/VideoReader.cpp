@@ -405,7 +405,9 @@ VideoReader::~VideoReader(){
 	av_freep(&picture->data[0]);
 	avcodec_free_frame(&picture);
 	//av_free(&picture);
-
+	if (decodedFrame!=NULL){
+		delete decodedFrame;
+	}
 	if (&frameIndices != NULL){
 		frameIndices.clear();
 	}
@@ -416,13 +418,13 @@ int VideoReader::getNumberOfFrames(){
 	duration = ((double) pFormatCtx->streams[videoStream]->duration)*timeBase;
 	startTime=(long) pFormatCtx->streams[videoStream]->start_time;
 	double frameInterval = (double)pFormatCtx->streams[videoStream]->codec->time_base.num/(double)pFormatCtx->streams[videoStream]->codec->time_base.den;
-	printf("startTime %ld duration %.2f timeBase %.8f frameInterval %.4f\n",startTime,(float) duration,(float) timeBase,(float) frameInterval);
+	//printf("startTime %ld duration %.2f timeBase %.8f frameInterval %.4f\n",startTime,(float) duration,(float) timeBase,(float) frameInterval);
 	if (pFormatCtx->streams[videoStream]->nb_frames > 0){
 	
-		printf("Stream returned the number of frames %d\n",(int) pFormatCtx->streams[videoStream]->nb_frames);
+		//printf("Stream returned the number of frames %d\n",(int) pFormatCtx->streams[videoStream]->nb_frames);
 		return (int) pFormatCtx->streams[videoStream]->nb_frames;
 	}
-	printf("Stream DID NOT return the number of frames %d\n",(int) (duration/frameInterval));
+	//printf("Stream DID NOT return the number of frames %d\n",(int) (duration/frameInterval));
 
 	return (int) (duration/timeBase);	/*THIS IS INCORRECT*/
 }

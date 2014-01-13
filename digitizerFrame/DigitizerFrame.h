@@ -34,6 +34,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <wx/tglbtn.h>		//Toggle button for starting and stopping auto tracking
 #include <thread>			//For threading, tracking opens up a new thread
 #include <vector>			//For region growing
+#include <wx/grid.h>		//For results grid
 
 /*Forward declare classes that are pointed to*/
 class ImagePanel;
@@ -52,6 +53,7 @@ public:
 	wxSlider		*slider;				//Slider
 	wxSlider		*searchRadius;				//Search radius from frame to next
 	wxSlider		*markerRadius;				//Radius of the marker
+	wxSlider		*colorTolerance;			//Tolerance for marker region grow color
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
 	int currentFrame;						//index of currentFrame
 	bool			trackOn;
@@ -61,36 +63,47 @@ public:
 		@param size size of the window
 	*/
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	void printCoordinates();	/**<Write the coordinates to resultsText*/
 private:
 	//DEBUG
 	FILE *debug;
 	//Variables
-	wxTextCtrl		*resultsText;			//For displaying text in screen
-	clock_t			*clockCounts,initClock;	//For storing processor times
-	wxButton		*resetButton;			//For resetting the clock
-	float			elapsedTime;				//time since first click
-	bool			timeRunning;				//to indicate whether the first click has passed
-	FILE			*resultFile;			//File to save to
-	wxButton 		*openMarkerFile;		//Pick a file to save to
-	wxFile 			*openFile;
-	wxButton 		*openVideoFile;		//Pick a file to save to
+	//wxTextCtrl		*resultsText;		/**<For coordinates*/
+	wxGrid			*resultsGrid;		/**<For coordinates*/
+	clock_t			*clockCounts,initClock;	/**<For storing processor times*/
+	wxButton		*resetButton;			/**<For resetting the clock*/
+	float			elapsedTime;				/**<time since first click*/
+	bool			timeRunning;				/**<to indicate whether the first click has passed*/
+	FILE			*resultFile;			/**<File to manipulate*/
+	wxButton 		*openMarkerFile;		/**<Pick a file to read markers from*/
+	wxFile 			*openFile;				/**<File to manipulate*/
+	wxButton 		*openVideoFile;		/**<Button for picking the video to open*/
 	wxFile 			*openVideo;
-	TrackingThread	*trackingThread;		//class for tracking, runs a thread
+	wxButton 		*openSaveFile;		/**<Button for picking the coordinate save file*/
+	wxTextFile		*openSave;
+	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
 	
-    void OnQuit(wxCommandEvent &event);
-	void OnQuit(wxCloseEvent& event);
-    void OnAbout(wxCommandEvent &event);
-	void LeftButtonDown(wxMouseEvent &event);
-	void LeftButtonUp(wxMouseEvent &event);
-	void ResetClock(wxCommandEvent &event);
-	void OpenFile(wxCommandEvent &event);
-	void OpenVideo(wxCommandEvent &event);
-	void ScrollVideo(wxScrollEvent &event);
-	void AdjustSearchRadius(wxScrollEvent &event);
-	void AdjustMarkerRadius(wxScrollEvent &event);
-	void SelectMarker(wxCommandEvent &event);
-	void ToggleTracking(wxCommandEvent &event);
+    void OnQuit(wxCommandEvent &event);			/**< */
+	void OnQuit(wxCloseEvent& event);			/**< */
+    void OnAbout(wxCommandEvent &event);		/**< About*/
+	void LeftButtonDown(wxMouseEvent &event);	/**< Left button handling*/
+	void LeftButtonUp(wxMouseEvent &event);		/**< */
+	void RightButtonDown(wxMouseEvent& event);	/**< Right button handling*/
+	void KeyDown(wxKeyEvent& event);			/**< Key handling*/
+	void ResetClock(wxCommandEvent &event);		/**< */
+	void OpenFile(wxCommandEvent &event);		/**< Open a marker file to read markers from*/
+	void OpenVideo(wxCommandEvent &event);		/**< Open a video for reading*/
+	void OpenSave(wxCommandEvent &event);		/**< Open a file for saving*/
+	void ScrollVideo(wxScrollEvent &event);		/**< */
+	void AdjustSearchRadius(wxScrollEvent &event);	/**< */
+	void AdjustMarkerRadius(wxScrollEvent &event);	/**< */
+	void AdjustColorTolerance(wxScrollEvent &event);	/**< */
+	void SelectMarker(wxCommandEvent &event);			/**< */
+	void ToggleTracking(wxCommandEvent &event);			/**< */
+	void NextMarker();									/**< Proceed to Next marker*/
+	void PreviousMarker();									/**< Back to Previous marker*/
+	void GetMarkerValues(int marker);								/**< Get parameters of a given marker*/
     DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };
@@ -102,9 +115,11 @@ enum
 	ID_Reset,
 	ID_picker,
 	ID_video,
+	ID_save,
 	ID_slider,
 	ID_searchRadius,
 	ID_markerRadius,
+	ID_colorTolerance,
 	ID_panel,
 	ID_markers,
 	ID_toggleTracking,
