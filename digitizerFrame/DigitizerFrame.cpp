@@ -160,7 +160,7 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 			}else{
 				openSave->Create(openFileDialog.GetPath());
 			}
-			SetStatusText(wxString::Format(wxT(" opened %s for makers"),openFileDialog.GetPath().mb_str()));
+			SetStatusText(wxString::Format(wxT(" opened %s for makers"),static_cast<const char*>(openFileDialog.GetPath().mb_str())));
 		}catch (int err){
 			SetStatusText(_("Could not open or create a res file"));
 		}
@@ -374,31 +374,6 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 /**<Write the coordinates to resultsText and to the results file (openSave)*/
 void DigitizerFrame::printCoordinates(){
 
-	/*
-					//Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...
-				#ifdef __linux__
-					wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
-				#else
-					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
-				#endif
-				printf("File isOpened %b\n",indiceFile->IsOpened());
-					fflush(stdout);
-							//DEBUGGING
-				//Write indices to file here
-				for (int i = 0; i<videoReader->frameIndices.size();++i){
-					indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
-														,videoReader->frameIndices.at(i).pts
-														,videoReader->frameIndices.at(i).pkt_pts)
-														,wxConvUTF8);
-				}
-				indiceFile->Close();
-				delete indiceFile;
-	
-	
-	
-	*/
-
-
 	/*Create result grid*/
 	if (markerSelector != NULL && videoReader !=NULL){
 		
@@ -407,12 +382,8 @@ void DigitizerFrame::printCoordinates(){
 		std::vector<wxString> columnHeadings = std::vector<wxString>();
 		//Column headings
 		for (int m = 0; m<markerSelector->markers.size();++m){
-			//for (int c = 0;c<2;++c){
-				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(" X")));
-				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(" Y")));
-				//resultsGrid->SetColLabelValue(m*2+0,markerSelector->GetString(m).Append(wxString(" X")));
-				//resultsGrid->SetColLabelValue(m*2+1,markerSelector->GetString(m).Append(wxString(" Y")));
-			//}
+				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(wxT(" X"))));
+				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(wxT(" Y"))));
 		}
 
 		/*Set Column labels*/
@@ -428,17 +399,17 @@ void DigitizerFrame::printCoordinates(){
 		}
 		
 		/*Get ready to print the results to file*/
-		wxString resultLine = wxString("");
+		wxString resultLine = wxString(_(""));
 		if (openSave != NULL){
-			resultLine+="Frame #\t";
+			resultLine+=wxT("Frame #\t");
 			for (int m = 0; m<markerSelector->markers.size();++m){
-				resultLine+=markerSelector->GetString(m).Append(wxString(" X"));
-				resultLine+="\t";
+				resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" X")));
+				resultLine+=wxT("\t");
 				if (m == markerSelector->markers.size()-1){	/*Don't print tab after the last column*/
-					resultLine+=markerSelector->GetString(m).Append(wxString(" Y"));
+					resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" Y")));
 				}else{
-					resultLine+=markerSelector->GetString(m).Append(wxString(" Y"));
-					resultLine+="\t";
+					resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" Y")));
+					resultLine+=wxT("\t");
 				}
 			}
 			openSave->Clear();
@@ -452,28 +423,28 @@ void DigitizerFrame::printCoordinates(){
 		for (int i = 0; i<videoReader->getNumberOfFrames();++i){
 			/*Loop through markers*/
 			resultLine = wxString::Format(wxT("%i"),i);
-			resultLine+="\t";
+			resultLine+=_("\t");
 			for (int m = 0; m<markerSelector->markers.size();++m){
 				try{	
 					coordinate markerCoordinate = markerSelector->getCoordinate(m, i);
 					resultsGrid->SetCellValue(i,m*2+0,wxString::Format(wxT("%f"),markerCoordinate.xCoordinate));
 					resultsGrid->SetCellValue(i,m*2+1,wxString::Format(wxT("%f"),markerCoordinate.yCoordinate));
 					resultLine+=wxString::Format(wxT("%f"),markerCoordinate.xCoordinate);
-					resultLine+="\t";
+					resultLine+=_("\t");
 					resultLine+=wxString::Format(wxT("%f"),markerCoordinate.yCoordinate);
 					
 				} catch (int err){	//Didn't have marker in current frame
 					//Print NaN or -1 for missing
-					resultsGrid->SetCellValue(i,m*2+0,wxString("NaN"));
-					resultsGrid->SetCellValue(i,m*2+1,wxString("NaN"));
-					resultLine+="NaN";
-					resultLine+="\t";
-					resultLine+="NaN";
+					resultsGrid->SetCellValue(i,m*2+0,_("NaN"));
+					resultsGrid->SetCellValue(i,m*2+1,_("NaN"));
+					resultLine+=_("NaN");
+					resultLine+=_("\t");
+					resultLine+=_("NaN");
 				}
 				if (m == markerSelector->markers.size()-1){ /*Don't print tab after the last column*/
 				
 				}else{
-					resultLine+="\t";
+					resultLine+=_("\t");
 				}
 			}
 			if (openSave != NULL){
