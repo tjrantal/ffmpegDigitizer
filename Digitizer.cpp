@@ -7,6 +7,8 @@
 */
 
 #include <wx/wx.h>
+#include <wx/display.h>		/*Try to modify the size of the display*/
+#include <wx/gdicmn.h>		/*wxRect wxDisplaySize*/
 #ifndef IMAGEPANEL_H 
 	#include "imagePanel/ImagePanel.h"
 #endif
@@ -31,8 +33,21 @@ IMPLEMENT_APP_NO_MAIN(DigitizerApp)
 
 bool DigitizerApp::OnInit()
 {
-    DigitizerFrame *frame = new DigitizerFrame( _("Digitizer"), wxPoint(0, 50), wxSize(1000, 600) );
-    frame->Show(true);
+	/*Try to learn about the display on init*/
+	unsigned int displayCoung = wxDisplay::GetCount();
+	int width,height;
+	wxDisplaySize(&width,&height);
+	
+    DigitizerFrame *frame = new DigitizerFrame( _("Digitizer"), wxPoint(0, 50), wxSize(width-50, height-100) );
+    /*
+	int currentDisplay = wxDisplay::GetFromWindow(frame);
+	wxDisplay disp = wxDisplay(currentDisplay);
+	wxRect rect = disp.GetGeometry();
+	int width = rect.GetWidth()-50;
+	int height = rect.GetHeight()-100;
+	frame->SetSize(wxSize(width, height));
+	*/
+	frame->Show(true);
     SetTopWindow(frame);
     return true;
 }

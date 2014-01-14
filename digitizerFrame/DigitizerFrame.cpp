@@ -51,7 +51,8 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
 	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/
-	slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
+	slider = NULL;
+	//slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
 	//Connect(ID_slider,EVT_SCROLL,wxCommandEventHandler(DigitizerFrame::ScrollVideo),NULL,this);
 	/*Connect button click events*/
 	/*
@@ -64,7 +65,11 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
 	*/
 	//imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
-	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
+	/*Maximize imagePanel size*/
+	int width,height;
+	this->GetSize(&width,&height);	
+	
+	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(width-220,height-180));
 	/*Connect the mouse listener to digitize points on screen*/
 	imagePanel->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	imagePanel->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(DigitizerFrame::RightButtonDown), NULL,this);
@@ -386,8 +391,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
-			delete slider;
-			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint(300,470),wxSize(400,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+
+			if (slider != NULL){
+				delete slider;
+			}
+			int width,height;
+			this->GetSize(&width,&height);
+			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint((width-200)/2-200,height-120),wxSize(400,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			currentFrame = 0;
 		}else{
 			SetStatusText(_("Could not open video!"));
