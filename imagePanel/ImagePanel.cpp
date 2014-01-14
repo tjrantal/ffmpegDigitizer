@@ -68,12 +68,13 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
  
  /**Draw a circle in the current image to highlight a digitized marker*/
  void ImagePanel::digitizeXY(int xCoordinate,int yCoordinate, double radius){
+ 
  	lockThread.lock();
-	/*update the coordinates to scaled image coordinates*/
-	xCoordinate = xCoordinate*scaleFactor;
-	yCoordinate = yCoordinate*scaleFactor;
+	//update the coordinates to scaled image coordinates
+	xCoordinate = xCoordinate/scaleFactor;
+	yCoordinate = yCoordinate/scaleFactor;
 	
-	/*draw to the image*/
+	//draw to the image
 	double xAdd;
 	double yAdd;
 	for  (int i = 0; i<(int)ceil(2.0*M_PI*radius);++i){
@@ -91,7 +92,7 @@ void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
 	lockThread.lock();
 	/*draw to the image*/
 	for  (int i = 0; i<areaCoordinates.size();++i){
-		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate*scaleFactor,(int) areaCoordinates[i].yCoordinate*scaleFactor,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
+		currentImage.SetRGB((int) (areaCoordinates[i].xCoordinate/scaleFactor),(int) (areaCoordinates[i].yCoordinate/scaleFactor),(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
 	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
 	Refresh();

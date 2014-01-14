@@ -89,24 +89,34 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 /*Digitizing markers*/
 void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	/*Adjust the digitized coordinates with the sceling factor*/
-	double xCoordinate = (double) event.GetX()/imagePanel->scaleFactor;
-	double yCoordinate = (double) event.GetY()/imagePanel->scaleFactor;
+	printf("Left Button %d %d\n", event.GetX(), event.GetY());
+	SetStatusText(wxString::Format(wxT("X %i Y %i"),event.GetX(), event.GetY() ));
+	
+	double xCoordinate = ((double) event.GetX())*imagePanel->scaleFactor;
+	double yCoordinate = ((double) event.GetY())*imagePanel->scaleFactor;
 	double radius = (double)  markerRadius->GetValue();
+	SetStatusText(wxString::Format(wxT("X %i Y %i X %f Y %f"),event.GetX(), event.GetY(),xCoordinate,yCoordinate ));
+	
+	printf("Trying to digitizeXY\n");
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 
 	//Get active marker and set the coordinates for the marker
 
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
 	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
-	/*Take the histogram for the marker*/
+	//Take the histogram for the marker
 	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	printf("Try to get color\n");
 	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
 	//Highlight area...
 	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	printf("Got color, try to grow region\n");
 	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
-		
+	printf("Grew region, trying to digitizer area\n");	
 	imagePanel->digitizeXYArea(areaCoordinates);
+	printf("Digitized area\n");	
+	
 }
 
 void DigitizerFrame::RightButtonDown(wxMouseEvent& event){
