@@ -51,7 +51,8 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
 	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/
-	slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
+	slider = NULL;
+	//slider = new wxSlider(this,ID_slider,0,0,100,wxPoint(300,470),wxSize(400,40));
 	//Connect(ID_slider,EVT_SCROLL,wxCommandEventHandler(DigitizerFrame::ScrollVideo),NULL,this);
 	/*Connect button click events*/
 	/*
@@ -64,7 +65,11 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(DigitizerFrame::LeftButtonUp),NULL,this);
 	*/
 	//imagePanel = new ImagePanel(this,ID_panel,_("DSC_0001.JPG"),wxBITMAP_TYPE_JPEG,wxPoint(200,10),wxSize(750,380));
-	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(750,380));
+	/*Maximize imagePanel size*/
+	int width,height;
+	this->GetSize(&width,&height);	
+	
+	imagePanel = new ImagePanel(this,ID_panel,wxPoint(200,10),wxSize(width-220,height-180));
 	/*Connect the mouse listener to digitize points on screen*/
 	imagePanel->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	imagePanel->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(DigitizerFrame::RightButtonDown), NULL,this);
@@ -83,21 +88,36 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 /*Button event handling*/
 /*Digitizing markers*/
 void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
-	double xCoordinate = (double) event.GetX();
-	double yCoordinate = (double) event.GetY();
+	/*Adjust the digitized coordinates with the sceling factor*/
+	printf("Left Button %d %d\n", event.GetX(), event.GetY());
+	SetStatusText(wxString::Format(wxT("X %i Y %i"),event.GetX(), event.GetY() ));
+	
+	double xCoordinate = ((double) event.GetX())*imagePanel->scaleFactor;
+	double yCoordinate = ((double) event.GetY())*imagePanel->scaleFactor;
 	double radius = (double)  markerRadius->GetValue();
+	SetStatusText(wxString::Format(wxT("X %i Y %i X %f Y %f"),event.GetX(), event.GetY(),xCoordinate,yCoordinate ));
+	
+	printf("Trying to digitizeXY\n");
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 
 	//Get active marker and set the coordinates for the marker
 
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
 	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
-	/*Take the histogram for the marker*/
-	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
-	markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	//Take the histogram for the marker
+	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
+	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	printf("Try to get color\n");
+	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
 	//Highlight area...
-	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	printf("Got color, try to grow region\n");
+	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	printf("Grew region, trying to digitizer area\n");	
 	imagePanel->digitizeXYArea(areaCoordinates);
+	imagePanel->reFreshImage();
+	printf("Digitized area\n");	
+	
 }
 
 void DigitizerFrame::RightButtonDown(wxMouseEvent& event){
@@ -355,7 +375,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				#else
 					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
 				#endif
-				printf("File isOpened %b\n",indiceFile->IsOpened());
+				printf("File isOpened %d\n",indiceFile->IsOpened());
 					fflush(stdout);
 							//DEBUGGING
 				//Write indices to file here
@@ -386,8 +406,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
-			delete slider;
-			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint(300,470),wxSize(400,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+
+			if (slider != NULL){
+				delete slider;
+			}
+			int width,height;
+			this->GetSize(&width,&height);
+			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint((width-200)/2-200,height-120),wxSize(400,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			currentFrame = 0;
 		}else{
 			SetStatusText(_("Could not open video!"));
