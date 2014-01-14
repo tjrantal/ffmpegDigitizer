@@ -69,15 +69,20 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			
 			/**Look for the marker in the image based on region growing*/
 			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int);
+			std::vector<coordinate>getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int);
 			
 			/**Get the histogram of the current marker*/
 			double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 			
 			/**Get the color of the current marker*/
 			static unsigned char* getColor(wxImage *currentImage,int xCoordinate,int yCoordinate);	
+			static unsigned char* getColor(unsigned char *currentImage, int width, int height,int xCoordinate,int yCoordinate);	
 			
 			/**Region grow algorithm*/
 			static std::vector<coordinate> growRegion(wxImage *currentImage,double x, double y, unsigned char* markerColor, int colorTolerance);
+			static std::vector<coordinate> growRegion(unsigned char *currentImage,int imageWidth,int imageHeight,double x, double y, unsigned char* markerColor, int colorTolerance);
+			
+			
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
 	};

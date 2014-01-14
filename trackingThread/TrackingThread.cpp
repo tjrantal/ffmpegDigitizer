@@ -35,11 +35,13 @@ void TrackingThread::run(){
 	bool gotMarker;
 	int markersFound;
 	coordinate initCoordinate;
-	wxImage *currentImage;
+	//wxImage *currentImage;
+	unsigned char* currentImageData;
 	while (mainThread->trackOn == true && currentFrame <= mainThread->videoReader->getNumberOfIndices()){
 		/*Make a copy of the current image*/
 		//printf("Track Started\n");
-		 currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
+		 //currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
+		 currentImageData = mainThread->imagePanel->currentImageData;
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		markersFound = 0;
@@ -69,7 +71,8 @@ void TrackingThread::run(){
 			if (gotMarker){
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
 				try{
-					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData,i, initCoordinate);
 					//Calculate the mean of the area coordinates..
 					double meanCoord[2] = {0,0};	//init to zero
 					double meanSize = areaCoordinates.size();
@@ -107,7 +110,7 @@ void TrackingThread::run(){
 				/*Stop the thread*/
 				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 				mainThread->trackOn == false;	/*Stop tracking*/
-				delete currentImage; /*Try to save mem...*/
+				//delete currentImage; /*Try to save mem...*/
 				break;
 			}
 			
@@ -116,7 +119,7 @@ void TrackingThread::run(){
 			mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 			mainThread->trackOn == false;	/*Stop tracking*/
 		}
-		delete currentImage; /*Try to save mem...*/
+		//delete currentImage; /*Try to save mem...*/
 	}
 	mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 	mainThread->trackOn == false;	/*Stop tracking*/
@@ -149,6 +152,113 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 	//sleep(1);
 	return coordinate(bestMatch.x,bestMatch.y,-1);
 }
+
+/**Look for the marker in the image based on region growing*/
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int){
+	int imageWidth =mainThread->imagePanel->imSize.x;
+	int imageHeight =mainThread->imagePanel->imSize.y;
+	/*Go through the search area, return the first continuous marker area found.*/
+	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
+	int colorTolerance = mainThread->markerSelector->markers[markerIndice].colorTolerance;
+	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
+	double markerRadius =  (double) (mainThread->markerSelector->markers[markerIndice].markerRadius);
+	for (int i = 0;i<searchCoordinates.size();++i){
+		double x = coordinates.xCoordinate+searchCoordinates[i].xCoordinate;
+		double y = coordinates.yCoordinate+searchCoordinates[i].yCoordinate;
+		/*Check whether color matches, if it does, grow region to confirm that the marker is big enough*/
+		unsigned char* pixelColor = getColor(currentImage,imageWidth,imageHeight,(int) x, (int) y);
+		
+		if(	/*If color match is close enough, do region growing*/
+			(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
+			(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
+			(((int)pixelColor[2])-((int)markerColor[2])) < colorTolerance && (((int)pixelColor[2])-((int)markerColor[2])) > -colorTolerance			
+			)
+		{
+			//printf("Marker %d %d %d pixel %d %d %d\n",markerColor[0],markerColor[1],markerColor[2],pixelColor[0],pixelColor[1],pixelColor[2]);
+			std::vector<coordinate> areaCoordinates = growRegion(currentImage,imageWidth,imageHeight,x,y,markerColor, colorTolerance);
+			if (areaCoordinates.size() >= 5){// M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
+				return areaCoordinates;								/*First sufficiently large marker returned... */
+				
+			}
+		}
+	}
+	throw 2;	/*No marker found, throw error. Implement missing marker at some point...*/
+	//return coordinates;	/*No marker found, shouldn't get here*/
+}
+
+/**Region grow*/
+std::vector<coordinate> TrackingThread::growRegion(unsigned char *currentImage,int imageWidth,int imageHeight,double x, double y, unsigned char* markerColor, int colorTolerance){
+		int neighbourhoodSize = 4;
+	int ** neighbourhood = new int*[neighbourhoodSize];
+	for (int i = 0; i<4;++i){
+		neighbourhood[i]=new int[2];
+	}
+	
+	char* visited = new char[imageWidth*imageHeight]();	/*ReserveMemory and init to zero*/
+	//visited[(int) (x+imageWidth*y)] =1;	/*Set the init pixel to 1*/
+	int regionPixels = 0;
+	std::vector<coordinate> pixelQueue;
+	std::vector<coordinate> areaCoordinates;
+	pixelQueue.push_back(coordinate(x,y,-1));
+	coordinate nextPixel;
+	while (pixelQueue.size() > 0){ //Go through all cells in queue
+		nextPixel = pixelQueue.front();        /*Get the pixel with the lowest cost and remove it from the queue*/
+		pixelQueue.erase(pixelQueue.begin());	/*remove the pixel from the queue*/
+		/*In case the pixel has been visited subsequent to having been added*/
+		while (visited[(int) (nextPixel.xCoordinate+imageWidth*nextPixel.yCoordinate)] == 1 && pixelQueue.size() > 0){
+			nextPixel = pixelQueue.front();        /*Get the pixel with the lowest cost and remove it from the queue*/
+			pixelQueue.erase(pixelQueue.begin());	/*remove the pixel from the queue*/
+		}
+		visited[(int) (nextPixel.xCoordinate+imageWidth*nextPixel.yCoordinate)] = 1;
+		areaCoordinates.push_back(nextPixel);
+		++regionPixels;        //Add the new pixel to the area
+		/*        Add 4-connected neighbourhood to the queue, unless the
+		neighbourhood pixels have already been visited or are part of the
+		mask already*/
+		neighbourhood[0][0] = (int) nextPixel.xCoordinate-1;        /*Left one*/
+		neighbourhood[1][0] = (int) nextPixel.xCoordinate+1;        /*Right one*/
+		neighbourhood[2][0] = (int) nextPixel.xCoordinate;
+		neighbourhood[3][0] = (int) nextPixel.xCoordinate;
+		
+		neighbourhood[0][1] = (int) nextPixel.yCoordinate;
+		neighbourhood[1][1] = (int) nextPixel.yCoordinate;
+		neighbourhood[2][1] = (int) nextPixel.yCoordinate-1;        /*Up one*/
+		neighbourhood[3][1] = (int) nextPixel.yCoordinate+1;        /*Down one*/
+
+		//checkNeighbours and add to queue;
+		int* coordinates;
+        for (int r = 0;r<neighbourhoodSize;++r){
+			coordinates = neighbourhood[r];
+			
+			//Check that the neighbour is within the image.
+            if (coordinates[0] >= 0 && coordinates[0] < imageWidth && coordinates[1] >=0 && coordinates[1] < imageHeight){ 
+				//Add to queue if the neighbour has not been visited, and is of marker color
+				unsigned char* pixelColor =  getColor(currentImage,imageWidth,imageHeight,coordinates[0], coordinates[1]);
+				if (visited[coordinates[0]+coordinates[1]*imageWidth] == (unsigned char) 0 && 
+					(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
+					(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
+					(((int)pixelColor[2])-((int)markerColor[2])) < colorTolerance && (((int)pixelColor[2])-((int)markerColor[2])) > -colorTolerance			
+					)
+				{
+					pixelQueue.push_back(coordinate((double) coordinates[0],(double)coordinates[1],-1));
+				}
+				delete pixelColor;	//Try to save memory..
+            }
+        }
+
+		
+	}
+	/*Release memory*/
+	delete visited;
+	for (int i = 0; i<4;++i){
+		delete neighbourhood[i];
+	}
+	delete neighbourhood;
+	
+	return areaCoordinates;
+}
+
+
 
 /**Look for the marker in the image based on region growing*/
 std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int){
@@ -293,5 +403,17 @@ unsigned char* TrackingThread::getColor(wxImage *currentImage,int xCoordinate,in
 	colour[0] = currentImage->GetRed(xCoordinate,yCoordinate);
 	colour[1] = currentImage->GetGreen(xCoordinate,yCoordinate);
 	colour[2] = currentImage->GetBlue(xCoordinate,yCoordinate);
+	return colour;
+}	
+
+/**Get the color of the current marker*/
+unsigned char* TrackingThread::getColor(unsigned char *currentImage, int width, int height,int xCoordinate,int yCoordinate){
+	/*Get the histogram*/
+	unsigned char* colour;
+	colour = new unsigned char[3];	/*Color figure comprises 3 different colors...*/
+	/*get the color values*/
+	colour[0] = currentImage[yCoordinate*width*3+xCoordinate*3];		//R
+	colour[1] = currentImage[yCoordinate*width*3+xCoordinate*3+1];	//G
+	colour[2] = currentImage[yCoordinate*width*3+xCoordinate*3+2];	//B
 	return colour;
 }	

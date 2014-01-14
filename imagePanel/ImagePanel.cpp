@@ -47,6 +47,13 @@ wxPanel(parent,id,pos,sizeIn)
 /*Set image to show*/
 void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data){
 	imageCopy =wxImage(width,height,data,static_data);//*(new wxImage(width,height,data,static_data));
+	imSize = wxSize(width,height);	/*Save the current image size*/
+	delete currentImageData;		/*Should be safe on a null pointer*/
+	currentImageData = new unsigned char[imSize.x*imSize.y*3];	/*Reserve memory to copy the data*/
+	/*Note, current image data is copied, so it will change when next frame is read! Image data is RGB*/
+	for (int i = 0;i<width*height*3;++i){
+		currentImageData[i] = data[i];
+	}	
 	scaleFactor = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
     if (scaleFactor != 1){ //Scale to fit the panel
     	imageCopy.Rescale(width/scaleFactor,height/scaleFactor,wxIMAGE_QUALITY_HIGH);
@@ -62,6 +69,10 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
  /**Draw a circle in the current image to highlight a digitized marker*/
  void ImagePanel::digitizeXY(int xCoordinate,int yCoordinate, double radius){
  	lockThread.lock();
+	/*update the coordinates to scaled image coordinates*/
+	xCoordinate = xCoordinate*scaleFactor;
+	yCoordinate = yCoordinate*scaleFactor;
+	
 	/*draw to the image*/
 	double xAdd;
 	double yAdd;
@@ -80,7 +91,7 @@ void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
 	lockThread.lock();
 	/*draw to the image*/
 	for  (int i = 0; i<areaCoordinates.size();++i){
-		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate,(int) areaCoordinates[i].yCoordinate,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
+		currentImage.SetRGB((int) areaCoordinates[i].xCoordinate*scaleFactor,(int) areaCoordinates[i].yCoordinate*scaleFactor,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
 	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
 	Refresh();

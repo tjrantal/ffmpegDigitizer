@@ -32,10 +32,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxBitmap	resizedImage;	/**The current image displayed*/
 			wxImage currentImage;		/**Copy of the current image for drawing onto*/
 			wxSize		size;			/**On-screen image size*/
-			double		scaleFactor;	/**Scaling from original to screen*/
 			std::mutex	lockThread;		/**Try locking the thread...*/
 		public:
-			wxImage currentClearImage;	/**To access the current image without overlaid color*/
+			wxImage currentClearImage;				/**To access the current image without overlaid color*/
+			unsigned char* currentImageData = NULL;	/**Original image from videoReader*/
+			wxSize imSize;							/**Size of the original image*/
+			double		scaleFactor;				/**Scaling from original to screen, use to adjust digitized coordinates*/
 			/*Constructor with an image loaded*/
 		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn);
 			/*Constructor without an image*/

@@ -88,8 +88,9 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 /*Button event handling*/
 /*Digitizing markers*/
 void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
-	double xCoordinate = (double) event.GetX();
-	double yCoordinate = (double) event.GetY();
+	/*Adjust the digitized coordinates with the sceling factor*/
+	double xCoordinate = (double) event.GetX()/imagePanel->scaleFactor;
+	double yCoordinate = (double) event.GetY()/imagePanel->scaleFactor;
 	double radius = (double)  markerRadius->GetValue();
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 
@@ -98,10 +99,13 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	int selectedMarker = markerSelector->GetCurrentSelection();	//Number of active marker
 	markerSelector->setCoordinate(selectedMarker,xCoordinate, yCoordinate, slider->GetValue());	//Set the coordinate for the frame
 	/*Take the histogram for the marker*/
-	markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
-	markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
+	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
+	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
 	//Highlight area...
-	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+		
 	imagePanel->digitizeXYArea(areaCoordinates);
 }
 
@@ -360,7 +364,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				#else
 					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
 				#endif
-				printf("File isOpened %b\n",indiceFile->IsOpened());
+				printf("File isOpened %d\n",indiceFile->IsOpened());
 					fflush(stdout);
 							//DEBUGGING
 				//Write indices to file here
