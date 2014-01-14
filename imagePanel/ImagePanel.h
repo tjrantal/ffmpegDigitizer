@@ -19,6 +19,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <wx/wx.h> /*Include all wx headers*/
 	#include <wx/sizer.h>
 	#include <wx/image.h>
+	#include <wx/dcbuffer.h>	/*Include for double buffering*/
 	#include <math.h>       /* ceil floor round*/
 	#include <vector>
 	#include <mutex>		/*To use mutex to lock the thread (kept crashing when called from another thread, hope this helps...)*/
@@ -30,6 +31,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxBitmap	imageOrig;
 			wxImage		imageCopy;
 			wxBitmap	resizedImage;	/**The current image displayed*/
+			wxBitmap	tempImage;		/**Used for double buffering*/
 			wxImage currentImage;		/**Copy of the current image for drawing onto*/
 			wxSize		size;			/**On-screen image size*/
 			std::mutex	lockThread;		/**Try locking the thread...*/
@@ -37,17 +39,20 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			wxImage currentClearImage;				/**To access the current image without overlaid color*/
 			unsigned char* currentImageData = NULL;	/**Original image from videoReader*/
 			wxSize imSize;							/**Size of the original image*/
+			wxSize oldSize;							/**Size for double buffering*/
 			double		scaleFactor;				/**Scaling from original to screen, use to adjust digitized coordinates*/
 			/*Constructor with an image loaded*/
 		    ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn);
 			/*Constructor without an image*/
 			ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn);
-		    void setImage(int width, int height, unsigned char* data,bool static_data=true);	/**Set current image*/
+		    void setImage(int width, int height, unsigned char* data,bool static_data=true,bool refresh = true);	/**Set current image*/
 			void digitizeXY(int xCoordinate,int yCoordinate, double radius);	/**Draw a circle in the current image*/
 			void digitizeXYArea(std::vector<coordinate> areaCoordinates);		/**Highlight grown region in the current image*/
 		    void paintEvent(wxPaintEvent & evt);
 		    void paintNow();
-			double getScalingFactor(); /**Return the scaling from original image to screen*/
+			void reFreshImage();
+			double getScalingFactor();								/**< Return the scaling from original image to screen*/
+			void setScalingFactor(double scaleFactor);	/**< Set the screen scaling factor*/
 			double** getHistogram(int xCoordinate,int yCoordinate, std::vector<coordinate> *samplingCoordinates);	/**Get the histogram of the current marker*/
 			unsigned char* getColor(int xCoordinate,int yCoordinate);	/**Get the color of the current marker*/
 		    void render(wxDC& dc);

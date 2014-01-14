@@ -97,15 +97,16 @@ void TrackingThread::run(){
 				}
 			}
 		}
+		mainThread->imagePanel->reFreshImage();
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0){
 			/*Proceed to the next frame, if this was not the last frame*/
 			if (currentFrame < mainThread->videoReader->getNumberOfIndices()){
-				//std::this_thread::sleep_for (std::chrono::milliseconds(50));
+				//std::this_thread::sleep_for (std::chrono::milliseconds(20));
 				currentFrame++;
 				mainThread->slider->SetValue(currentFrame);
 				mainThread->videoReader->readFrameFromDisk(currentFrame);
-				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true);
+				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true,false);
 			}else{
 				/*Stop the thread*/
 				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/

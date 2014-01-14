@@ -35,18 +35,22 @@ wxPanel(parent,id,pos,sizeIn)
     }
 	currentImage = resizedImage.ConvertToImage();
 	currentClearImage = currentImage;    
+	oldSize = wxSize(resizedImage.GetWidth(),resizedImage.GetHeight());
 }
 
 ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, const wxPoint& pos, const wxSize& sizeIn) :
 wxPanel(parent,id,pos,sizeIn)
 {
     size = sizeIn;
+	scaleFactor = 1;
+	oldSize = wxSize(0,0);
 }
 
 
 /*Set image to show*/
-void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data){
+void ImagePanel::setImage(int width, int height, unsigned char* data,bool static_data, bool refresh){
 	imageCopy =wxImage(width,height,data,static_data);//*(new wxImage(width,height,data,static_data));
+	//imageCopy =wxImage(imageOrig);//*(new wxImage(width,height,data,static_data));
 	imSize = wxSize(width,height);	/*Save the current image size*/
 	delete currentImageData;		/*Should be safe on a null pointer*/
 	currentImageData = new unsigned char[imSize.x*imSize.y*3];	/*Reserve memory to copy the data*/
@@ -54,16 +58,31 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 	for (int i = 0;i<width*height*3;++i){
 		currentImageData[i] = data[i];
 	}	
-	scaleFactor = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
+	double tempSF = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
+	/*If image is larger than image panel (i.e. tempSF > 1), scale the image to fit on screen*/
+	scaleFactor = tempSF > scaleFactor ? tempSF : scaleFactor;
+	/*Scale only if needed*/
     if (scaleFactor != 1){ //Scale to fit the panel
     	imageCopy.Rescale(width/scaleFactor,height/scaleFactor,wxIMAGE_QUALITY_HIGH);
     	resizedImage = wxBitmap(imageCopy);//*(new wxBitmap(imageCopy));
+		if (oldSize.x != width && oldSize.y != height){
+			tempImage = resizedImage;
+			oldSize = imSize;
+		}
     }else{ //No scaling needed
-    	resizedImage = wxBitmap(imageOrig);//*(new wxBitmap(imageOrig));
+    	resizedImage = wxBitmap(imageCopy);//*(new wxBitmap(imageOrig));
+		if (oldSize.x != width && oldSize.y != height){
+			tempImage = resizedImage;
+			oldSize = imSize;
+		}
+
     }
 	currentImage = resizedImage.ConvertToImage();
 	currentClearImage = currentImage;
-    Refresh();
+	
+	if (refresh){
+		reFreshImage();
+	}
 }
  
  /**Draw a circle in the current image to highlight a digitized marker*/
@@ -83,7 +102,6 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 		currentImage.SetRGB(xCoordinate+(int)xAdd,yCoordinate+(int)yAdd,(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
 	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
-	Refresh();
 	lockThread.unlock();
 } 
 
@@ -95,9 +113,16 @@ void ImagePanel::digitizeXYArea(std::vector<coordinate> areaCoordinates){
 		currentImage.SetRGB((int) (areaCoordinates[i].xCoordinate/scaleFactor),(int) (areaCoordinates[i].yCoordinate/scaleFactor),(unsigned char) 255,(unsigned char) 0,(unsigned char) 0);
 	}
 	resizedImage = wxBitmap(currentImage);//*(new wxBitmap(currentImage));
-	Refresh();
+	
 	lockThread.unlock();
 } 
+
+void ImagePanel::reFreshImage(){
+	lockThread.lock();
+	wxRect tempRect =wxRect(0,0,imSize.x,imSize.y);
+	Refresh(false,&tempRect);
+	lockThread.unlock();
+}
 
 /**Get the histogram of the current marker*/
 double** ImagePanel::getHistogram(int xCoordinate,int yCoordinate, std::vector<coordinate> *samplingCoordinates){
@@ -174,7 +199,9 @@ void ImagePanel::paintNow()
  */
 void ImagePanel::render(wxDC&  dc)
 {
+	//wxBufferedDC bdc = wxBufferedDC(&dc,tempImage);
     dc.DrawBitmap( resizedImage, 0, 0, false );
+	//bdc.DrawBitmap( resizedImage, 0, 0, false );
 }
 
 
@@ -183,18 +210,12 @@ double ImagePanel::getScalingFactor()
 	return scaleFactor;
 }
 
+void ImagePanel::setScalingFactor(double scaleFactor)
+{
+	this->scaleFactor = scaleFactor;
+}
+
 /*EVENT TABLE*/
 BEGIN_EVENT_TABLE(ImagePanel, wxPanel)
-	// some useful events
-	/*
-	 EVT_MOTION(ImagePanel::mouseMoved)
-	 EVT_LEFT_DOWN(ImagePanel::mouseDown)
-	 EVT_LEFT_UP(ImagePanel::mouseReleased)
-	 EVT_RIGHT_DOWN(ImagePanel::rightClick)
-	 EVT_LEAVE_WINDOW(ImagePanel::mouseLeftWindow)
-	 EVT_KEY_DOWN(ImagePanel::keyPressed)
-	 EVT_KEY_UP(ImagePanel::keyReleased)
-	 EVT_MOUSEWHEEL(ImagePanel::mouseWheelMoved)
-	 */
 	EVT_PAINT(ImagePanel::paintEvent) // catch paint events
 END_EVENT_TABLE()
