@@ -44,6 +44,7 @@ wxPanel(parent,id,pos,sizeIn)
     size = sizeIn;
 	scaleFactor = 1;
 	oldSize = wxSize(0,0);
+	setImage(size.GetWidth(),size.GetHeight(),new unsigned char[3*size.GetWidth()*size.GetHeight()],true);
 }
 
 
