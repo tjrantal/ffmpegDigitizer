@@ -34,7 +34,7 @@ IMPLEMENT_APP_NO_MAIN(DigitizerApp)
 bool DigitizerApp::OnInit()
 {
 	/*Try to learn about the display on init*/
-	unsigned int displayCoung = wxDisplay::GetCount();
+	unsigned int displayCount = wxDisplay::GetCount();
 	int width,height;
 	wxDisplaySize(&width,&height);
 	
