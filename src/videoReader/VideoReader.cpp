@@ -84,7 +84,7 @@ VideoReader::VideoReader(const char* file)
 	if(pCodecCtx->time_base.num>1000 && pCodecCtx->time_base.den==1)
 		pCodecCtx->time_base.den=1000;
 	
-	tmp_picture=avcodec_alloc_frame();
+	tmp_picture=av_frame_alloc();
 	if (!tmp_picture){
 		printf("Coulnd't alloc frame\n");
 		fflush(stdout);			//DEBUGGING
@@ -96,7 +96,7 @@ VideoReader::VideoReader(const char* file)
 	if (pCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 		printf("different pix_fmt\n");
 	
-		picture = avcodec_alloc_frame();
+		picture = av_frame_alloc();
 		if (!picture){
 			printf("Couldn't alloc frame\n");
 			return;
@@ -399,11 +399,11 @@ VideoReader::~VideoReader(){
 	pFormatCtx = NULL;
 	pCodecCtx =NULL;
 	//Attempt to free pictures
-	avcodec_free_frame(&tmp_picture);
+	av_frame_free(&tmp_picture);
 	//av_free(&tmp_picture);
 
 	av_freep(&picture->data[0]);
-	avcodec_free_frame(&picture);
+	av_frame_free(&picture);
 	//av_free(&picture);
 	if (decodedFrame!=NULL){
 		delete decodedFrame;
