@@ -73,16 +73,15 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 	/*Connect the mouse listener to digitize points on screen*/
 	imagePanel->Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(DigitizerFrame::LeftButtonDown), NULL,this);
 	imagePanel->Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(DigitizerFrame::RightButtonDown), NULL,this);
-	//videoReader = new VideoReader("GOPR0085.MP4",10);
 	
-	/*Text panel for digitized markers*/
-	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(1000,10),wxSize(200,200),wxTE_MULTILINE);
+		/*Text panel for digitized markers*/
+		//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(1000,10),wxSize(200,200),wxTE_MULTILINE);
 	/*Key handling*/
 	Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown),NULL,this);
 	imagePanel->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown),NULL,this);
 	videoReader = NULL;
 	markerSelector = NULL;
-	//debug = freopen("debug.log","w",stdout);
+		//debug = freopen("debug.log","w",stdout);
 }
 
 /*Button event handling*/
@@ -316,7 +315,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			int gotPackets = 0;
 			if (config->Read(videoFilePath,&indexFileName)){
 				//Read indices from file here
-				printf("Reading from conf\n");
+				printf("Reading from conf %s\n",indexFileName.c_str().AsChar());
 				fflush(stdout);			//DEBUGGING
 				wxTextFile* indexFile = new wxTextFile();
 				if( wxFileName::FileExists(indexFileName)){
@@ -402,11 +401,11 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 	}
 	printf("Create file name\n");
 		fflush(stdout);			//DEBUGGING
-	wxFileName temp(wxT("videoIndices"));
-	wxString indexFileName = temp.GetPathWithSep();
+	wxDir temp(wxT("videoIndices"));
+	wxString indexFileName = temp.GetNameWithSep();
 	indexFileName.Append(videoFileName.GetName());
 	indexFileName.append(wxT(".ind"));
-	//printf("%s\n",indexFileName.ToAscii());
+	printf("INDEX FILE NAME %s\n",indexFileName.c_str().AsChar());
 	fflush(stdout);			//DEBUGGING
 	/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
 	#ifdef __linux__
