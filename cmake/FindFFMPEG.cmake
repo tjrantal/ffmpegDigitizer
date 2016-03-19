@@ -46,6 +46,12 @@ else( WIN32 )
 			     ${AVCODEC_INCLUDE_DIRS}
 			     ${AVUTIL_INCLUDE_DIRS}
 			     ${AVDEVICE_INCLUDE_DIRS} )
+			     
+	SET( FFMPEG_LIBRARIES ${AVFORMAT_LIBRARIES}
+			     ${AVCODEC_LIBRARIES}
+			     ${AVUTIL_LIBRARIES}
+			     ${AVDEVICE_LIBRARIES})
+			     
 endif( WIN32 )
 
 # add in swscale if found

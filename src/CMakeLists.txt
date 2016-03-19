@@ -52,13 +52,13 @@ message("FFMPEG_LIBRARIES  " ${FFMPEG_LIBRARIES})
 message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
 
 #Get the missing dependent libs for ffmpeg...
-find_package(PkgConfig REQUIRED)
-pkg_search_module(LIBAVFORMAT REQUIRED libavformat)
+#find_package(PkgConfig REQUIRED)
+#pkg_search_module(LIBAVFORMAT REQUIRED libavformat)
 
 #message("LIBAVFORMAT " ${LIBAVFORMAT_LIBRARIES})
 
 # Properties->Linker->Input->Additional Dependencies
-target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} ${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
+target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} )#${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
  
  
 # Creates a folder "executables" and adds target 
