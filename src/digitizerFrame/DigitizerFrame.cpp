@@ -319,78 +319,42 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				printf("Reading from conf\n");
 				fflush(stdout);			//DEBUGGING
 				wxTextFile* indexFile = new wxTextFile();
-				indexFile->Open(indexFileName,wxConvUTF8); /*Open the file for reading*/
-				wxString temp;
-				std::vector<frameIndice> tempFrameIndices= std::vector<frameIndice>();
-				/*Read indices from the file*/
-				if (indexFile->IsOpened()){
-					for (temp = indexFile->GetFirstLine(); !indexFile ->Eof(); temp = indexFile->GetNextLine()){
-						wxStringTokenizer tkz(temp, wxT("\t"));
-						std::vector<wxString>* tokens = new std::vector<wxString>();
-						while ( tkz.HasMoreTokens() )
-						{
-							tokens->push_back(tkz.GetNextToken());
+				if( wxFileName::FileExists(indexFileName)){
+					indexFile->Open(indexFileName,wxConvUTF8); /*Open the file for reading*/
+					wxString temp;
+					std::vector<frameIndice> tempFrameIndices= std::vector<frameIndice>();
+					/*Read indices from the file*/
+					if (indexFile->IsOpened()){
+						for (temp = indexFile->GetFirstLine(); !indexFile ->Eof(); temp = indexFile->GetNextLine()){
+							wxStringTokenizer tkz(temp, wxT("\t"));
+							std::vector<wxString>* tokens = new std::vector<wxString>();
+							while ( tkz.HasMoreTokens() )
+							{
+								tokens->push_back(tkz.GetNextToken());
+							}
+							int temp1 = wxAtoi(tokens->at(0));
+							long temp2;
+							long temp3;
+							tokens->at(1).ToLong(&temp2);
+							tokens->at(2).ToLong(&temp3);
+							frameIndice tempIndice = { temp1,temp2 ,temp3};
+							tempFrameIndices.push_back(tempIndice);
+							tokens->clear();
+							delete tokens;									
 						}
-						int temp1 = wxAtoi(tokens->at(0));
-						long temp2;
-						long temp3;
-						tokens->at(1).ToLong(&temp2);
-						tokens->at(2).ToLong(&temp3);
-						frameIndice tempIndice = { temp1,temp2 ,temp3};
-						tempFrameIndices.push_back(tempIndice);
-						tokens->clear();
-						delete tokens;									
+		
 					}
-	
+					indexFile->Close();
+					delete indexFile;
+					videoReader->frameIndices = tempFrameIndices;
+				} else{
+					printf("File didn't exist\n");
+					gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
 				}
-				indexFile->Close();
-				delete indexFile;
-				delete config;
-				videoReader->frameIndices = tempFrameIndices;
 			}else{
-				/*Index the file and save the index file name to config*/
-				gotPackets = videoReader->readIndices();
-				printf("Indices read\n");
-				fflush(stdout);			//DEBUGGING
-				if (!wxDir::Exists(_("videoIndices"))){
-					#ifdef __linux__
-						wxMkDir("videoIndices",0777);	//Linux
-					#else
-						wxMkDir("videoIndices");		//Windows
-					#endif
-					printf("Dir created\n");
-					fflush(stdout);			//DEBUGGING
-				}
-				printf("Create file name\n");
-					fflush(stdout);			//DEBUGGING
-				wxFileName temp(wxT("videoIndices"));
-				wxString indexFileName = temp.GetPathWithSep();
-				indexFileName.Append(videoFileName.GetName());
-				indexFileName.append(wxT(".ind"));
-				//printf("%s\n",indexFileName.ToAscii());
-				fflush(stdout);			//DEBUGGING
-				/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
-				#ifdef __linux__
-					wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
-				#else
-					wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
-				#endif
-				printf("File isOpened %d\n",indiceFile->IsOpened());
-					fflush(stdout);
-							//DEBUGGING
-				//Write indices to file here
-				for (int i = 0; i<videoReader->frameIndices.size();++i){
-					indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
-														,videoReader->frameIndices.at(i).pts
-														,videoReader->frameIndices.at(i).pkt_pts)
-														,wxConvUTF8);
-				}
-				indiceFile->Close();
-				delete indiceFile;
-				//videoReader->writeIndicesToFile();					
-				config->Write(videoFilePath, indexFileName);
-				delete config;
-			}		
+				gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
+			}
+			delete config;
 			printf("Got indices %d\n", gotPackets);
 			fflush(stdout);			//DEBUGGING
 			printf("Reading frame\n");
@@ -422,6 +386,50 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 }
 
+int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFileName,wxString videoFilePath,wxConfig *config){
+	/*Index the file and save the index file name to config*/
+	int gotPackets = videoReader->readIndices();
+	printf("Indices read\n");
+	fflush(stdout);			//DEBUGGING
+	if (!wxDir::Exists(_("videoIndices"))){
+		#ifdef __linux__
+			wxMkDir("videoIndices",0777);	//Linux
+		#else
+			wxMkDir("videoIndices");		//Windows
+		#endif
+		printf("Dir created\n");
+		fflush(stdout);			//DEBUGGING
+	}
+	printf("Create file name\n");
+		fflush(stdout);			//DEBUGGING
+	wxFileName temp(wxT("videoIndices"));
+	wxString indexFileName = temp.GetPathWithSep();
+	indexFileName.Append(videoFileName.GetName());
+	indexFileName.append(wxT(".ind"));
+	//printf("%s\n",indexFileName.ToAscii());
+	fflush(stdout);			//DEBUGGING
+	/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
+	#ifdef __linux__
+		wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
+	#else
+		wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
+	#endif
+	printf("File isOpened %d\n",indiceFile->IsOpened());
+		fflush(stdout);
+				//DEBUGGING
+	//Write indices to file here
+	for (int i = 0; i<videoReader->frameIndices.size();++i){
+		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
+											,videoReader->frameIndices.at(i).pts
+											,videoReader->frameIndices.at(i).pkt_pts)
+											,wxConvUTF8);
+	}
+	indiceFile->Close();
+	delete indiceFile;
+	//videoReader->writeIndicesToFile();					
+	config->Write(videoFilePath, indexFileName);
+	return gotPackets;
+}
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	currentFrame = slider->GetValue();

@@ -104,7 +104,9 @@ private:
 	void NextMarker();									/**< Proceed to Next marker*/
 	void PreviousMarker();									/**< Back to Previous marker*/
 	void GetMarkerValues(int marker);								/**< Get parameters of a given marker*/
-    DECLARE_EVENT_TABLE()
+    int getPrintIndices(VideoReader *videoReader, wxFileName videoFileName,wxString videoFilePath,wxConfig *config);
+	
+	DECLARE_EVENT_TABLE()
 	//wxDECLARE_EVENT_TABLE();
 };
 
