@@ -279,15 +279,23 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 }
 
 void DigitizerFrame::OpenVideo(wxCommandEvent& event){
+	//Use wxConfig to store path to look for videos... 
+	wxConfig *config = new wxConfig(_("digitizerConfig"));
+	wxString defaultVideoFolder;
+	if (config->Read(_("defaultVideoFolder"),&defaultVideoFolder)){
+	}else{
+		defaultVideoFolder = _("");
+	}
 	
 	/*Open marker file*/
-		wxFileDialog openFileDialog(this, _("Open video file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
+		wxFileDialog openFileDialog(this, _("Open video file"), defaultVideoFolder, _(""),
 	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
+		delete config;
 		//resultsText->ChangeValue(_("No video file opened"));
 	}else{
-		/*Close any pre-existing video*/
+				/*Close any pre-existing video*/
 		printf("Pre-existing videoReader?\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL){
@@ -303,6 +311,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		wxString videoFilePath = openFileDialog.GetPath();
 		videoReader = new VideoReader(videoFilePath.char_str());
 		wxFileName videoFileName(videoFilePath);
+		//Save the video file folder as the default path
+		config->Write(_("defaultVideoFolder"), videoFileName.GetPath());
 		printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
@@ -310,7 +320,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			printf("Read indices\n");
 			fflush(stdout);			//DEBUGGING
 			/*Check whether the video has already been indexed, if not index the video*/
-			wxConfig *config = new wxConfig(_("digitizerConfig"));
+			//config = new wxConfig(_("digitizerConfig"));
 			wxString indexFileName;
 			int gotPackets = 0;
 			if (config->Read(videoFilePath,&indexFileName)){
