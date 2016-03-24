@@ -413,7 +413,7 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 		fflush(stdout);			//DEBUGGING
 	wxDir temp(wxT("videoIndices"));
 	wxString indexFileName = temp.GetNameWithSep();
-	indexFileName.Append(videoFileName.GetName());
+	indexFileName.Append(videoFileName.GetFullName());
 	indexFileName.append(wxT(".ind"));
 	printf("INDEX FILE NAME %s\n",indexFileName.c_str().AsChar());
 	fflush(stdout);			//DEBUGGING
