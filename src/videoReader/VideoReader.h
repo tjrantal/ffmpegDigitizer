@@ -35,11 +35,16 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	}
 	
 	/**Struct to store frame indices and corresponding time stamps*/
-	typedef struct{
+	struct FrameIndice{
 		int 	frameNo;	/**< Number of picture in series*/
 		int64_t	pts;	/**< TimeStamp of the frame */
 		int64_t	pkt_pts;	/**< TimeStamp of the packet */
-	} frameIndice;
+		FrameIndice(int _frameNo,int64_t _pts, int64_t _pkt_pts){
+			frameNo = _frameNo;
+			pts = _pts;
+			pkt_pts = _pkt_pts;
+		}
+	};
 	
 	
 	/*! CLASS FOR VIDEO READING*/
@@ -74,7 +79,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		long startTime;		/**< ffmpeg startTime*/
 		bool videoOpen;		/**< true, if video was opened successfully*/
 		unsigned char *decodedFrame;	/**< Current decoded frame*/
-		std::vector<frameIndice> frameIndices;	/**< frame indices and timestamps*/
+		std::vector<FrameIndice*> frameIndices;	/**< frame indices and timestamps*/
 
 		//Class function declarations
 		int getNumberOfFrames();	/**< Get the number of frames in the video (might not work...)*/

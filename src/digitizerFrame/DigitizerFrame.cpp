@@ -355,7 +355,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				if( wxFileName::FileExists(indexFileName)){
 					indexFile->Open(indexFileName,wxConvUTF8); /*Open the file for reading*/
 					wxString temp;
-					std::vector<frameIndice> tempFrameIndices= std::vector<frameIndice>();
+					std::vector<FrameIndice*> *tempFrameIndices = new std::vector<FrameIndice*>();
 					/*Read indices from the file*/
 					if (indexFile->IsOpened()){
 						for (temp = indexFile->GetFirstLine(); !indexFile ->Eof(); temp = indexFile->GetNextLine()){
@@ -370,8 +370,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 							long temp3;
 							tokens->at(1).ToLong(&temp2);
 							tokens->at(2).ToLong(&temp3);
-							frameIndice tempIndice = { temp1,temp2 ,temp3};
-							tempFrameIndices.push_back(tempIndice);
+							FrameIndice *tempIndice = new FrameIndice( temp1,temp2 ,temp3);
+							tempFrameIndices->push_back(tempIndice);
 							tokens->clear();
 							delete tokens;									
 						}
@@ -379,7 +379,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 					}
 					indexFile->Close();
 					delete indexFile;
-					videoReader->frameIndices = tempFrameIndices;
+					videoReader->frameIndices = *tempFrameIndices;
 				} else{
 					printf("File didn't exist\n");
 					gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
@@ -392,7 +392,9 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			fflush(stdout);			//DEBUGGING
 			printf("Reading frame\n");
 			fflush(stdout);			//DEBUGGING
-			int displayPictureNumber = videoReader->readNextFrameFromDisk();			
+			//int displayPictureNumber = videoReader->readNextFrameFromDisk();			
+			int displayPictureNumber = videoReader->readFrameFromDisk(0);
+			
 			int framesInVid = videoReader->getNumberOfFrames();			
 			printf("Frames in video %d\n",framesInVid);
 			fflush(stdout);			//DEBUGGING
@@ -452,9 +454,9 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 				//DEBUGGING
 	//Write indices to file here
 	for (int i = 0; i<videoReader->frameIndices.size();++i){
-		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i).frameNo
-											,videoReader->frameIndices.at(i).pts
-											,videoReader->frameIndices.at(i).pkt_pts)
+		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i)->frameNo
+											,videoReader->frameIndices.at(i)->pts
+											,videoReader->frameIndices.at(i)->pkt_pts)
 											,wxConvUTF8);
 	}
 	indiceFile->Close();
