@@ -198,14 +198,26 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 }
 
 void DigitizerFrame::OpenSave(wxCommandEvent& event){
-
+	//Use wxConfig to store path to look for coordinate file... 
+	wxConfig *config = new wxConfig(_("digitizerConfig"));
+	wxString defaultCoordinateFolder;
+	if (config->Read(_("defaultCoordinateFolder"),&defaultCoordinateFolder)){
+	}else{
+		defaultCoordinateFolder = _("");
+	}
+	
 	/*Open coordinate file*/
-	wxFileDialog openFileDialog(this, _("Create/open a RES file. Will be overwritten"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
+	wxFileDialog openFileDialog(this, _("Create/open a RES file. Will be overwritten"), defaultCoordinateFolder, _(""),
 	_("RES files (*.RES|*.res"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
+		delete config;
 		//resultsText->ChangeValue(_("No marker file opened"));
 	}else{
+		//Save default defaultMarkerFolder
+		wxFileName temp(openFileDialog.GetPath());
+		config->Write(_("defaultCoordinateFolder"),temp.GetPath());
+		delete config;
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (openSave != NULL){
 			openSave->Write();
