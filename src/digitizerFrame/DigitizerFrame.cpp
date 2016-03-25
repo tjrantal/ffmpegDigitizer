@@ -368,9 +368,11 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 							int temp1 = wxAtoi(tokens->at(0));
 							long temp2;
 							long temp3;
+							long temp4;
 							tokens->at(1).ToLong(&temp2);
 							tokens->at(2).ToLong(&temp3);
-							FrameIndice *tempIndice = new FrameIndice( temp1,temp2 ,temp3);
+							tokens->at(3).ToLong(&temp4);
+							FrameIndice *tempIndice = new FrameIndice( temp1,temp2 ,temp3,temp4);
 							tempFrameIndices->push_back(tempIndice);
 							tokens->clear();
 							delete tokens;									
@@ -454,9 +456,10 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 				//DEBUGGING
 	//Write indices to file here
 	for (int i = 0; i<videoReader->frameIndices.size();++i){
-		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\n"),videoReader->frameIndices.at(i)->frameNo
+		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\t%ld\n"),videoReader->frameIndices.at(i)->frameNo
 											,videoReader->frameIndices.at(i)->pts
-											,videoReader->frameIndices.at(i)->pkt_pts)
+											,videoReader->frameIndices.at(i)->pkt_pts
+											,videoReader->frameIndices.at(i)->dts)
 											,wxConvUTF8);
 	}
 	indiceFile->Close();

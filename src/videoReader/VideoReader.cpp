@@ -150,7 +150,7 @@ int VideoReader::readIndices(){
 	            &packet);
 	        if (frameFinished){
 				++frameNo;
-				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts);
+				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,packet.dts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}
@@ -167,7 +167,7 @@ int VideoReader::readIndices(){
 		
 			if (frameFinished){
 				++frameNo;
-				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts);
+				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,packet.dts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}else{
@@ -181,7 +181,9 @@ int VideoReader::readIndices(){
 		}
 	}
 	/*Rewind the file*/
-	av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0)->pts,AVSEEK_FLAG_BACKWARD); 
+	//av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0)->pts,AVSEEK_FLAG_BACKWARD); 
+	av_seek_frame(pFormatCtx,videoStream,frameIndices.at(0)->dts,AVSEEK_FLAG_BACKWARD); 
+	
 	return frameNo;
 
 }
@@ -288,7 +290,8 @@ int VideoReader::readFrameFromDisk(int frameNo){
 		return frameNo;
 	}
 	/*Seek to the desired frame*/
-	int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo)->pkt_pts,AVSEEK_FLAG_BACKWARD);
+	//int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo)->pkt_pts,AVSEEK_FLAG_BACKWARD);
+	int success = av_seek_frame(pFormatCtx,videoStream,frameIndices.at(frameNo)->dts,AVSEEK_FLAG_BACKWARD);
 	if (success < 0){
 		printf("Seek failed %d\n",success);
 		fflush(stdout);
@@ -308,7 +311,9 @@ int VideoReader::readFrameFromDisk(int frameNo){
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 			&packet);
 			if (frameFinished){
-				if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
+				//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
+				if (packet.dts == frameIndices.at(frameNo)->dts){
+					
 					moreFrames = false;
 					if(img_convert_ctx == NULL){
 						if (tmp_picture->linesize[0] != width){ //Hack for padding
@@ -352,7 +357,9 @@ int VideoReader::readFrameFromDisk(int frameNo){
 					&packet) >=0){
 			
 				if (frameFinished){
-					if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
+					//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
+					if (packet.dts == frameIndices.at(frameNo)->dts){
+						
 						if(img_convert_ctx == NULL){
 							if (tmp_picture->linesize[0] != width){ //Hack for padding
 								for (int zzz = 0; zzz < height;zzz++){

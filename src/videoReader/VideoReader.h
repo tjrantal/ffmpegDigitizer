@@ -39,10 +39,16 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int 	frameNo;	/**< Number of picture in series*/
 		int64_t	pts;	/**< TimeStamp of the frame */
 		int64_t	pkt_pts;	/**< TimeStamp of the packet */
-		FrameIndice(int _frameNo,int64_t _pts, int64_t _pkt_pts){
+		int64_t	dts;		//
+		int 	dpn;		//Display picture number
+		int		cpn;		//Coded picture number
+		FrameIndice(int _frameNo,int64_t _pts, int64_t _pkt_pts,int64_t _dts = 0,int _dpn =0, int _cpn = 0){
 			frameNo = _frameNo;
 			pts = _pts;
 			pkt_pts = _pkt_pts;
+			dts	= _dts;
+			dpn  = _dpn;
+			cpn = _cpn;
 		}
 	};
 	
