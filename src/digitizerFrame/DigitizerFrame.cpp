@@ -241,14 +241,26 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 }
 
 void DigitizerFrame::OpenFile(wxCommandEvent& event){
-
+	//Use wxConfig to store path to look for maker file... 
+	wxConfig *config = new wxConfig(_("digitizerConfig"));
+	wxString defaultMarkerFolder;
+	if (config->Read(_("defaultMarkerFolder"),&defaultMarkerFolder)){
+	}else{
+		defaultMarkerFolder = _("");
+	}
+	
 	/*Open marker file*/
-	wxFileDialog openFileDialog(this, _("Open TAB file"), _("/home/timo/windows/timo/research/Digitizer/"), _(""),
+	wxFileDialog openFileDialog(this, _("Open TAB file"), defaultMarkerFolder, _(""),
 	_("TAB files (*.tab)|*.tab"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
+		delete config;
 		//resultsText->ChangeValue(_("No marker file opened"));
 	}else{
+		//Save default defaultMarkerFolder
+		wxFileName temp(openFileDialog.GetPath());
+		config->Write(_("defaultMarkerFolder"),temp.GetPath());
+		delete config;
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
 			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,300));
