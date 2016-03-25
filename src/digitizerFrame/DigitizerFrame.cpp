@@ -41,13 +41,13 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
     SetStatusText( _("Welcome to Digitizer!") );
 	/*Add text field for results*/
 	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(10,10),wxSize(180,130),wxTE_MULTILINE);
-	resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,130),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
+	resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,100),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
 	/*Button for reading markers in*/
-	openMarkerFile 	= new wxButton(this,ID_picker,_("Open &marker file"),wxPoint(10,150));
+	openMarkerFile 	= new wxButton(this,ID_picker,_("Open &marker file"),wxPoint(10,120));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
-	openVideoFile 	= new wxButton(this,ID_video,_("Open &video file"),wxPoint(10,200));
+	openVideoFile 	= new wxButton(this,ID_video,_("Open &video file"),wxPoint(10,160));
 	Connect(ID_video,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenVideo),NULL,this);
-	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file"),wxPoint(10,250));
+	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file"),wxPoint(10,200));
 	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
 	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/
@@ -275,14 +275,14 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		delete config;
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
-			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,300));
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,250));
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
-			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,350),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,400),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			colorTolerance = new wxSlider(this,ID_colorTolerance,30,0,255,wxPoint(10,450),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,500));
+			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,350),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			colorTolerance = new wxSlider(this,ID_colorTolerance,30,0,255,wxPoint(10,400),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,450));
 			trackOn = false;
 		} else {
 			markerSelector->setMarkerList(openFileDialog.GetPath());
