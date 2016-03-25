@@ -144,13 +144,17 @@ int VideoReader::readIndices(){
 	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
 	{
 		
+		
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {	
+			printf("packet dts %ld pts %ld\n",packet.dts,packet.pts);
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &packet);
 	        if (frameFinished){
 				++frameNo;
-				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,packet.dts);
+				//printf("FRAME %d dts %ld pts %ld av %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts);
+				//printf("FRAME %d dts %ld pts %ld av %ld av pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts);
+				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}
@@ -160,14 +164,19 @@ int VideoReader::readIndices(){
 	}
 	/*Check whether null frames need to be fed in to get the remaining data*/
 	while (1){
-		packet.data = NULL;
-		packet.size = 0;
+		//Set data to null, if all of the packet has been consumed
+		if (packet.size = 0){
+			packet.data = NULL;
+			packet.size = 0;
+		}
 		if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &packet) >=0){
 		
 			if (frameFinished){
 				++frameNo;
-				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,packet.dts);
+				//printf("REMAIN FRAME %d dts %ld pts %ld av %ld av pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts);
+				
+				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
 			}else{
@@ -235,8 +244,10 @@ int VideoReader::readNextFrameFromDisk(){
 	/*Feed null frames need to get a delayed frame*/
 	if (readMore ==1){
 		while (1){
-			packet.data = NULL;
-			packet.size = 0;
+			if (packet.size = 0){
+				packet.data = NULL;
+				packet.size = 0;
+			}
 			if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 					&packet) >=0){
 			
@@ -312,8 +323,10 @@ int VideoReader::readFrameFromDisk(int frameNo){
 			&packet);
 			if (frameFinished){
 				//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
-				if (packet.dts == frameIndices.at(frameNo)->dts){
+				//if (packet.dts == frameIndices.at(frameNo)->dts){
+				if (tmp_picture->pkt_dts == frameIndices.at(frameNo)->dts){
 					
+	
 					moreFrames = false;
 					if(img_convert_ctx == NULL){
 						if (tmp_picture->linesize[0] != width){ //Hack for padding
@@ -351,15 +364,18 @@ int VideoReader::readFrameFromDisk(int frameNo){
 	/*Feed null frames need to get a delayed frame*/
 	if (moreFrames){
 		while (1){
-			packet.data = NULL;
-			packet.size = 0;
+			if (packet.size = 0){
+				packet.data = NULL;
+				packet.size = 0;
+			}
 			if (avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 					&packet) >=0){
 			
 				if (frameFinished){
 					//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
-					if (packet.dts == frameIndices.at(frameNo)->dts){
-						
+					//if (packet.dts == frameIndices.at(frameNo)->dts){
+					if (tmp_picture->pkt_dts == frameIndices.at(frameNo)->dts){
+					
 						if(img_convert_ctx == NULL){
 							if (tmp_picture->linesize[0] != width){ //Hack for padding
 								for (int zzz = 0; zzz < height;zzz++){

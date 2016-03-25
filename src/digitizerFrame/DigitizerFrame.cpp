@@ -352,7 +352,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				printf("Reading from conf %s\n",indexFileName.c_str().AsChar());
 				fflush(stdout);			//DEBUGGING
 				wxTextFile* indexFile = new wxTextFile();
-				if( wxFileName::FileExists(indexFileName)){
+				//Debugging false &&
+				if( false && wxFileName::FileExists(indexFileName)){
 					indexFile->Open(indexFileName,wxConvUTF8); /*Open the file for reading*/
 					wxString temp;
 					std::vector<FrameIndice*> *tempFrameIndices = new std::vector<FrameIndice*>();
