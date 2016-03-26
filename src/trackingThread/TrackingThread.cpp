@@ -45,7 +45,8 @@ void TrackingThread::run(){
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		markersFound = 0;
-		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
+		int keepTracking = 1;
+		for (int i = 0; i<mainThread->markerSelector->markers.size() && keepTracking == 1;++i){
 			//Look for coordinate in the previous image/
 			//printf("Marker %d\n",i);
 			gotMarker = false;
@@ -64,6 +65,7 @@ void TrackingThread::run(){
 				} catch (int err){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
 					//printf("Tried getting previous frame marker, caught %d\n",err);
+					
 				}
 
 			}
@@ -93,13 +95,18 @@ void TrackingThread::run(){
 					//printf("Digitized coordinate\n");
 					++markersFound;
 				}catch (int err){
+					keepTracking = 0;	//Set to stop the tracking thread
 					printf("Tried digitizing, caught %d\n",err);
+					mainThread->markerSelector->currentMarker = i;
+					mainThread->markerSelector->SetSelection(i);					
+					goto breakLoop;	//Stop the loop
 				}
 			}
 		}
+breakLoop:
 		mainThread->imagePanel->reFreshImage();
 		//Advance frame if at least one marker was digitized
-		if (markersFound > 0){
+		if (markersFound > 0 && keepTracking == 1){
 			/*Proceed to the next frame, if this was not the last frame*/
 			if (currentFrame < mainThread->videoReader->getNumberOfIndices()){
 				//std::this_thread::sleep_for (std::chrono::milliseconds(20));
@@ -111,6 +118,7 @@ void TrackingThread::run(){
 				/*Stop the thread*/
 				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 				mainThread->trackOn == false;	/*Stop tracking*/
+				printf("Trying to stop the thread\n");
 				//delete currentImage; /*Try to save mem...*/
 				break;
 			}
@@ -118,12 +126,13 @@ void TrackingThread::run(){
 		}else{
 			/*Stop the thread*/
 			mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
-			mainThread->trackOn == false;	/*Stop tracking*/
+			mainThread->trackOn = false;	/*Stop tracking*/
 		}
 		//delete currentImage; /*Try to save mem...*/
 	}
+	printf("Exiting thread\n");
 	mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
-	mainThread->trackOn == false;	/*Stop tracking*/
+	mainThread->trackOn = false;	/*Stop tracking*/
 	mainThread->printCoordinates();	/*Update the coordinate list*/
 	/*Done with automatic digitizing*/
 }
