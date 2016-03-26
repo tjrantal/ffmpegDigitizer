@@ -457,5 +457,5 @@ int VideoReader::getNumberOfFrames(){
 }
 
 int VideoReader::getNumberOfIndices(){
-	return frameIndices.size();
+	return (int) frameIndices.size();
 }

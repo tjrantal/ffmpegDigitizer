@@ -391,23 +391,11 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 				gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
 			}
 			delete config;
-			printf("Got indices %d\n", gotPackets);
-			fflush(stdout);			//DEBUGGING
-			printf("Reading frame\n");
-			fflush(stdout);			//DEBUGGING
+			
 			//int displayPictureNumber = videoReader->readNextFrameFromDisk();			
 			int displayPictureNumber = videoReader->readFrameFromDisk(0);
-			
-			int framesInVid = videoReader->getNumberOfFrames();			
-			printf("Frames in video %d\n",framesInVid);
-			fflush(stdout);			//DEBUGGING
-			
-			//int gotPackets = videoReader->readPackets();
-			
-			//int framesInVid = videoReader->readFrames(); 
-			//int displayPictureNumber = videoReader->decodeNextFrame();
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
-				SetStatusText(wxString::Format(wxT("%s ffmpeg %d packets %d, frameNo %d"),_("Video opened, frames:"), framesInVid, videoReader->getNumberOfIndices(),displayPictureNumber));
+				SetStatusText(wxString::Format(wxT("%s ffmpeg packets %d, frameNo %d"),_("Video opened, frames:"), videoReader->getNumberOfIndices(),displayPictureNumber));
 
 			if (slider != NULL){
 				delete slider;
@@ -427,7 +415,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFileName,wxString videoFilePath,wxConfig *config){
 	/*Index the file and save the index file name to config*/
 	int gotPackets = videoReader->readIndices();
-	printf("Indices read\n");
+	//printf("Indices read\n");
 	fflush(stdout);			//DEBUGGING
 	if (!wxDir::Exists(_("videoIndices"))){
 		#ifdef __linux__
@@ -438,7 +426,7 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 		printf("Dir created\n");
 		fflush(stdout);			//DEBUGGING
 	}
-	printf("Create file name\n");
+	//printf("Create file name\n");
 		fflush(stdout);			//DEBUGGING
 	wxDir temp(wxT("videoIndices"));
 	wxString indexFileName = temp.GetNameWithSep();
@@ -452,8 +440,8 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 	#else
 		wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
 	#endif
-	printf("File isOpened %d\n",indiceFile->IsOpened());
-		fflush(stdout);
+	//printf("File isOpened %d\n",indiceFile->IsOpened());
+	//	fflush(stdout);
 				//DEBUGGING
 	//Write indices to file here
 	for (int i = 0; i<videoReader->frameIndices.size();++i){

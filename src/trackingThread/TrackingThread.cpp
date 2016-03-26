@@ -46,7 +46,7 @@ void TrackingThread::run(){
 		//Go through all of the markers in the image
 		markersFound = 0;
 		int keepTracking = 1;
-		for (int i = 0; i<mainThread->markerSelector->markers.size() && keepTracking == 1;++i){
+		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
 			//Look for coordinate in the previous image/
 			//printf("Marker %d\n",i);
 			gotMarker = false;
@@ -96,14 +96,13 @@ void TrackingThread::run(){
 					++markersFound;
 				}catch (int err){
 					keepTracking = 0;	//Set to stop the tracking thread
-					printf("Tried digitizing, caught %d\n",err);
+					//printf("Tried digitizing, caught %d\n",err);
 					mainThread->markerSelector->currentMarker = i;
 					mainThread->markerSelector->SetSelection(i);					
-					goto breakLoop;	//Stop the loop
+					break;	//Stop the loop
 				}
 			}
 		}
-breakLoop:
 		mainThread->imagePanel->reFreshImage();
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0 && keepTracking == 1){
@@ -130,7 +129,7 @@ breakLoop:
 		}
 		//delete currentImage; /*Try to save mem...*/
 	}
-	printf("Exiting thread\n");
+	//printf("Exiting thread\n");
 	mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 	mainThread->trackOn = false;	/*Stop tracking*/
 	mainThread->printCoordinates();	/*Update the coordinate list*/
