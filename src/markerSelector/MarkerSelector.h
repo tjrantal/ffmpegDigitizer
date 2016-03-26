@@ -29,7 +29,7 @@ class MarkerSelector : public wxComboBox{
 		
 	
 	public:
-
+		
 		/*Variables*/
 		std::vector<marker> markers;	/**< Markers read from the file*/
 		int currentMarker;
@@ -38,15 +38,15 @@ class MarkerSelector : public wxComboBox{
 		@param fileIn file to open*/
 		void setMarkerList(wxString fileIn);	/**< Reset the marker list*/
 		/** Set the coordinates of a given marker
-		@param marker the indice of the marker to set
+		@param markerIndice the indice of the marker to set
 		@param xCoordinate the x-coordinate of the marker
 		@param yCoordinate the y-coordinate of the marker
 		@param frameNo the frame for which the coordinates are assigned to*/
-		void setCoordinate(int marker,double xCoordinate, double yCoordinate, int frameNo);	/**< Assign a value to a marker at a specific frame*/
+		void setCoordinate(int markerIndice,double xCoordinate, double yCoordinate, int frameNo);	/**< Assign a value to a marker at a specific frame*/
 		/** Get the coordinates of a given marker in a specific frame
-		@param marker the indice of the marker to get
+		@param markerIndice the indice of the marker to get
 		@param frameNo the frame for which the coordinate is to be looked up for*/
-		coordinate getCoordinate(int marker, int frameNo) throw(int);	/**< Get the coordinate at a specific frame*/
+		coordinate getCoordinate(int markerIndice, int frameNo) throw(int);	/**< Get the coordinate at a specific frame*/
 		
 		/**Set relative sampling coordinate
 			@param radius of the circular sampling area
@@ -68,6 +68,21 @@ class MarkerSelector : public wxComboBox{
 			@param histo2 Second histogram for the closeness
 		*/
 		double getCloseness(double** histo1,double** histo2);	/**compare a histogram to the histogram of the marker*/
+		
+		/**
+		 * @brief Clear marker frameNo
+		 * @param markerIndice marker to erase
+		 * @param frameNo frame to erase the marker from
+		 */
+		void eraseCoordinate(int markerIndice, int frameNo);
+		
+		/**
+		 * @brief clear marker coordinates to 
+		 * @param markerIndice the marker to reset
+		 */		
+		void eraseMarker(int markerIndice){
+			markers[markerIndice].coordinates.clear();
+		}
 		
 		/**Consructor
 		@param fileIn file to open

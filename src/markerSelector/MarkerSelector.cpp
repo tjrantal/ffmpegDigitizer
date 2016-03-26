@@ -47,25 +47,25 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 }
 
 /**< Assign a value to a marker at a specific frame*/
-void MarkerSelector::setCoordinate(int marker,double xCoordinate, double yCoordinate, int frameNo){
+void MarkerSelector::setCoordinate(int markerIndice,double xCoordinate, double yCoordinate, int frameNo){
 	/*Check that there is at least frameNo markers*/
-	if (markers.size() > marker){
+	if (markers.size() > markerIndice){
 		/*Check whether the frame has coordinates already*/
 		bool exists = false;
-		for (int j = 0; j<markers[marker].coordinates.size();++j){
-			if (frameNo == markers[marker].coordinates[j].frame){
+		for (int j = 0; j<markers[markerIndice].coordinates.size();++j){
+			if (frameNo == markers[markerIndice].coordinates[j].frame){
 				exists = true;
-				markers[marker].coordinates[j].frame = frameNo;
-				markers[marker].coordinates[j].xCoordinate = xCoordinate;
-				markers[marker].coordinates[j].yCoordinate = yCoordinate;
+				markers[markerIndice].coordinates[j].frame = frameNo;
+				markers[markerIndice].coordinates[j].xCoordinate = xCoordinate;
+				markers[markerIndice].coordinates[j].yCoordinate = yCoordinate;
 			}
 		}
 		/*If the frame didn't have a coordinate yet, add*/
 		if (exists == false){
-			markers[marker].coordinates.push_back(coordinate(xCoordinate,yCoordinate,frameNo));
+			markers[markerIndice].coordinates.push_back(coordinate(xCoordinate,yCoordinate,frameNo));
 		}
 		/*Sort the marker coordinates according to the frameNo*/
-		std::sort(markers[marker].coordinates.begin(),markers[marker].coordinates.end());
+		std::sort(markers[markerIndice].coordinates.begin(),markers[markerIndice].coordinates.end());
 	}
 }
 
@@ -84,13 +84,13 @@ void MarkerSelector::setSearchRadius(int markerNo, double radius){
 }
 
 /**< Get the coordinate at a specific frame*/
-coordinate MarkerSelector::getCoordinate(int marker, int frameNo) throw(int){
+coordinate MarkerSelector::getCoordinate(int markerIndice, int frameNo) throw(int){
 	/*Check that there is at least frameNo markers*/
-	if (markers.size() > marker && frameNo>-1){
+	if (markers.size() > markerIndice && frameNo>-1){
 		/*Check whether the frame has coordinates associated with it*/
-		for (int j = 0; j<markers[marker].coordinates.size();++j){
-			if (frameNo == markers[marker].coordinates[j].frame){
-				return markers[marker].coordinates[j];
+		for (int j = 0; j<markers[markerIndice].coordinates.size();++j){
+			if (frameNo == markers[markerIndice].coordinates[j].frame){
+				return markers[markerIndice].coordinates[j];
 			}
 		}
 	}
@@ -140,6 +140,19 @@ double MarkerSelector::getCloseness(double** histo1,double** histo2){
 		}
 	}
 	return closeness;
+}
+
+void MarkerSelector::eraseCoordinate(int markerIndice, int frameNo){
+	/*Check that there is at least frameNo markers*/
+	if (markers.size() > markerIndice && frameNo>-1){
+		/*Check whether the frame has coordinates associated with it*/
+		for (int j = 0; j<markers[markerIndice].coordinates.size();++j){
+			if (frameNo == markers[markerIndice].coordinates[j].frame){
+				markers[markerIndice].coordinates.erase(markers[markerIndice].coordinates.begin()+j);
+				return;
+			}
+		}
+	}
 }
 
 double min(){}
