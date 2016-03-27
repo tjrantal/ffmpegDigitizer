@@ -38,7 +38,7 @@ bool DigitizerApp::OnInit()
 	int width,height;
 	wxDisplaySize(&width,&height);
 	
-    DigitizerFrame *frame = new DigitizerFrame( _("Digitizer"), wxPoint(0, 50), wxSize(width-50, height-100) );
+    DigitizerFrame *frame = new DigitizerFrame( _("Digitizer"), wxPoint(10, 10), wxSize(width-10, height-10) );
     /*
 	int currentDisplay = wxDisplay::GetFromWindow(frame);
 	wxDisplay disp = wxDisplay(currentDisplay);
