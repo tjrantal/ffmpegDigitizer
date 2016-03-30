@@ -25,7 +25,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <algorithm>
 	#include <thread>			//For threading, tracking opens up a new thread, requires ISO C++ 2011 compliant compiler, e.g. g++ version 4.7 and up
 	#include <stdio.h>			//For output
-	#include <unistd.h>			//For sleep
+	//#include <unistd.h>			//For sleep
 	#include <wx/image.h>		//For working with the image
 	#include <wx/bitmap.h>		//For working with the image
 	#include <math.h>			//For M_PI

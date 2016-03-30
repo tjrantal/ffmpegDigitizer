@@ -155,9 +155,6 @@ void MarkerSelector::eraseCoordinate(int markerIndice, int frameNo){
 	}
 }
 
-double min(){}
-
-
 MarkerSelector::~MarkerSelector(){
 	for (int j = 0; j<markers.size();++j){
 		markers[j].coordinates.clear();
