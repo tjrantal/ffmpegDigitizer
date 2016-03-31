@@ -25,3 +25,7 @@ Dependencies
 	Has to be compiled with a ISO C++ 2011 standard supporting compiler (e.g. Gnu C++ compiler version 4.7 or higher) due to threading using pthreads. Use the cmake file for building.
 
 
+WIN 7 compilation notes
+wxWidgets 3.1.0 works. Compiled as a shared library (docs/msw/install.txt had details on compilation)
+ffmpeg	downloaded Zeranoe pre-compiled -dev, shared runtime libs, unzipped the .dlls from the shared runtime to -dev lib
+	

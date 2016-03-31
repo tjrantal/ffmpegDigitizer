@@ -93,7 +93,7 @@ VideoReader::VideoReader(const char* file)
 
 	img_convert_ctx = NULL;
 	/*PIX_FMT_YUV420P*/
-	if (pCodecCtx->pix_fmt != PIX_FMT_RGB24) {
+	if (pCodecCtx->pix_fmt != AV_PIX_FMT_RGB24) {
 		printf("different pix_fmt\n");
 	
 		picture = av_frame_alloc();
@@ -104,7 +104,7 @@ VideoReader::VideoReader(const char* file)
 
 		int ret = av_image_alloc(picture->data, picture->linesize,
 						 pCodecCtx->width, pCodecCtx->height,
-						 PIX_FMT_RGB24, 1);
+						 AV_PIX_FMT_RGB24, 1);
 		if (ret < 0) {
 			printf("Could not allocate raw video buffer\n");
 			return;
@@ -113,11 +113,11 @@ VideoReader::VideoReader(const char* file)
 		/* as ffmpeg returns a YUV420P picture from a video, we must convert it
 		   to the desired pixel format */
 		if (img_convert_ctx == NULL) {
-			/*Target image format PIX_FMT_RGB24*/
+			/*Target image format AV_PIX_FMT_RGB24*/
 			img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height,
 											 pCodecCtx->pix_fmt,
 											 width, height,
-											 PIX_FMT_RGB24
+											 AV_PIX_FMT_RGB24
 											 , SWS_BICUBIC, NULL, NULL, NULL);
 			if (img_convert_ctx == NULL) {
 				printf("Cannot initialize the conversion context\n");

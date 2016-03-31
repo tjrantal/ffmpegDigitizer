@@ -6,7 +6,10 @@
 	g++ Digitizer.cpp -o digitizer -static `wx-config --cppflags --libs` `pkg-config --cflags --libs libavformat` `pkg-config --cflags --libs libavcodec` `pkg-config --cflags --libs libswscale`
 */
 
-#include <wx/wx.h>
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+	#include <wx/wx.h>
+#endif
 #include <wx/display.h>		/*Try to modify the size of the display*/
 #include <wx/gdicmn.h>		/*wxRect wxDisplaySize*/
 #ifndef IMAGEPANEL_H 
@@ -34,7 +37,7 @@ IMPLEMENT_APP_NO_MAIN(DigitizerApp)
 bool DigitizerApp::OnInit()
 {
 	/*Try to learn about the display on init*/
-	unsigned int displayCount = wxDisplay::GetCount();
+	//unsigned int displayCount = wxDisplay::GetCount();
 	int width,height;
 	wxDisplaySize(&width,&height);
 	

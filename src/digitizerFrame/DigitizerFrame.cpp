@@ -41,7 +41,18 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
     SetStatusText( _("Welcome to Digitizer!") );
 	/*Add text field for results*/
 	//resultsText = new wxTextCtrl(this,-1,_("Coordinates will appear here"),wxPoint(10,10),wxSize(180,130),wxTE_MULTILINE);
-	resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,100),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
+	//resultsGrid = new wxGrid(this,-1,wxPoint(10,10),wxSize(180,100),wxVSCROLL|wxHSCROLL|wxWANTS_CHARS|wxFULL_REPAINT_ON_RESIZE,_("Coordinates"));
+	//resultsGrid = new wxGrid(this, -1, wxPoint(10, 10), wxSize(180, 100), (long) (wxVSCROLL | wxHSCROLL | wxWANTS_CHARS | wxFULL_REPAINT_ON_RESIZE), _("Coordinates"));
+
+	/*
+	    wxGrid(wxWindow *parent,
+            wxWindowID id,
+				const wxPoint& pos = wxDefaultPosition,
+				const wxSize& size = wxDefaultSize,
+				long style = wxWANTS_CHARS,
+				const wxString& name = wxGridNameStr)
+				*/
+	//resultsGrid->CreateGrid(4,4);
 	/*Button for reading markers in*/
 	openMarkerFile 	= new wxButton(this,ID_picker,_("Open &marker file"),wxPoint(10,120));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
@@ -183,7 +194,7 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 	
 	/*Write out and close any open results file*/
 	if (openSave != NULL && openSave->IsOpened()){
-		printCoordinates();
+		//printCoordinates();
 		openSave->Write();
 		openSave->Close();
 		delete openSave;
@@ -479,12 +490,13 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 }
 
 /**<Write the coordinates to resultsText and to the results file (openSave)*/
+/*
 void DigitizerFrame::printCoordinates(){
 
-	/*Create result grid*/
+	//Create result grid/
 	if (markerSelector != NULL && videoReader !=NULL){
 		
-		resultsGrid->ClearGrid();	/*Clear the grid*/
+		resultsGrid->ClearGrid();	//Clear the grid
 		resultsGrid->CreateGrid(videoReader->getNumberOfIndices(),2*markerSelector->markers.size());
 		std::vector<wxString> columnHeadings = std::vector<wxString>();
 		//Column headings
@@ -493,26 +505,26 @@ void DigitizerFrame::printCoordinates(){
 				columnHeadings.push_back(markerSelector->GetString(m).Append(wxString(wxT(" Y"))));
 		}
 
-		/*Set Column labels*/
+		//Set Column labels
 		for (int m = 0; m<columnHeadings.size();++m){
 			//for (int c = 0;c<2;++c){
 				resultsGrid->SetColLabelValue(m,columnHeadings[m]);
 				//printf("%s\t%s\n",std::string(columnHeadings[m].mb_str()).c_str(),resultsGrid->GetColLabelValue(m).mb_str());
 			//}
 		}
-		/*Set row labels*/
+		//Set row labels
 		for (int f = 0; f<videoReader->getNumberOfIndices();++f){
 			resultsGrid->SetRowLabelValue(f,wxString::Format(wxT("%i"),f));
 		}
 		
-		/*Get ready to print the results to file*/
+		//Get ready to print the results to file
 		wxString resultLine = wxString(_(""));
 		if (openSave != NULL){
 			resultLine+=wxT("Frame #\t");
 			for (int m = 0; m<markerSelector->markers.size();++m){
 				resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" X")));
 				resultLine+=wxT("\t");
-				if (m == markerSelector->markers.size()-1){	/*Don't print tab after the last column*/
+				if (m == markerSelector->markers.size()-1){	//Don't print tab after the last column
 					resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" Y")));
 				}else{
 					resultLine+=markerSelector->GetString(m).Append(wxString(wxT(" Y")));
@@ -520,15 +532,15 @@ void DigitizerFrame::printCoordinates(){
 				}
 			}
 			openSave->Clear();
-			/*Write header line*/
+			//Write header line
 			openSave->AddLine(resultLine);
 		}
 		
 		
-		/*Print the data*/
-		/*Loop through frames*/
+		//Print the data
+		//Loop through frames
 		for (int i = 0; i<videoReader->getNumberOfIndices();++i){
-			/*Loop through markers*/
+			//Loop through markers
 			resultLine = wxString::Format(wxT("%i"),i);
 			resultLine+=_("\t");
 			for (int m = 0; m<markerSelector->markers.size();++m){
@@ -548,7 +560,7 @@ void DigitizerFrame::printCoordinates(){
 					resultLine+=_("\t");
 					resultLine+=_("NaN");
 				}
-				if (m == markerSelector->markers.size()-1){ /*Don't print tab after the last column*/
+				if (m == markerSelector->markers.size()-1){ //Don't print tab after the last column
 				
 				}else{
 					resultLine+=_("\t");
@@ -563,6 +575,7 @@ void DigitizerFrame::printCoordinates(){
 		}
 	}
 }	
+*/
 
 /**Select marker from the drop down list*/
 void DigitizerFrame::SelectMarker(wxCommandEvent &event){
