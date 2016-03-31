@@ -14,12 +14,15 @@ SET(CMAKE_MODULE_PATH "${digitizer_SOURCE_DIR}/cmake")	#FindFFMPEG.cmake
 
 #CONFIG WXWIDGETS
 if (WIN32)
-	OPTION(wxWidgets_USE_STATIC "Use static wxWindows libraries" ON)
+	OPTION(wxWidgets_USE_STATIC "Use static wxWindows libraries" OFF)
 	OPTION(wxWidgets_USE_UNICODE "Use Unicode wxWindows" ON)
 	OPTION(wxWidgets_USE_UNIVERSAL "Use Universal  wxWindows libraries" OFF)
 	OPTION(wxWidgets_USE_DEBUG "Use DEBUG  wxWindows" OFF)
 	message ("wxWidgets root dir $ENV{wxWidgets_ROOT_DIR}")
 	message ("wxWidgets lib dir $ENV{wxWidgets_LIB_DIR}")
+	#Try to add precompiler options
+	 add_definitions(-DwxUSE_GUI=1 -DWXUSINGDLL -D_WINDOWS -D__WXWINDOWS__ -D__WXMSW__ -D__WIN32__)	#
+
 endif(WIN32)
 if (UNIX)
 	SET(wxWidgets_USE_LIBS)
@@ -46,7 +49,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Set compiler flags and options. 
 # Here it is setting the Visual Studio warning level to 4
 if (WIN32)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")#/W4  /MT")
 endif(WIN32)
 if(UNIX)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__")	#WxWidgets requires file_offset & UsingDLL & __WXGTK__

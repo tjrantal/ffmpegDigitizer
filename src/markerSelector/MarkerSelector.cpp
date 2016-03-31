@@ -84,7 +84,7 @@ void MarkerSelector::setSearchRadius(int markerNo, double radius){
 }
 
 /**< Get the coordinate at a specific frame*/
-coordinate MarkerSelector::getCoordinate(int markerIndice, int frameNo) throw(int){
+coordinate MarkerSelector::getCoordinate(int markerIndice, int frameNo) throw(...){
 	/*Check that there is at least frameNo markers*/
 	if (markers.size() > markerIndice && frameNo>-1){
 		/*Check whether the frame has coordinates associated with it*/
@@ -154,9 +154,6 @@ void MarkerSelector::eraseCoordinate(int markerIndice, int frameNo){
 		}
 	}
 }
-
-double min(){}
-
 
 MarkerSelector::~MarkerSelector(){
 	for (int j = 0; j<markers.size();++j){

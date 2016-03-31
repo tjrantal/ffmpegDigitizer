@@ -46,7 +46,7 @@ class MarkerSelector : public wxComboBox{
 		/** Get the coordinates of a given marker in a specific frame
 		@param markerIndice the indice of the marker to get
 		@param frameNo the frame for which the coordinate is to be looked up for*/
-		coordinate getCoordinate(int markerIndice, int frameNo) throw(int);	/**< Get the coordinate at a specific frame*/
+		coordinate getCoordinate(int markerIndice, int frameNo) throw(...);	/**< Get the coordinate at a specific frame*/
 		
 		/**Set relative sampling coordinate
 			@param radius of the circular sampling area

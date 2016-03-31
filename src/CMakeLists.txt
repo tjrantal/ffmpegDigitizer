@@ -46,7 +46,15 @@ INCLUDE_DIRECTORIES( ${FFMPEG_INCLUDE_DIRS} )
 # Creates digitizer.exe with the listed sources (main.cxx)
 # Adds sources to the Solution Explorer
 #add_executable (digitizer digitizer.cpp utils/CSVReader.cpp dlt/)
-add_executable (digitizer ${SOURCE_FILES}  ${digitizerFrame_FUNCTION_SOURCES} ${imagePanel_FUNCTION_SOURCES} ${markerSelector_FUNCTION_SOURCES} ${trackingThread_FUNCTION_SOURCES} ${videoReader_FUNCTION_SOURCES})
+
+
+if (WIN32)
+	message("Executable WIN32")
+	add_executable (digitizer ${SOURCE_FILES}  ${digitizerFrame_FUNCTION_SOURCES} ${imagePanel_FUNCTION_SOURCES} ${markerSelector_FUNCTION_SOURCES} ${trackingThread_FUNCTION_SOURCES} ${videoReader_FUNCTION_SOURCES})
+endif(WIN32)
+if(UNIX)
+	add_executable (digitizer ${SOURCE_FILES}  ${digitizerFrame_FUNCTION_SOURCES} ${imagePanel_FUNCTION_SOURCES} ${markerSelector_FUNCTION_SOURCES} ${trackingThread_FUNCTION_SOURCES} ${videoReader_FUNCTION_SOURCES})
+endif(UNIX)
 
 message("FFMPEG_LIBRARIES  " ${FFMPEG_LIBRARIES})
 message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
@@ -59,7 +67,7 @@ message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
 
 # Properties->Linker->Input->Additional Dependencies
 target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} )#${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
- 
+ message("wxWidgets wxWidgets_LIBRARIES ${wxWidgets_LIBRARIES}")
  
 # Creates a folder "executables" and adds target 
 # project (digitizer.vcproj) under it

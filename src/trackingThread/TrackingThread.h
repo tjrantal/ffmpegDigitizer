@@ -25,7 +25,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <algorithm>
 	#include <thread>			//For threading, tracking opens up a new thread, requires ISO C++ 2011 compliant compiler, e.g. g++ version 4.7 and up
 	#include <stdio.h>			//For output
-	#include <unistd.h>			//For sleep
+	//#include <unistd.h>			//For sleep
 	#include <wx/image.h>		//For working with the image
 	#include <wx/bitmap.h>		//For working with the image
 	#include <math.h>			//For M_PI
@@ -68,8 +68,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
 			
 			/**Look for the marker in the image based on region growing*/
-			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int);
-			std::vector<coordinate>getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int);
+			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(...);
+			std::vector<coordinate> getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(...);
 			
 			/**Get the histogram of the current marker*/
 			double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
