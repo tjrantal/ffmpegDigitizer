@@ -25,3 +25,4 @@ Dependencies
 	Has to be compiled with a ISO C++ 2011 standard supporting compiler (e.g. Gnu C++ compiler version 4.7 or higher) due to threading using pthreads. Use the cmake file for building.
 
 
+prior to merge
