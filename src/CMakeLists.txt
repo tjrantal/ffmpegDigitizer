@@ -66,7 +66,12 @@ message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
 #message("LIBAVFORMAT " ${LIBAVFORMAT_LIBRARIES})
 
 # Properties->Linker->Input->Additional Dependencies
-target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} )#${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
+if(UNIX)
+	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} -lX11)#${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
+endif(UNIX)
+if(WIN32)
+	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES})
+endif(WIN32)
  message("wxWidgets wxWidgets_LIBRARIES ${wxWidgets_LIBRARIES}")
  
 # Creates a folder "executables" and adds target 

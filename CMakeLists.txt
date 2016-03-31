@@ -25,7 +25,9 @@ if (WIN32)
 
 endif(WIN32)
 if (UNIX)
+	SET(CMAKE_FIND_LIBRARY_SUFFIXES .so)	#For shared libs 
 	SET(wxWidgets_USE_LIBS)
+	
 endif(UNIX)
 
 find_package(wxWidgets REQUIRED)	#Look for wxWidgets
