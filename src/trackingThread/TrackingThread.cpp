@@ -163,7 +163,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 }
 
 /**Look for the marker in the image based on region growing*/
-std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(...){
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(){
 	int imageWidth =mainThread->imagePanel->imSize.x;
 	int imageHeight =mainThread->imagePanel->imSize.y;
 	/*Go through the search area, return the first continuous marker area found.*/
@@ -270,7 +270,7 @@ std::vector<coordinate> TrackingThread::growRegion(unsigned char *currentImage,i
 
 
 /**Look for the marker in the image based on region growing*/
-std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw( ...){
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(){
 	/*Go through the search area, return the first continuous marker area found.*/
 	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
 	int colorTolerance = mainThread->markerSelector->markers[markerIndice].colorTolerance;

@@ -68,8 +68,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
 			
 			/**Look for the marker in the image based on region growing*/
-			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(...);
-			std::vector<coordinate> getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(...);
+			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw();
+			std::vector<coordinate> getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw();
 			
 			/**Get the histogram of the current marker*/
 			double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
