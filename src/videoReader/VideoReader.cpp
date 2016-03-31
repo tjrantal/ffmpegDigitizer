@@ -140,14 +140,14 @@ int VideoReader::readIndices(){
 	frameIndices = std::vector<FrameIndice*>();
 	lastFrame = -1;		/*Set last frame to -1, since none have been decoded*/
 	int frameNo = -1;
-	printf("\n");	
+	printf("Read packets from the video\n");	
 	while(av_read_frame(pFormatCtx, &packet)>=0) /*Read all frames to memory*/
 	{
 		
 		
 	    if(packet.stream_index==videoStream)		 // Is this a packet from the video stream?
 	    {	
-			printf("packet dts %ld pts %ld\n",packet.dts,packet.pts);
+			//printf("packet dts %ld pts %ld\n",packet.dts,packet.pts);
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 	            &packet);
 	        if (frameFinished){

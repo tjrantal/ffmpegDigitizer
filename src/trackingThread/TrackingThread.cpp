@@ -132,7 +132,7 @@ void TrackingThread::run(){
 	//printf("Exiting thread\n");
 	mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
 	mainThread->trackOn = false;	/*Stop tracking*/
-	//mainThread->printCoordinates();	/*Update the coordinate list*/
+	mainThread->printCoordinates();	/*Update the coordinate list*/
 	/*Done with automatic digitizing*/
 }
 

@@ -63,7 +63,7 @@ public:
 		@param size size of the window
 	*/
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-	//void printCoordinates();	/**<Write the coordinates to resultsText*/
+	void printCoordinates();	/**<Write the coordinates to resultsText*/
 private:
 	//DEBUG
 	FILE *debug;
