@@ -55,14 +55,14 @@ void TrackingThread::run(){
 				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 				gotMarker = true;
-			} catch (int err){	//Didn't have marker in current frame, check the previous frame
+			} catch (...){	//Didn't have marker in current frame, check the previous frame
 				//printf("Tried getting current frame marker, caught %d\n",err);
 				try{
 					initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame-1);
 					gotMarker = true;
 					//printf("Got init current %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 					
-				} catch (int err){
+				} catch (...){
 					//Marker has not been digitized in the previous or the current frame, so do nothing for this marker
 					//printf("Tried getting previous frame marker, caught %d\n",err);
 					
@@ -94,7 +94,7 @@ void TrackingThread::run(){
 					//std::this_thread::sleep_for (std::chrono::milliseconds(100));
 					//printf("Digitized coordinate\n");
 					++markersFound;
-				}catch (int err){
+				}catch (...){
 					keepTracking = 0;	//Set to stop the tracking thread
 					//printf("Tried digitizing, caught %d\n",err);
 					mainThread->markerSelector->currentMarker = i;
@@ -163,7 +163,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 }
 
 /**Look for the marker in the image based on region growing*/
-std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(){
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int){
 	int imageWidth =mainThread->imagePanel->imSize.x;
 	int imageHeight =mainThread->imagePanel->imSize.y;
 	/*Go through the search area, return the first continuous marker area found.*/
@@ -270,7 +270,7 @@ std::vector<coordinate> TrackingThread::growRegion(unsigned char *currentImage,i
 
 
 /**Look for the marker in the image based on region growing*/
-std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(){
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int){
 	/*Go through the search area, return the first continuous marker area found.*/
 	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
 	int colorTolerance = mainThread->markerSelector->markers[markerIndice].colorTolerance;
