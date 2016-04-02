@@ -479,6 +479,12 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 	currentFrame = slider->GetValue();
 	int displayPictureNumber = videoReader->readFrameFromDisk(currentFrame);
+	redrawFrame();
+	//resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
+	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
+}
+
+void DigitizerFrame::redrawFrame(){
 	imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 	/*Check whether markers exist, if so add them to the image*/
 	if (markerSelector != NULL){
@@ -491,11 +497,7 @@ void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
 			}
 		}
 	}
-	
-	//resultsText->ChangeValue(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
-	SetStatusText(wxString::Format(wxT("%s %d %d"),_("Frame #"), currentFrame,displayPictureNumber));
 }
-
 /**<Write the coordinates to resultsText and to the results file (openSave)*/
 
 void DigitizerFrame::printCoordinates(){
@@ -618,6 +620,7 @@ void DigitizerFrame::PreviousMarker(){
 /**< Clear all coordinates*/
 void DigitizerFrame::ClearMarker(wxCommandEvent &event){
 	markerSelector->eraseMarker(markerSelector->currentMarker);
+	redrawFrame();
 }
 
 /**< Clear coordinates from current frame onwards*/			
@@ -625,6 +628,7 @@ void DigitizerFrame::ClearOnwards(wxCommandEvent &event){
 	for (int i = currentFrame;i<videoReader->frameIndices.size();++i){
 		markerSelector->eraseCoordinate(markerSelector->currentMarker,i);
 	}
+	redrawFrame();
 }			
 	
 

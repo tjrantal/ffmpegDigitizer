@@ -85,6 +85,7 @@ private:
 	wxButton		*clearOnwards;		/**<Button to clear marker coordinates from current frame onwards*/
 	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
+	void redrawFrame();							/**< Refresh the frame*/
 	
     void OnQuit(wxCommandEvent &event);			/**< */
 	void OnQuit(wxCloseEvent& event);			/**< */
