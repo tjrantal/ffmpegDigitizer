@@ -81,6 +81,8 @@ private:
 	wxFile 			*openVideo;
 	wxButton 		*openSaveFile;		/**<Button for picking the coordinate save file*/
 	wxTextFile		*openSave;
+	wxButton		*clearMarker;		/**<Button to clear all marker coordinates*/
+	wxButton		*clearOnwards;		/**<Button to clear marker coordinates from current frame onwards*/
 	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
 	
@@ -101,6 +103,8 @@ private:
 	void AdjustColorTolerance(wxScrollEvent &event);	/**< */
 	void SelectMarker(wxCommandEvent &event);			/**< */
 	void ToggleTracking(wxCommandEvent &event);			/**< */
+	void ClearMarker(wxCommandEvent &event);			/**< Clear all coordinates*/
+	void ClearOnwards(wxCommandEvent &event);			/**< Clear coordinates from current frame onwards*/
 	void NextMarker();									/**< Proceed to Next marker*/
 	void PreviousMarker();									/**< Back to Previous marker*/
 	void GetMarkerValues(int marker);								/**< Get parameters of a given marker*/
@@ -125,6 +129,8 @@ enum
 	ID_panel,
 	ID_markers,
 	ID_toggleTracking,
+	ID_clearMarker,
+	ID_clearOnwards,
 };
 
 

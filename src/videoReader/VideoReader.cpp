@@ -40,9 +40,14 @@ VideoReader::VideoReader(const char* file)
 	}
 
 	av_dump_format(pFormatCtx, 0, filename, 0);
+	//Print additional debugging...
+	printf("Start time %ld\n",pFormatCtx->start_time);
+	printf("Duration %ld\n",pFormatCtx->duration);
+	
 	fflush(stdout);			//DEBUGGING
 			// Find the first video stream
 	  /* retrieve stream information */
+	  /*
 	videoStream=-1;
 	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++){
 		if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO)
@@ -56,7 +61,7 @@ VideoReader::VideoReader(const char* file)
 		fflush(stdout);			//DEBUGGING
 		return;
 	}
-	
+	*/
 	videoStream = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 	//Look for videostream index and open codec context
 	if (videoStream < 0) {
@@ -66,6 +71,16 @@ VideoReader::VideoReader(const char* file)
 	}	
 	// Get a pointer to the codec context for the video stream
 	pCodecCtx=pFormatCtx->streams[videoStream]->codec;
+	//Print additional debugging...
+	printf("Delay %d\n",pCodecCtx->delay);
+	printf("timecode_frame_start %ld\n",pCodecCtx->timecode_frame_start);
+	printf("codec frame rate %f\n",((double) pCodecCtx->framerate.num)/((double) pCodecCtx->framerate.den));
+	printf("codec frame rate %d\n",pCodecCtx->seek_preroll);
+	
+	printf("time base %f\n",((double) pFormatCtx->streams[videoStream]->time_base.num)/((double) pFormatCtx->streams[videoStream]->time_base.den));
+	printf("nb_frames %d\n",pFormatCtx->streams[videoStream]->nb_frames);
+	
+	
 	width = pCodecCtx->width;
 	height = pCodecCtx->height;
 
