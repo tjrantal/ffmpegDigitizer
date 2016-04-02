@@ -123,7 +123,8 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
 	printf("Got color, try to grow region\n");
 	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
-	printf("Grew region, trying to digitizer area\n");	
+	printf("Grew region, trying to digitizer area\n");
+	redrawFrame();	//Erase the previous digitizations
 	imagePanel->digitizeXYArea(areaCoordinates);
 	imagePanel->reFreshImage();
 	printf("Digitized area\n");	
