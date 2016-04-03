@@ -54,6 +54,12 @@ void TrackingThread::run(){
 			/*Check out whether the current or the previous frame has the marker digitized*/
 			try{	
 				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
+				//Check if we've got a known marker color
+				if (mainThread->markerSelector->markers[i].fourBitColors == NULL){
+					//Get the color from the image
+					mainThread->markerSelector->markers[i].fourBitColors = getColor(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y,(int) initCoordinate.xCoordinate,(int) initCoordinate.yCoordinate);	
+				}
+				
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
 				gotMarker = true;
 			} catch (...){	//Didn't have marker in current frame, check the previous frame
@@ -72,10 +78,14 @@ void TrackingThread::run(){
 			}
 			//Digitize if we've got an init coordinate...
 			if (gotMarker){
+				printf("Found marker tracking thread\n");
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
 				try{
 					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
+					printf("Try to get marker coordinates region grow in tracking thread\n");
 					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData,i, initCoordinate);
+					printf("Got marker coordinates region grow in tracking thread %d\n",(int) areaCoordinates.size());
+					
 					//Calculate the mean of the area coordinates..
 					double meanCoord[2] = {0,0};	//init to zero
 					double meanSize = areaCoordinates.size();
@@ -96,6 +106,7 @@ void TrackingThread::run(){
 					//printf("Digitized coordinate\n");
 					++markersFound;
 				}catch (...){
+					printf("Could not digitize in tracking thread\n");
 					keepTracking = 0;	//Set to stop the tracking thread
 					//printf("Tried digitizing, caught %d\n",err);
 					mainThread->markerSelector->currentMarker = i;
@@ -168,19 +179,25 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 
 /**Look for the marker in the image based on region growing*/
 std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int){
+	printf("getMCoords getWidth\n");
 	int imageWidth =mainThread->imagePanel->imSize.x;
 	int imageHeight =mainThread->imagePanel->imSize.y;
+	printf("getMCoords gotWidth\n");
 	/*Go through the search area, return the first continuous marker area found.*/
 	unsigned char* markerColor = mainThread->markerSelector->markers[markerIndice].fourBitColors;
+	printf("getMCoords gotMColor\n");
+		
 	int colorTolerance = mainThread->markerSelector->markers[markerIndice].colorTolerance;
 	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
 	double markerRadius =  (double) (mainThread->markerSelector->markers[markerIndice].markerRadius);
+	printf("getMCoords goThroughSearchCoordinates %d\n",(int) searchCoordinates.size());
 	for (int i = 0;i<searchCoordinates.size();++i){
 		double x = coordinates.xCoordinate+searchCoordinates[i].xCoordinate;
 		double y = coordinates.yCoordinate+searchCoordinates[i].yCoordinate;
 		/*Check whether color matches, if it does, grow region to confirm that the marker is big enough*/
+		printf("getMCoords getColor %d %d %d %d\n",imageWidth,imageHeight,(int) x, (int) y);
 		unsigned char* pixelColor = getColor(currentImage,imageWidth,imageHeight,(int) x, (int) y);
-		
+		printf("getMCoords gotColor %d %d\n",(int) x, (int) y);
 		if(	/*If color match is close enough, do region growing*/
 			(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
 			(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
@@ -188,13 +205,16 @@ std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned 
 			)
 		{
 			//printf("Marker %d %d %d pixel %d %d %d\n",markerColor[0],markerColor[1],markerColor[2],pixelColor[0],pixelColor[1],pixelColor[2]);
+			printf("getMCoords growArea %d %d\n",(int) x, (int) y);
 			std::vector<coordinate> areaCoordinates = growRegion(currentImage,imageWidth,imageHeight,x,y,markerColor, colorTolerance);
+			printf("getMCoords grewArea %d %d\n",(int) x, (int) y);
 			if (areaCoordinates.size() >= 5){// M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
 				return areaCoordinates;								/*First sufficiently large marker returned... */
 				
 			}
 		}
 	}
+	printf("getMCoords All done\n");
 	throw 2;	/*No marker found, throw error. Implement missing marker at some point...*/
 	//return coordinates;	/*No marker found, shouldn't get here*/
 }
@@ -422,6 +442,7 @@ unsigned char* TrackingThread::getColor(wxImage *currentImage,int xCoordinate,in
 /**Get the color of the current marker*/
 unsigned char* TrackingThread::getColor(unsigned char *currentImage, int width, int height,int xCoordinate,int yCoordinate){
 	/*Get the histogram*/
+	printf("trying to get color %d %d %d %d\n",width,height,xCoordinate,yCoordinate);
 	unsigned char* colour;
 	colour = new unsigned char[3];	/*Color figure comprises 3 different colors...*/
 	/*get the color values*/
