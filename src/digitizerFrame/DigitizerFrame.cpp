@@ -110,7 +110,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	double radius = (double)  markerRadius->GetValue();
 	SetStatusText(wxString::Format(wxT("X %i Y %i X %f Y %f"),event.GetX(), event.GetY(),xCoordinate,yCoordinate ));
 	
-	printf("Trying to digitizeXY\n");
+	//printf("Trying to digitizeXY\n");
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 
 	//Get active marker and set the coordinates for the marker
@@ -120,17 +120,17 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	//Take the histogram for the marker
 	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
-	printf("Try to get color\n");
+	//printf("Try to get color\n");
 	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
 	//Highlight area...
 	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
-	printf("Got color, try to grow region\n");
+	//printf("Got color, try to grow region\n");
 	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
-	printf("Grew region, trying to digitizer area\n");
+	//printf("Grew region, trying to digitizer area\n");
 	redrawFrame();	//Erase the previous digitizations
 	imagePanel->digitizeXYArea(areaCoordinates);
 	imagePanel->reFreshImage();
-	printf("Digitized area\n");	
+	//printf("Digitized area\n");	
 	
 }
 
@@ -264,7 +264,7 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 						double yCoord = std::stod(delimited.at(i+1),nullptr);
 						int frameInd = std::stoi(delimited.at(0),nullptr);
 						if ((xCoord==xCoord) && (yCoord==yCoord)){
-							printf("fi %d marker %d x %.1f y %.1f\n",frameInd,markerIndice,xCoord,yCoord);
+							//printf("fi %d marker %d x %.1f y %.1f\n",frameInd,markerIndice,xCoord,yCoord);
 							markerSelector->setCoordinate(markerIndice,xCoord,yCoord,frameInd);
 						}
 						
@@ -273,14 +273,14 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 				redrawFrame();	//Draw the coordinate on the frame
 				
 				SetStatusText(wxString::Format(wxT("opened %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
-				printf("File exists, opened %d\n",openSave->IsOpened());
+				//printf("File exists, opened %d\n",openSave->IsOpened());
 			}else{
-				printf("File did not exist %d\n",openSave->IsOpened());
+				//printf("File did not exist %d\n",openSave->IsOpened());
 				openSave->Create();
-				printf("File created %d\n",openSave->IsOpened());
+				//printf("File created %d\n",openSave->IsOpened());
 				openSave->Open();
 				SetStatusText(wxString::Format(wxT("created %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
-				printf("Created file opened %d\n",openSave->IsOpened());
+				//printf("Created file opened %d\n",openSave->IsOpened());
 			}
 		}catch (int err){
 			SetStatusText(_("Could not open or create a res file"));
@@ -370,28 +370,28 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 		//resultsText->ChangeValue(_("No video file opened"));
 	}else{
 				/*Close any pre-existing video*/
-		printf("Pre-existing videoReader?\n");
+		//printf("Pre-existing videoReader?\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL){
-			printf("Remove pre-existing videoReader?\n");
+			//printf("Remove pre-existing videoReader?\n");
 			fflush(stdout);			//DEBUGGING
 			delete videoReader;
-					printf("Return from deconstructor\n");
+					printf("Return from destructor\n");
 		fflush(stdout);			//DEBUGGING
 			videoReader = NULL;
 		}
-		printf("construct video reader\n");
+		//printf("construct video reader\n");
 		fflush(stdout);			//DEBUGGING
 		wxString videoFilePath = openFileDialog.GetPath();
 		videoReader = new VideoReader(videoFilePath.char_str());
 		wxFileName videoFileName(videoFilePath);
 		//Save the video file folder as the default path
 		config->Write(_("defaultVideoFolder"), videoFileName.GetPath());
-		printf("video reader constructed\n");
+		//printf("video reader constructed\n");
 		fflush(stdout);			//DEBUGGING
 		if (videoReader != NULL && videoReader->videoOpen){
 			SetStatusText(_("Wait while reading packet indices to memory. Requires decoding the whole file, will take a while ..."));
-			printf("Read indices\n");
+			//printf("Read indices\n");
 			fflush(stdout);			//DEBUGGING
 			/*Check whether the video has already been indexed, if not index the video*/
 			//config = new wxConfig(_("digitizerConfig"));
@@ -433,11 +433,11 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 					delete indexFile;
 					videoReader->frameIndices = *tempFrameIndices;
 				} else{
-					printf("File didn't exist\n");
+					//printf("File didn't exist\n");
 					gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
 				}
 			}else{
-				printf("File not found from config\n");
+				//printf("File not found from config\n");
 				gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
 			}
 			delete config;
@@ -473,7 +473,7 @@ int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFil
 		#else
 			wxMkDir("videoIndices");		//Windows
 		#endif
-		printf("Dir created\n");
+		//printf("Dir created\n");
 		fflush(stdout);			//DEBUGGING
 	}
 	//printf("Create file name\n");
@@ -573,7 +573,7 @@ void DigitizerFrame::printCoordinates(){
 					resultLine+=wxT("\t");
 				}
 			}
-			printf("Trying to clear openSave\n");
+			//printf("Trying to clear openSave\n");
 			openSave->Clear();
 			//Write header line
 			openSave->AddLine(resultLine);
@@ -582,7 +582,7 @@ void DigitizerFrame::printCoordinates(){
 		
 		//Print the data
 		//Loop through frames
-		printf("Start printing to clear openSave\n");
+		//printf("Start printing to clear openSave\n");
 		for (int i = 0; i<videoReader->getNumberOfIndices();++i){
 			//Loop through markers
 			resultLine = wxString::Format(wxT("%i"),i);
@@ -616,7 +616,7 @@ void DigitizerFrame::printCoordinates(){
 			}
 		}
 		if (openSave != NULL){
-			printf("Write to openSave\n");
+			//printf("Write to openSave\n");
 			openSave->Write();
 		}
 	}
