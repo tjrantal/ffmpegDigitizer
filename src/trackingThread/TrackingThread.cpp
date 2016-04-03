@@ -37,6 +37,7 @@ void TrackingThread::run(){
 	coordinate initCoordinate;
 	//wxImage *currentImage;
 	unsigned char* currentImageData;
+	printf("Started tracking thread\n");
 	while (mainThread->trackOn == true && currentFrame <= mainThread->videoReader->getNumberOfIndices()){
 		/*Make a copy of the current image*/
 		//printf("Track Started\n");
@@ -98,18 +99,21 @@ void TrackingThread::run(){
 					keepTracking = 0;	//Set to stop the tracking thread
 					//printf("Tried digitizing, caught %d\n",err);
 					mainThread->markerSelector->currentMarker = i;
-					mainThread->markerSelector->SetSelection(i);					
+					mainThread->markerSelector->SetSelection(i);	
+					printf("Couldn't find marker in tracking thread\n");
 					break;	//Stop the loop
 				}
 			}
 		}
+		printf("Frame done in tracking thread\n");
 		mainThread->imagePanel->reFreshImage();
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0 && keepTracking == 1){
 			/*Proceed to the next frame, if this was not the last frame*/
 			if (currentFrame < mainThread->videoReader->getNumberOfIndices()){
 				//std::this_thread::sleep_for (std::chrono::milliseconds(20));
-				currentFrame++;
+				++currentFrame;
+				printf("Get next frame in tracking thread\n");
 				mainThread->slider->SetValue(currentFrame);
 				mainThread->videoReader->readFrameFromDisk(currentFrame);
 				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true,false);

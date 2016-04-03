@@ -21,7 +21,10 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include "../markerSelector/MarkerCoordinates.h"
 #include "../markerSelector/MarkerSelector.h"
 #include "../trackingThread/TrackingThread.h"
-
+#include <vector>		
+#include <string>      
+#include <sstream>
+#include <math.h>       /* isnan, sqrt */
 
 DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
        : wxFrame(NULL, -1, title, pos, size)
@@ -220,7 +223,7 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 	
 	/*Open coordinate file*/
 	wxFileDialog openFileDialog(this, _("Create/open a RES file. Will be overwritten"), defaultCoordinateFolder, _(""),
-	_("RES files (*.RES|*.res"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+	_("RES files (*.RES|*.res"), wxFD_SAVE);//|wxFD_OVERWRITE_PROMPT);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No marker file opened"));
 		delete config;
@@ -241,6 +244,34 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 			openSave = new wxTextFile(openFileDialog.GetPath());
 			if (openSave->Exists()){
 				openSave->Open();
+				//Read marker coordinates from file
+				wxString headerLine = openSave->GetFirstLine();	//Ignore
+				wxString nextLine;
+				
+				while (!openSave->Eof()){
+					nextLine = openSave->GetNextLine();
+					std::vector<std::string> delimited;
+					std::string tempLine(nextLine);
+					std::stringstream sourceStringStream(tempLine);
+					std::string item;
+					while(std::getline(sourceStringStream,item,'\t')){
+						delimited.push_back(item);
+						//cout<<item<<"\t";
+					}
+					for( int i = 1;i<delimited.size();i=i+2){
+						int markerIndice = (i-1)/2;
+						double xCoord = std::stod(delimited.at(i),nullptr);
+						double yCoord = std::stod(delimited.at(i+1),nullptr);
+						int frameInd = std::stoi(delimited.at(0),nullptr);
+						if ((xCoord==xCoord) && (yCoord==yCoord)){
+							printf("fi %d marker %d x %.1f y %.1f\n",frameInd,markerIndice,xCoord,yCoord);
+							markerSelector->setCoordinate(markerIndice,xCoord,yCoord,frameInd);
+						}
+						
+					}
+				}
+				redrawFrame();	//Draw the coordinate on the frame
+				
 				SetStatusText(wxString::Format(wxT("opened %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
 				printf("File exists, opened %d\n",openSave->IsOpened());
 			}else{
@@ -542,6 +573,7 @@ void DigitizerFrame::printCoordinates(){
 					resultLine+=wxT("\t");
 				}
 			}
+			printf("Trying to clear openSave\n");
 			openSave->Clear();
 			//Write header line
 			openSave->AddLine(resultLine);
@@ -550,6 +582,7 @@ void DigitizerFrame::printCoordinates(){
 		
 		//Print the data
 		//Loop through frames
+		printf("Start printing to clear openSave\n");
 		for (int i = 0; i<videoReader->getNumberOfIndices();++i){
 			//Loop through markers
 			resultLine = wxString::Format(wxT("%i"),i);
@@ -564,7 +597,7 @@ void DigitizerFrame::printCoordinates(){
 					resultLine+=_("\t");
 					resultLine+=wxString::Format(wxT("%f"),markerCoordinate.yCoordinate);
 					
-				} catch (int err){	//Didn't have marker in current frame
+				} catch (...){	//Didn't have marker in current frame
 					//Print NaN or -1 for missing
 					//resultsGrid->SetCellValue(i,m*2+0,_("NaN"));
 					//resultsGrid->SetCellValue(i,m*2+1,_("NaN"));
@@ -583,6 +616,7 @@ void DigitizerFrame::printCoordinates(){
 			}
 		}
 		if (openSave != NULL){
+			printf("Write to openSave\n");
 			openSave->Write();
 		}
 	}
