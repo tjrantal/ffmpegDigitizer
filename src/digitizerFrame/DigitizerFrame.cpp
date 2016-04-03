@@ -434,16 +434,17 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 					videoReader->frameIndices = *tempFrameIndices;
 				} else{
 					//printf("File didn't exist\n");
-					gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
+					gotPackets = getPrintIndices(videoFileName,videoFilePath,config);
 				}
 			}else{
 				//printf("File not found from config\n");
-				gotPackets = getPrintIndices(videoReader,videoFileName,videoFilePath,config);
+				gotPackets = getPrintIndices(videoFileName,videoFilePath,config);
 			}
 			delete config;
 			
-			//int displayPictureNumber = videoReader->readNextFrameFromDisk();			
+			//int displayPictureNumber = videoReader->readNextFrameFromDisk();
 			int displayPictureNumber = videoReader->readFrameFromDisk(0);
+			printf("Tried to read the first frame\n");
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 				SetStatusText(wxString::Format(wxT("%s ffmpeg packets %d, frameNo %d"),_("Video opened, frames:"), videoReader->getNumberOfIndices(),displayPictureNumber));
 
@@ -462,7 +463,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 }
 
-int DigitizerFrame::getPrintIndices(VideoReader *videoReader,wxFileName videoFileName,wxString videoFilePath,wxConfig *config){
+int DigitizerFrame::getPrintIndices(wxFileName videoFileName,wxString videoFilePath,wxConfig *config){
 	/*Index the file and save the index file name to config*/
 	int gotPackets = videoReader->readIndices();
 	//printf("Indices read\n");

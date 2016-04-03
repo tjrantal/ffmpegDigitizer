@@ -74,7 +74,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		AVPacket packet;
 		AVCodec         *pCodec;
 		int             numBytes;
-		int lastFrame;	/*Index of last decoded frame*/
+		int lastFrame = -1;	/*Index of last decoded frame*/
 	
 		public:
 		const char *filename; /**< Name of the video file*/
