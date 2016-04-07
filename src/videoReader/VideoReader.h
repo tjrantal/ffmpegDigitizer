@@ -40,13 +40,15 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int64_t	pts;	/**< TimeStamp of the frame */
 		int64_t	pkt_pts;	/**< TimeStamp of the packet */
 		int64_t	dts;		//
+		int64_t bestPTS;	//Best pts provided by av_frame_get_best_effort_timestamp. Used for searching
 		int 	dpn;		//Display picture number
 		int		cpn;		//Coded picture number
-		FrameIndice(int _frameNo,int64_t _pts, int64_t _pkt_pts,int64_t _dts = 0,int _dpn =0, int _cpn = 0){
+		FrameIndice(int _frameNo,int64_t _pts, int64_t _pkt_pts,int64_t _dts = 0,int64_t _bestPTS = 0,int _dpn =0, int _cpn = 0){
 			frameNo = _frameNo;
 			pts = _pts;
 			pkt_pts = _pkt_pts;
 			dts	= _dts;
+			bestPTS = _bestPTS;
 			dpn  = _dpn;
 			cpn = _cpn;
 		}
