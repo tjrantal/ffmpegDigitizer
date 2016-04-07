@@ -16,6 +16,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef VIDEOREADER_H
 	#include "VideoReader.h"
 #endif
+//int64_t av_frame_get_best_effort_timestamp	(	const AVFrame * 	frame	)	
+
 //Constructor
 VideoReader::VideoReader(const char* file)
 {
@@ -174,7 +176,8 @@ int VideoReader::readIndices(){
 	        if (frameFinished){
 				++frameNo;
 				//printf("FRAME %d dts %ld pts %ld av %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts);
-				printf("FRAME %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number);
+				int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				printf("FRAME %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d best pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
 				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts);
 				frameIndices.push_back(lastIndice);
 				av_free_packet(&packet);
@@ -195,7 +198,9 @@ int VideoReader::readIndices(){
 		
 			if (frameFinished){
 				++frameNo;
-				printf("REMAIN FRAME %d dts %ld pts %ld av %ld av pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts);
+				int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				
+				printf("REMAIN FRAME %d dts %ld pts %ld av %ld av pts %ld bestPTS %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,bestPTS);
 				
 				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts);
 				frameIndices.push_back(lastIndice);
@@ -234,7 +239,9 @@ int VideoReader::readNextFrameFromDisk(){
 	        avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, &packet);            // Decode video frame
 	        if(frameFinished)	            // Did we get a video frame?
 	        {
-				printf("NEXT FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number);
+				int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				
+				printf("NEXT FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d bestPTS %ld\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
 					
 				readMore = 0;
 				if(img_convert_ctx == NULL){
@@ -275,7 +282,9 @@ int VideoReader::readNextFrameFromDisk(){
 					&packet) >=0){
 			
 				if (frameFinished){
-					printf("NEXT EXTRA FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number);
+					int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				
+					printf("NEXT EXTRA FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d bestPTS %ld\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
 				
 					if(img_convert_ctx == NULL){
 						if (tmp_picture->linesize[0] != width){ //Hack for padding
@@ -347,7 +356,9 @@ int VideoReader::readFrameFromDisk(int frameNo){
 			avcodec_decode_video2(pCodecCtx, tmp_picture, &frameFinished, 
 			&packet);
 			if (frameFinished){
-				printf("Search from Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number);
+				int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				
+				printf("Search from Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d bestPTS %ld\n",lastFrame+1,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
 				
 				//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
 				//if (packet.dts == frameIndices.at(frameNo)->dts){
@@ -400,7 +411,9 @@ int VideoReader::readFrameFromDisk(int frameNo){
 				if (frameFinished){
 					//if (packet.pts == frameIndices.at(frameNo)->pkt_pts){
 					//if (packet.dts == frameIndices.at(frameNo)->dts){
-					printf("Search EXTRA FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number);
+					int64_t bestPTS = av_frame_get_best_effort_timestamp	(tmp_picture);
+				
+					printf("Search EXTRA FRAME From Disk %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d bestPTS %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
 					
 					if (tmp_picture->pkt_dts == frameIndices.at(frameNo)->dts){
 					
