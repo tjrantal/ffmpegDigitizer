@@ -120,11 +120,20 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	//Take the histogram for the marker
 	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
-	printf("Try to get color\n");
 	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
-	printf("Try to get histogram\n");
-	markerSelector->markers[selectedMarker].histogram = TrackingThread::getHistogram(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y, coordinate(xCoordinate, yCoordinate,-1), *(markerSelector->markers[selectedMarker].radiusCoordinates));
+	printf("Color x %d y %d R %u G %u B %u\n",(int) xCoordinate,(int) yCoordinate, markerSelector->markers[selectedMarker].fourBitColors[0], markerSelector->markers[selectedMarker].fourBitColors[1], markerSelector->markers[selectedMarker].fourBitColors[2]);
+	
+	//printf("Try to get histogram\n");
+	markerSelector->markers[selectedMarker].histogram = TrackingThread::getHistogram16(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y, coordinate(xCoordinate, yCoordinate,-1), *(markerSelector->markers[selectedMarker].radiusCoordinates));
 	printf("Got histogram\n");
+	/*Print the histogram for debugging*/
+	for (int j = 0; j<3; ++j) {
+		for (int i = 0; i<16; ++i) {
+			printf("%.2f ",markerSelector->markers[selectedMarker].histogram[j][i]);
+		}
+		printf("\n");
+	}
+	
 	//Highlight area...
 	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
 	//printf("Got color, try to grow region\n");

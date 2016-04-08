@@ -69,6 +69,8 @@ class MarkerSelector : public wxComboBox{
 		*/
 		double getCloseness(double** histo1,double** histo2);	/**compare a histogram to the histogram of the marker*/
 		
+		double getCloseness16(double** histo1,double** histo2);
+
 		/**
 		 * @brief Clear marker frameNo
 		 * @param markerIndice marker to erase

@@ -142,6 +142,16 @@ double MarkerSelector::getCloseness(double** histo1,double** histo2){
 	return closeness;
 }
 
+double MarkerSelector::getCloseness16(double** histo1,double** histo2){
+	double closeness = 0;
+	for (int j = 0;j<3;++j){
+		for (int i = 0;i<16;++i){
+			closeness+= (histo1[j][i]<histo2[j][i]) ? histo1[j][i] : histo2[j][i];
+		}
+	}
+	return closeness;
+}
+
 void MarkerSelector::eraseCoordinate(int markerIndice, int frameNo){
 	/*Check that there is at least frameNo markers*/
 	if (markers.size() > markerIndice && frameNo>-1){

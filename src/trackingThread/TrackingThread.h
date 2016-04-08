@@ -75,6 +75,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			/**Get the histogram of the current marker*/
 			static double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 			static double** getHistogram(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates);
+			static double** getHistogram16(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates);
+
 			/**Get the color of the current marker*/
 			static unsigned char* getColor(wxImage *currentImage,int xCoordinate,int yCoordinate);	
 			static unsigned char* getColor(unsigned char *currentImage, int width, int height,int xCoordinate,int yCoordinate);	

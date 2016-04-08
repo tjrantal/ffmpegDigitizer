@@ -59,7 +59,7 @@ void TrackingThread::run(){
 					//Get the color from the image
 					mainThread->markerSelector->markers[i].fourBitColors = getColor(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y,(int) initCoordinate.xCoordinate,(int) initCoordinate.yCoordinate);	
 					//Get the histogram from the image
-					mainThread->markerSelector->markers[i].histogram = getHistogram(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, initCoordinate, *(mainThread->markerSelector->markers[i].radiusCoordinates));
+					mainThread->markerSelector->markers[i].histogram = getHistogram16(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, initCoordinate, *(mainThread->markerSelector->markers[i].radiusCoordinates));
 				}
 				
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
@@ -200,13 +200,14 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 	std::vector<coordinateCloseness> checkClose;
 	std::vector<coordinate> samplingCoordinates = *(mainThread->markerSelector->markers[markerIndice].radiusCoordinates);
 	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
-
+	double xx = round(coordinates.xCoordinate);
+	double yy = round(coordinates.yCoordinate);
 	for (int i = 0; i<searchCoordinates.size(); ++i) {
-		double x = coordinates.xCoordinate + searchCoordinates[i].xCoordinate;
-		double y = coordinates.yCoordinate + searchCoordinates[i].yCoordinate;
+		double x = xx + searchCoordinates[i].xCoordinate;
+		double y = yy + searchCoordinates[i].yCoordinate;
 		coordinate check(x, y, -1);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
-		double closeness = mainThread->markerSelector->getCloseness(histogram, getHistogram(currentImage,width,height, check, samplingCoordinates));
+		double closeness = mainThread->markerSelector->getCloseness(histogram, getHistogram16(currentImage,width,height, check, samplingCoordinates));
 		printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
 		checkClose.push_back(coordinateCloseness(x, y, closeness));
 	}
@@ -464,6 +465,38 @@ double** TrackingThread::getHistogram(unsigned char *currentImage, int width, in
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 1*/
 	for (int j = 0; j<3; ++j) {
 		for (int i = 0; i<256; ++i) {
+			histogram[j][i] /= ((double)samplingCoordinates.size());
+		}
+	}
+	return histogram;
+}
+
+/**Get the histogram of the current marker
+ * The histograms are reduced to 16 levels per color channel
+ * */
+double** TrackingThread::getHistogram16(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates) {
+	int bins = 16;
+	/*Get the histogram*/
+	double** histogram;
+	histogram = new double*[3];	/*Color figure comprises 3 different colors...*/
+	for (int i = 0; i<3; ++i) {
+		histogram[i] = new double[bins](); /*possible intensities of a given color, the () initialises the values to zero*/
+	}
+	int xCoordinate = coordinates.xCoordinate;
+	int yCoordinate = coordinates.yCoordinate;
+	/*get the colorvalues for the histograms*/
+	for (int i = 0; i<samplingCoordinates.size(); ++i) {
+		if (xCoordinate + samplingCoordinates[i].xCoordinate >= 0 && xCoordinate + samplingCoordinates[i].xCoordinate < width
+			&& yCoordinate + samplingCoordinates[i].yCoordinate >= 0 && yCoordinate + samplingCoordinates[i].yCoordinate < height
+			) {
+			histogram[0][((int) currentImage[(int) ((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 0)])>>4] += 1;
+			histogram[1][((int) currentImage[(int)((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 1)])>>4] += 1;
+			histogram[2][((int) currentImage[(int)((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 2)])>>4] += 1;
+		}
+	}
+	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 1*/
+	for (int j = 0; j<3; ++j) {
+		for (int i = 0; i<bins; ++i) {
 			histogram[j][i] /= ((double)samplingCoordinates.size());
 		}
 	}
