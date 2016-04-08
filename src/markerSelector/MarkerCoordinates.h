@@ -61,7 +61,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			coordinates		= std::vector<coordinate>();	/*Coordinates*/
 			markerRadius	= 10;					/* Size of LBP box*/
 			colorImage	= (unsigned char) 1;	/* Color or BW image*/
-			searchRadius	= 30;					/* The radius of the search window*/
+			searchRadius	= 5; //30;					/* The radius of the search window*/
 			trackMarker	= (unsigned char) 1;	/* Is the marker being tracked*/
 			predictive	= (unsigned char) 1;	/* Trying to predict the marker trajectory*/
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/

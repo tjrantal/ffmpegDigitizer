@@ -102,14 +102,14 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 /*Digitizing markers*/
 void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	/*Adjust the digitized coordinates with the sceling factor*/
-	printf("Left Button %d %d\n", event.GetX(), event.GetY());
+	
 	SetStatusText(wxString::Format(wxT("X %i Y %i"),event.GetX(), event.GetY() ));
 	
 	double xCoordinate = ((double) event.GetX())*imagePanel->scaleFactor;
 	double yCoordinate = ((double) event.GetY())*imagePanel->scaleFactor;
 	double radius = (double)  markerRadius->GetValue();
 	SetStatusText(wxString::Format(wxT("X %i Y %i X %f Y %f"),event.GetX(), event.GetY(),xCoordinate,yCoordinate ));
-	
+	printf("Left Button %d %d %f %f\n", event.GetX(), event.GetY(),xCoordinate,yCoorinate);
 	//printf("Trying to digitizeXY\n");
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 

@@ -64,6 +64,7 @@ public:
 	*/
     DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	void printCoordinates();	/**<Write the coordinates to resultsText*/
+	void redrawFrame();							/**< Refresh the frame*/
 private:
 	//DEBUG
 	FILE *debug;
@@ -85,7 +86,7 @@ private:
 	wxButton		*clearOnwards;		/**<Button to clear marker coordinates from current frame onwards*/
 	TrackingThread	*trackingThread;		/**<class for tracking, runs in a thread*/
 	
-	void redrawFrame();							/**< Refresh the frame*/
+	
 	
     void OnQuit(wxCommandEvent &event);			/**< */
 	void OnQuit(wxCloseEvent& event);			/**< */

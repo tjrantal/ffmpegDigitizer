@@ -197,7 +197,6 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, double** histogram) {
 	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
 	Digitize the closest match, provided that it is above the threshold.*/
-	double** markerHistogram = mainThread->markerSelector->markers[markerIndice].histogram;
 	std::vector<coordinateCloseness> checkClose;
 	std::vector<coordinate> samplingCoordinates = *(mainThread->markerSelector->markers[markerIndice].radiusCoordinates);
 	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
@@ -207,13 +206,14 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 		double y = coordinates.yCoordinate + searchCoordinates[i].yCoordinate;
 		coordinate check(x, y, -1);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
-		double closeness = mainThread->markerSelector->getCloseness(markerHistogram, getHistogram(currentImage,width,height, check, samplingCoordinates));
-
+		double closeness = mainThread->markerSelector->getCloseness(histogram, getHistogram(currentImage,width,height, check, samplingCoordinates));
+		printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
 		checkClose.push_back(coordinateCloseness(x, y, closeness));
 	}
 
 	std::sort(checkClose.begin(), checkClose.end());	//Sort the closeness values to ascending order, best closeness is the last
 	coordinateCloseness bestMatch = checkClose.back();
+	printf("Best closeness %f %f %f\n", bestMatch.closeness, bestMatch.x, bestMatch.y);
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
 	//sleep(1);
 	return coordinate(bestMatch.x, bestMatch.y, -1);
