@@ -120,15 +120,21 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	//Take the histogram for the marker
 	//markerSelector->markers[selectedMarker].histogram = imagePanel->getHistogram(xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].radiusCoordinates);
 	//markerSelector->markers[selectedMarker].fourBitColors = imagePanel->getColor(xCoordinate,yCoordinate);
-	//printf("Try to get color\n");
+	printf("Try to get color\n");
 	markerSelector->markers[selectedMarker].fourBitColors = TrackingThread::getColor(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,(int) xCoordinate,(int) yCoordinate);
+	printf("Try to get histogram\n");
+	markerSelector->markers[selectedMarker].histogram = TrackingThread::getHistogram(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y, coordinate(xCoordinate, yCoordinate,-1), *(markerSelector->markers[selectedMarker].radiusCoordinates));
+	printf("Got histogram\n");
 	//Highlight area...
 	//std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(new wxImage(imagePanel->currentClearImage),xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
 	//printf("Got color, try to grow region\n");
-	std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y,xCoordinate,yCoordinate,markerSelector->markers[selectedMarker].fourBitColors,markerSelector->markers[selectedMarker].colorTolerance);
+	
 	//printf("Grew region, trying to digitizer area\n");
 	redrawFrame();	//Erase the previous digitizations
-	imagePanel->digitizeXYArea(areaCoordinates);
+	if (false) {
+		std::vector<coordinate> areaCoordinates = TrackingThread::growRegion(imagePanel->currentImageData, imagePanel->imSize.x, imagePanel->imSize.y, xCoordinate, yCoordinate, markerSelector->markers[selectedMarker].fourBitColors, markerSelector->markers[selectedMarker].colorTolerance);
+		imagePanel->digitizeXYArea(areaCoordinates);
+	}
 	imagePanel->reFreshImage();
 	//printf("Digitized area\n");	
 	

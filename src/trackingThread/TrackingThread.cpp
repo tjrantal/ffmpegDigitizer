@@ -82,28 +82,40 @@ void TrackingThread::run(){
 			if (gotMarker){
 				//printf("Found marker tracking thread\n");
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+				int trackX, trackY;
 				try{
 					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
-					std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData,i, initCoordinate);
-					//printf("Got marker coordinates region grow in tracking thread %d\n",(int) areaCoordinates.size());
-					
-					//Calculate the mean of the area coordinates..
-					double meanCoord[2] = {0,0};	//init to zero
-					double meanSize = areaCoordinates.size();
-					for (int j = 0; j < areaCoordinates.size();++j){
-						meanCoord[0] += areaCoordinates[j].xCoordinate/meanSize;
-						meanCoord[1] += areaCoordinates[j].yCoordinate/meanSize;
-						//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
+					//Deactivate color-based tracking for now
+					if (false) {
+						std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData, i, initCoordinate);
+						//printf("Got marker coordinates region grow in tracking thread %d\n",(int) areaCoordinates.size());
+						//Calculate the mean of the area coordinates..
+						double meanCoord[2] = { 0,0 };	//init to zero
+						double meanSize = areaCoordinates.size();
+						for (int j = 0; j < areaCoordinates.size(); ++j) {
+							meanCoord[0] += areaCoordinates[j].xCoordinate / meanSize;
+							meanCoord[1] += areaCoordinates[j].yCoordinate / meanSize;
+							//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
+						}
+						trackX = meanCoord[0];
+						trackY = meanCoord[1];
+						
+						//printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
+						//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
+						//sleep(1);
+						mainThread->imagePanel->digitizeXYArea(areaCoordinates);
+					}else {
+						//Try histogram-based tracking
+						coordinate temp = getMarkerCoordinates(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+						trackX = temp.xCoordinate;
+						trackY = temp.yCoordinate;
+
 					}
-					coordinate coordinatesReturned(meanCoord[0],meanCoord[1],-1);	/*The mean coordinates of the area*/
-					//printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
-					//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
-					//sleep(1);
-					mainThread->markerSelector->setCoordinate(i,coordinatesReturned.xCoordinate, coordinatesReturned.yCoordinate, currentFrame);
+					mainThread->markerSelector->setCoordinate(i, trackX, trackY, currentFrame);
 					//printf("Set coordinate\n");
 					//Digitize the marker
-					mainThread->imagePanel->digitizeXYArea(areaCoordinates);
+					
 					//std::this_thread::sleep_for (std::chrono::milliseconds(100));
 					//printf("Digitized coordinate\n");
 					++markersFound;
@@ -119,6 +131,7 @@ void TrackingThread::run(){
 			}
 		}
 		//printf("Frame done in tracking thread\n");
+		mainThread->redrawFrame();	//Re-draw the digitized markers
 		mainThread->imagePanel->reFreshImage();
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0 && keepTracking == 1){
@@ -174,6 +187,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 	
 	std::sort(checkClose.begin(),checkClose.end());	//Sort the closeness values to ascending order, best closeness is the last
 	coordinateCloseness bestMatch = checkClose.back();
+	printf("Best closeness %f\n", bestMatch.closeness);
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
 	//sleep(1);
 	return coordinate(bestMatch.x,bestMatch.y,-1);
