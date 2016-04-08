@@ -177,13 +177,13 @@ int VideoReader::readIndices(){
 				++frameNo;
 				//printf("FRAME %d dts %ld pts %ld av %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts);
 				//int64_t bestPTS = av_frame_get_best_effort_timestamp(tmp_picture);
-				//printf("FRAME %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d best pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number,bestPTS);
+				printf("FRAME %d dts %ld pts %ld av_dts %ld av_pts %ld dpn %d best pts %ld\n",frameNo,packet.dts,packet.pts,tmp_picture->pkt_dts,tmp_picture->pkt_pts,tmp_picture->display_picture_number, av_frame_get_best_effort_timestamp(tmp_picture));
 				FrameIndice *lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts,av_frame_get_best_effort_timestamp(tmp_picture));
 				frameIndices.push_back(lastIndice);
-				av_free_packet(&packet);
+				av_packet_unref(&packet);
 			}
 	    }else{
-	    	av_free_packet(&packet);
+			av_packet_unref(&packet);
 	    }
 	}
 	/*Check whether null frames need to be fed in to get the remaining data*/
@@ -204,7 +204,7 @@ int VideoReader::readIndices(){
 				
 				FrameIndice* lastIndice = new FrameIndice(frameNo,tmp_picture->pts,tmp_picture->pkt_pts,tmp_picture->pkt_dts,av_frame_get_best_effort_timestamp(tmp_picture));
 				frameIndices.push_back(lastIndice);
-				av_free_packet(&packet);
+				av_packet_unref(&packet);
 			}else{
 				printf("Didn't get a frame anymore %d\n",frameNo);
 				fflush(stdout);
@@ -269,7 +269,7 @@ int VideoReader::readNextFrameFromDisk(){
 			}
 	    }
 	    // Free the packet that was allocated by av_read_frame
-	    av_free_packet(&packet);
+		av_packet_unref(&packet);
 	}
 	/*Feed null frames need to get a delayed frame*/
 	if (readMore ==1){
@@ -387,11 +387,11 @@ int VideoReader::readFrameFromDisk(int frameNo){
 						}
 					}
 				}
-				av_free_packet( &packet );
+				av_packet_unref( &packet );
 			}
 				
 		}else{
-			av_free_packet( &packet );
+			av_packet_unref( &packet );
 		}
 	
 		

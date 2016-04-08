@@ -486,14 +486,15 @@ int DigitizerFrame::getPrintIndices(wxFileName videoFileName,wxString videoFileP
 	indexFileName.Append(videoFileName.GetFullName());
 	indexFileName.append(wxT(".ind"));
 	printf("INDEX FILE NAME %s\n",indexFileName.c_str().AsChar());
-	fflush(stdout);			//DEBUGGING
+
 	/**Couldn't figure out how to convert to appropriate string type using one command on both linux and windows. Could be a difference between different wxWidgets versions as well, didn't check...*/
 	#ifdef __linux__
 		wxFile* indiceFile = new wxFile(indexFileName.wc_str(),wxFile::write);	//Linux
 	#else
-		wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
+		//wxFile* indiceFile = new wxFile(indexFileName.ToAscii(),wxFile::write);		//Windows
+		wxFile* indiceFile = new wxFile(indexFileName.c_str().AsChar(), wxFile::write);		//Windows		
 	#endif
-	//printf("File isOpened %d\n",indiceFile->IsOpened());
+	printf("File isOpened %d\n",indiceFile->IsOpened());
 	//	fflush(stdout);
 				//DEBUGGING
 	//Write indices to file here
