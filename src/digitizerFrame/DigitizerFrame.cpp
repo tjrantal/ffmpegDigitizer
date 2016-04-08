@@ -283,7 +283,7 @@ void DigitizerFrame::OpenSave(wxCommandEvent& event){
 				SetStatusText(wxString::Format(wxT("created %s for makers %i"),openFileDialog.GetPath().c_str(),openSave->IsOpened() ));
 				//printf("Created file opened %d\n",openSave->IsOpened());
 			}
-		}catch (int err){
+		}catch (...){
 			SetStatusText(_("Could not open or create a res file"));
 		}
 		/*
@@ -533,7 +533,7 @@ void DigitizerFrame::redrawFrame(){
 			try{
 				coordinate tempCoordinate = markerSelector->getCoordinate(i,currentFrame);
 				imagePanel->digitizeXY((int) tempCoordinate.xCoordinate,(int)  tempCoordinate.yCoordinate, markerSelector->markers[i].markerRadius);
-			} catch (int err){
+			} catch (...){
 			
 			}
 		}
@@ -642,7 +642,7 @@ void DigitizerFrame::SelectMarker(wxCommandEvent &event){
 /**Proceed to next marker*/
 void DigitizerFrame::NextMarker(){
 	int currentMarker = markerSelector->GetCurrentSelection();	/*Number of active marker*/
-	if (currentMarker+1<markerSelector->GetCount()){
+	if (currentMarker+1< (int) markerSelector->GetCount()){
 		currentMarker+=1;
 		markerSelector->SetSelection(currentMarker);
 		markerSelector->currentMarker = currentMarker;

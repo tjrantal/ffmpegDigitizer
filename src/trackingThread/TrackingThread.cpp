@@ -58,6 +58,8 @@ void TrackingThread::run(){
 				if (mainThread->markerSelector->markers[i].fourBitColors == NULL){
 					//Get the color from the image
 					mainThread->markerSelector->markers[i].fourBitColors = getColor(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y,(int) initCoordinate.xCoordinate,(int) initCoordinate.yCoordinate);	
+					//Get the histogram from the image
+					mainThread->markerSelector->markers[i].histogram = getHistogram(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, initCoordinate, *(mainThread->markerSelector->markers[i].radiusCoordinates));
 				}
 				
 				//printf("Got init previous %d %d\n",(int)initCoordinate.xCoordinate,(int)initCoordinate.yCoordinate);
@@ -175,6 +177,32 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
 	//sleep(1);
 	return coordinate(bestMatch.x,bestMatch.y,-1);
+}
+
+/**Look for the marker in the image*/
+coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, double** histogram) {
+	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
+	Digitize the closest match, provided that it is above the threshold.*/
+	double** markerHistogram = mainThread->markerSelector->markers[markerIndice].histogram;
+	std::vector<coordinateCloseness> checkClose;
+	std::vector<coordinate> samplingCoordinates = *(mainThread->markerSelector->markers[markerIndice].radiusCoordinates);
+	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
+
+	for (int i = 0; i<searchCoordinates.size(); ++i) {
+		double x = coordinates.xCoordinate + searchCoordinates[i].xCoordinate;
+		double y = coordinates.yCoordinate + searchCoordinates[i].yCoordinate;
+		coordinate check(x, y, -1);
+		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
+		double closeness = mainThread->markerSelector->getCloseness(markerHistogram, getHistogram(currentImage,width,height, check, samplingCoordinates));
+
+		checkClose.push_back(coordinateCloseness(x, y, closeness));
+	}
+
+	std::sort(checkClose.begin(), checkClose.end());	//Sort the closeness values to ascending order, best closeness is the last
+	coordinateCloseness bestMatch = checkClose.back();
+	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
+	//sleep(1);
+	return coordinate(bestMatch.x, bestMatch.y, -1);
 }
 
 /**Look for the marker in the image based on region growing*/
@@ -395,6 +423,37 @@ std::vector<coordinate> TrackingThread::growRegion(wxImage *currentImage,double 
 	delete neighbourhood;
 	
 	return areaCoordinates;
+}
+
+
+/**Get the histogram of the current marker*/
+double** TrackingThread::getHistogram(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates) {
+
+	/*Get the histogram*/
+	double** histogram;
+	histogram = new double*[3];	/*Color figure comprises 3 different colors...*/
+	for (int i = 0; i<3; ++i) {
+		histogram[i] = new double[256](); /*256 possible intensities of a given color, the () initialises the values to zero*/
+	}
+	int xCoordinate = coordinates.xCoordinate;
+	int yCoordinate = coordinates.yCoordinate;
+	/*get the colorvalues for the histograms*/
+	for (int i = 0; i<samplingCoordinates.size(); ++i) {
+		if (xCoordinate + samplingCoordinates[i].xCoordinate >= 0 && xCoordinate + samplingCoordinates[i].xCoordinate < width
+			&& yCoordinate + samplingCoordinates[i].yCoordinate >= 0 && yCoordinate + samplingCoordinates[i].yCoordinate < height
+			) {
+			histogram[0][(int) currentImage[(int) (xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 0)]] += 1;
+			histogram[1][(int) currentImage[(int)(xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 1)]] += 1;
+			histogram[2][(int) currentImage[(int)(xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 2)]] += 1;
+		}
+	}
+	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
+	for (int j = 0; j<3; ++j) {
+		for (int i = 0; i<256; ++i) {
+			histogram[j][i] /= ((double)samplingCoordinates.size());
+		}
+	}
+	return histogram;
 }
 
 /**Get the histogram of the current marker*/

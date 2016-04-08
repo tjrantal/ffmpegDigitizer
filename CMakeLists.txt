@@ -51,7 +51,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Set compiler flags and options. 
 # Here it is setting the Visual Studio warning level to 4
 if (WIN32)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")#/W4  /MT")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" /EHa)#/W4  /MT")	#Turn exceptions on
 endif(WIN32)
 if(UNIX)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__")	#WxWidgets requires file_offset & UsingDLL & __WXGTK__
