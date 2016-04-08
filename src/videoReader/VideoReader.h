@@ -103,7 +103,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		*/
 		VideoReader(const char* file); 
 		
-		/**Deconstructor*/
+		/**Destructor*/
 		~VideoReader();	/**< Close the video file and release memory*/
 		
 	};

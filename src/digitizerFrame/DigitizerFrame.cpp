@@ -195,9 +195,10 @@ void DigitizerFrame::OnQuit(wxCloseEvent &event)
 		delete videoReader;
 		videoReader = NULL;
 	}
-	
+	printf("Deleted vReader at the end\n");
 	/*Write out and close any open results file*/
 	if (openSave != NULL && openSave->IsOpened()){
+		printf("Close openSave\n");
 		//printCoordinates();
 		openSave->Write();
 		openSave->Close();
@@ -445,6 +446,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			delete config;
 			
 			//int displayPictureNumber = videoReader->readNextFrameFromDisk();
+			printf("Try to read the first frame\n");
 			int displayPictureNumber = videoReader->readFrameFromDisk(0);
 			printf("Tried to read the first frame\n");
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
@@ -499,17 +501,19 @@ int DigitizerFrame::getPrintIndices(wxFileName videoFileName,wxString videoFileP
 				//DEBUGGING
 	//Write indices to file here
 	for (int i = 0; i<videoReader->frameIndices.size();++i){
-		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\t%ld\t%ld\n"),videoReader->frameIndices.at(i)->frameNo
-											,videoReader->frameIndices.at(i)->pts
-											,videoReader->frameIndices.at(i)->pkt_pts
-											,videoReader->frameIndices.at(i)->dts
-											,videoReader->frameIndices.at(i)->bestPTS)
-											,wxConvUTF8);
+		indiceFile->Write(wxString::Format(wxT("%d\t%ld\t%ld\t%ld\t%ld\n"), (int) videoReader->frameIndices.at(i)->frameNo
+							, (long) videoReader->frameIndices.at(i)->pts
+							, (long) videoReader->frameIndices.at(i)->pkt_pts
+							, (long) videoReader->frameIndices.at(i)->dts
+							, (long) videoReader->frameIndices.at(i)->bestPTS));
+											//,wxConvUTF8);
 	}
 	indiceFile->Close();
 	delete indiceFile;
-	//videoReader->writeIndicesToFile();					
-	config->Write(videoFilePath, indexFileName);
+	//videoReader->writeIndicesToFile();
+	printf("Wrote indiceFile\n");
+	config->Write(videoFilePath, indexFileName.c_str().AsChar());
+	printf("Saved config\n");
 	return gotPackets;
 }
 
