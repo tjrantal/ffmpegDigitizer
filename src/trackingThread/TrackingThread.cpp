@@ -207,7 +207,7 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 		double y = yy + searchCoordinates[i].yCoordinate;
 		coordinate check(x, y, -1);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
-		double closeness = mainThread->markerSelector->getCloseness(histogram, getHistogram16(currentImage,width,height, check, samplingCoordinates));
+		double closeness = mainThread->markerSelector->getCloseness16(histogram, getHistogram16(currentImage,width,height, check, samplingCoordinates));
 		printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
 		checkClose.push_back(coordinateCloseness(x, y, closeness));
 	}
@@ -457,9 +457,9 @@ double** TrackingThread::getHistogram(unsigned char *currentImage, int width, in
 		if (xCoordinate + samplingCoordinates[i].xCoordinate >= 0 && xCoordinate + samplingCoordinates[i].xCoordinate < width
 			&& yCoordinate + samplingCoordinates[i].yCoordinate >= 0 && yCoordinate + samplingCoordinates[i].yCoordinate < height
 			) {
-			histogram[0][(int) currentImage[(int) (xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 0)]] += 1;
-			histogram[1][(int) currentImage[(int)(xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 1)]] += 1;
-			histogram[2][(int) currentImage[(int)(xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 2)]] += 1;
+			histogram[0][(int) currentImage[(int) ((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 0)]] += 1;
+			histogram[1][(int) currentImage[(int) ((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 1)]] += 1;
+			histogram[2][(int) currentImage[(int) ((xCoordinate + samplingCoordinates[i].xCoordinate)*3 + (yCoordinate + samplingCoordinates[i].yCoordinate)*width*3 + 2)]] += 1;
 		}
 	}
 	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 1*/
