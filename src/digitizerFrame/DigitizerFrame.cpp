@@ -109,7 +109,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 	double yCoordinate = ((double) event.GetY())*imagePanel->scaleFactor;
 	double radius = (double)  markerRadius->GetValue();
 	SetStatusText(wxString::Format(wxT("X %i Y %i X %f Y %f"),event.GetX(), event.GetY(),xCoordinate,yCoordinate ));
-	printf("Left Button %d %d %f %f\n", event.GetX(), event.GetY(),xCoordinate,yCoorinate);
+	printf("Left Button %d %d %f %f\n", event.GetX(), event.GetY(),xCoordinate,yCoordinate);
 	//printf("Trying to digitizeXY\n");
 	imagePanel->digitizeXY((int) xCoordinate,(int) yCoordinate, radius);
 

@@ -461,7 +461,7 @@ double** TrackingThread::getHistogram(unsigned char *currentImage, int width, in
 			histogram[2][(int) currentImage[(int)(xCoordinate + samplingCoordinates[i].xCoordinate + (yCoordinate + samplingCoordinates[i].yCoordinate)*width + 2)]] += 1;
 		}
 	}
-	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 0*/
+	/*Normalize sum to 1 (maximum, next to border sum of histogram will be less than 1*/
 	for (int j = 0; j<3; ++j) {
 		for (int i = 0; i<256; ++i) {
 			histogram[j][i] /= ((double)samplingCoordinates.size());
