@@ -59,15 +59,15 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		marker(wxString markerNameIn):markerName(markerNameIn){
 			/*Insert default values*/
 			coordinates		= std::vector<coordinate>();	/*Coordinates*/
-			markerRadius	= 10;					/* Size of LBP box*/
+			markerRadius	= 15;					/* Size of LBP box*/
 			colorImage	= (unsigned char) 1;	/* Color or BW image*/
-			searchRadius	= 5; //30;					/* The radius of the search window*/
+			searchRadius	= 40;					/* The radius of the search window*/
 			trackMarker	= (unsigned char) 1;	/* Is the marker being tracked*/
 			predictive	= (unsigned char) 1;	/* Trying to predict the marker trajectory*/
 			notFound		= (unsigned char) 0;	/* Was marker not found in the current frame*/
 			histogram	=NULL;
 			fourBitColors = NULL;
-			colorTolerance = 30;
+			colorTolerance = 127;
 		}
 	};
 #endif

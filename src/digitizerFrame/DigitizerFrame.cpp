@@ -338,9 +338,9 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
-			markerRadius = new wxSlider(this,ID_markerRadius,10,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			searchRadius = new wxSlider(this,ID_searchRadius,30,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			colorTolerance = new wxSlider(this,ID_colorTolerance,30,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			markerRadius	= new wxSlider(this,ID_markerRadius,15,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			searchRadius	= new wxSlider(this,ID_searchRadius,40,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			colorTolerance	= new wxSlider(this,ID_colorTolerance,127,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,350));
 			clearMarker		 = new wxButton(this,ID_clearMarker,_("&Clear Marker"),wxPoint(10,400));
 			clearOnwards	 = new wxButton(this,ID_clearOnwards,_("&Clear Onwards"),wxPoint(10,450));
@@ -703,9 +703,12 @@ void  DigitizerFrame::GetMarkerValues(int marker){
 
 /**Adjust marker size*/
 void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
+	//printf("start asr\n");
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = searchRadius->GetValue();	/*Get the value from the slider*/
+	//printf("Adjust search radius old %d new %d\n",markerSelector->markers.at(currentMarker).searchRadius,currentVal);
+	
 	markerSelector->markers.at(currentMarker).searchRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).searchCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
 	SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), markerSelector->markers.at(currentMarker).searchCoordinates->size()));
@@ -716,9 +719,12 @@ void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
 
 /**Adjust search radius*/
 void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
+	//printf("start amr\n");
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = markerRadius->GetValue();	/*Get the value from the slider*/
+	//printf("Adjust marker radius old %d new %d\n",markerSelector->markers.at(currentMarker).markerRadius,currentVal);
+	
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).radiusCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
 	SetStatusText(wxString::Format(wxT("%s %d"),_("# of marker radius area coordinates"), markerSelector->markers.at(currentMarker).radiusCoordinates->size()));
@@ -729,6 +735,7 @@ void DigitizerFrame::AdjustColorTolerance(wxScrollEvent &event){
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
 	int currentVal = colorTolerance->GetValue();	/*Get the value from the slider*/
+	//printf("Adjust color tol old %d new %d\n",markerSelector->markers.at(currentMarker).colorTolerance,currentVal);
 	markerSelector->markers.at(currentMarker).colorTolerance =	currentVal;	/*Save the slider value as the new marker radius*/
 	SetStatusText(wxString::Format(wxT("%s %d"),_("Color tolerance set to"), markerSelector->markers.at(currentMarker).colorTolerance));
 }

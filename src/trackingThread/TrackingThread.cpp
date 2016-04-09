@@ -107,7 +107,7 @@ void TrackingThread::run(){
 						mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 					}else {
 						//Try histogram-based tracking
-						coordinate temp = getMarkerCoordinates(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
+						coordinate temp = getMarkerCoordinates(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram,mainThread->markerSelector->markers[i].colorTolerance);
 						trackX = temp.xCoordinate;
 						trackY = temp.yCoordinate;
 
@@ -143,6 +143,7 @@ void TrackingThread::run(){
 				mainThread->slider->SetValue(currentFrame);
 				mainThread->videoReader->readFrameFromDisk(currentFrame);
 				mainThread->imagePanel->setImage(mainThread->videoReader->width,mainThread->videoReader->height,mainThread->videoReader->decodedFrame,true,false);
+				mainThread->currentFrame = currentFrame;
 			}else{
 				/*Stop the thread*/
 				mainThread->toggleTrack->SetValue(false);	/*Set the track on toggle to off*/
@@ -194,7 +195,7 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 }
 
 /**Look for the marker in the image*/
-coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, double** histogram) {
+coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, double** histogram,int colorTolerance) throw(int) {
 	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
 	Digitize the closest match, provided that it is above the threshold.*/
 	std::vector<coordinateCloseness> checkClose;
@@ -208,7 +209,7 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 		coordinate check(x, y, -1);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
 		double closeness = mainThread->markerSelector->getCloseness16(histogram, getHistogram16(currentImage,width,height, check, samplingCoordinates));
-		printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
+		//printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
 		checkClose.push_back(coordinateCloseness(x, y, closeness));
 	}
 
@@ -217,7 +218,11 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 	printf("Best closeness %f %f %f\n", bestMatch.closeness, bestMatch.x, bestMatch.y);
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
 	//sleep(1);
-	return coordinate(bestMatch.x, bestMatch.y, -1);
+	if (bestMatch.closeness >= ((double)colorTolerance)/256.0*3.0){
+		return coordinate(bestMatch.x, bestMatch.y, -1);
+	}else{
+		throw 4;
+	}
 }
 
 /**Look for the marker in the image based on region growing*/
