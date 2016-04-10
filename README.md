@@ -28,4 +28,6 @@ Dependencies
 WIN 7 compilation notes
 wxWidgets 3.1.0 works. Compiled as a shared library (docs/msw/install.txt had details on compilation)
 ffmpeg	downloaded Zeranoe pre-compiled -dev, shared runtime libs, unzipped the .dlls from the shared runtime to -dev lib
+wxWidgets compilation whinged about tiff_config re-defining snprintf, commented that row out, and compiled after
+Add FFMPEG_HOME, wxWidgets_ROOT_DIR, and wxWidgets_LIB_DIR environment vars. Look into cmake find wxWidgets for tips.
 
