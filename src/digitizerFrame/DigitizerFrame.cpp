@@ -711,7 +711,7 @@ void DigitizerFrame::AdjustSearchRadius(wxCommandEvent &event){
 	
 	markerSelector->markers.at(currentMarker).searchRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).searchCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
-	//SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), markerSelector->markers.at(currentMarker).searchCoordinates->size()));
+	SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), currentVal));
 	
 }
 
@@ -727,7 +727,7 @@ void DigitizerFrame::AdjustMarkerRadius(wxCommandEvent &event){
 	
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).radiusCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
-	//SetStatusText(wxString::Format(wxT("%s %d"),_("# of marker radius area coordinates"), markerSelector->markers.at(currentMarker).radiusCoordinates->size()));
+	SetStatusText(wxString::Format(wxT("%s %d"),_("# of marker radius area coordinates"), currentVal));
 }
 
 /**Adjust region grow color tolerance*/
