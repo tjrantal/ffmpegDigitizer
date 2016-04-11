@@ -215,7 +215,7 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 
 	std::sort(checkClose.begin(), checkClose.end());	//Sort the closeness values to ascending order, best closeness is the last
 	coordinateCloseness bestMatch = checkClose.back();
-	printf("Best closeness %f %f %f\n", bestMatch.closeness, bestMatch.x, bestMatch.y);
+	//printf("Best closeness %f %f %f\n", bestMatch.closeness, bestMatch.x, bestMatch.y);
 	//mainThread->SetStatusText(wxString::Format(wxT("%s %f %s %f"),_("CheckedCloseness, max"), bestMatch.closeness,_("last"), (checkClose.front()).closeness));
 	//sleep(1);
 	if (bestMatch.closeness >= ((double)colorTolerance)/256.0*3.0){
