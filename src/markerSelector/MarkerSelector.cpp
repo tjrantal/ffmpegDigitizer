@@ -132,21 +132,21 @@ std::vector<coordinate> *MarkerSelector::getRelativeSamplingCoordinates(double r
 }
 
 /**compare a histogram to the histogram of the marker*/
-double MarkerSelector::getCloseness(double** histo1,double** histo2){
+double MarkerSelector::getCloseness(Histogram* histo1, Histogram* histo2){
 	double closeness = 0;
 	for (int j = 0;j<3;++j){
 		for (int i = 0;i<256;++i){
-			closeness+= (histo1[j][i]<histo2[j][i]) ? histo1[j][i] : histo2[j][i];
+			closeness+= (histo1->histogram[j][i]<histo2->histogram[j][i]) ? histo1->histogram[j][i] : histo2->histogram[j][i];
 		}
 	}
 	return closeness;
 }
 
-double MarkerSelector::getCloseness16(double** histo1,double** histo2){
+double MarkerSelector::getCloseness16(Histogram* histo1, Histogram* histo2){
 	double closeness = 0;
 	for (int j = 0;j<3;++j){
 		for (int i = 0;i<16;++i){
-			closeness+= (histo1[j][i]<histo2[j][i]) ? histo1[j][i] : histo2[j][i];
+			closeness+= (histo1->histogram[j][i]<histo2->histogram[j][i]) ? histo1->histogram[j][i] : histo2->histogram[j][i];
 		}
 	}
 	return closeness;

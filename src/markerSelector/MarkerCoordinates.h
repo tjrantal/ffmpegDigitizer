@@ -17,6 +17,31 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #define MARKERCOORDINATES_H
 #include <vector>
 	
+	/**
+		 A struct to contain a histogram. Helps with memory management...
+	*/
+struct Histogram {
+	int channels;			/**histogram channels*/
+	int bins;			/**histogram bins per channel*/
+	double** histogram = NULL;
+	Histogram(int _channels, int _bins) :channels(_channels), bins(_bins) {
+		histogram = new double*[3];
+		for (int i = 0; i < channels; ++i) {
+			histogram[i] = new double[bins]();	//Initialise to zero
+		}
+	}
+
+	~Histogram() {
+		for (int i = 0; i < channels; ++i) {
+			delete[] histogram[i];
+		}
+		delete[] histogram;
+		histogram = NULL;
+	}
+
+};
+
+
 	/**A struct to contain the information for a coordinate. Needs to be in a separate coordinate
 		to create sortable vector...
 	*/
@@ -52,7 +77,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		int notFound;	/**< Was marker not found in the current frame*/
 		std::vector<coordinate> *radiusCoordinates;	/**<Relative sampling coordinates around the marker*/
 		std::vector<coordinate> *searchCoordinates;		/**<Relative sampling coordinates for track search area*/
-		double** histogram; 		/**<To store the colour histograms to look for*/
+		Histogram *histogram; 		/**<To store the colour histograms to look for*/
 		unsigned char*	fourBitColors;		/**<To store the 4 highest bits of marker color for region grow*/
 		int maxError;	/**<Maximum color error in a given channel for region growing*/
 		/**Constructor*/

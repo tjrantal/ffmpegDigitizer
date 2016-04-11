@@ -129,7 +129,7 @@ void DigitizerFrame::LeftButtonDown(wxMouseEvent& event){
 		/*Print the histogram for debugging*/
 		for (int j = 0; j < 3; ++j) {
 			for (int i = 0; i < 16; ++i) {
-				printf("%.2f ", markerSelector->markers[selectedMarker].histogram[j][i]);
+				printf("%.2f ", markerSelector->markers[selectedMarker].histogram->histogram[j][i]);
 			}
 			printf("\n");
 		}

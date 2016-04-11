@@ -66,16 +66,18 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void run();
 			/**Look for the marker in the image based on histograms*/
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
-			coordinate getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, double** histogram,int colorTolerance) throw(int);
+			coordinate getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance) throw(int);
 			
 			/**Look for the marker in the image based on region growing*/
 			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int);
 			std::vector<coordinate> getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int);
 			
 			/**Get the histogram of the current marker*/
+			/*
 			static double** getHistogram(wxImage *currentImage,coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 			static double** getHistogram(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates);
-			static double** getHistogram16(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates);
+			*/
+			static Histogram* getHistogram16(unsigned char *currentImage, int width, int height, coordinate coordinates, std::vector<coordinate> samplingCoordinates);
 
 			/**Get the color of the current marker*/
 			static unsigned char* getColor(wxImage *currentImage,int xCoordinate,int yCoordinate);	

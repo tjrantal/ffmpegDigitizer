@@ -67,9 +67,9 @@ class MarkerSelector : public wxComboBox{
 			@param histo1 First histogram for the closeness
 			@param histo2 Second histogram for the closeness
 		*/
-		double getCloseness(double** histo1,double** histo2);	/**compare a histogram to the histogram of the marker*/
+		double getCloseness(Histogram* histo1, Histogram* histo2);	/**compare a histogram to the histogram of the marker*/
 		
-		double getCloseness16(double** histo1,double** histo2);
+		double getCloseness16(Histogram* histo1, Histogram* histo2);
 
 		/**
 		 * @brief Clear marker frameNo
