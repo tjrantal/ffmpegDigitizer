@@ -702,39 +702,39 @@ void  DigitizerFrame::GetMarkerValues(int marker){
 
 
 /**Adjust marker size*/
-void DigitizerFrame::AdjustSearchRadius(wxScrollEvent &event){
-	//printf("start asr\n");
+void DigitizerFrame::AdjustSearchRadius(wxCommandEvent &event){
+	printf("start asr\n");
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
-	int currentVal = searchRadius->GetValue();	/*Get the value from the slider*/
-	//printf("Adjust search radius old %d new %d\n",markerSelector->markers.at(currentMarker).searchRadius,currentVal);
+	int currentVal = event.GetInt();// searchRadius->GetValue();	/*Get the value from the slider*/
+	printf("Adjust search radius old %d new %d\n",markerSelector->markers.at(currentMarker).searchRadius,currentVal);
 	
 	markerSelector->markers.at(currentMarker).searchRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).searchCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
-	SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), markerSelector->markers.at(currentMarker).searchCoordinates->size()));
+	//SetStatusText(wxString::Format(wxT("%s %d"),_("# of search radius area coordinates"), markerSelector->markers.at(currentMarker).searchCoordinates->size()));
 	
 }
 
 
 
 /**Adjust search radius*/
-void DigitizerFrame::AdjustMarkerRadius(wxScrollEvent &event){
-	//printf("start amr\n");
+void DigitizerFrame::AdjustMarkerRadius(wxCommandEvent &event){
+	printf("start amr\n");
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
-	int currentVal = markerRadius->GetValue();	/*Get the value from the slider*/
-	//printf("Adjust marker radius old %d new %d\n",markerSelector->markers.at(currentMarker).markerRadius,currentVal);
+	int currentVal = event.GetInt();// markerRadius->GetValue();	/*Get the value from the slider*/
+	printf("Adjust marker radius old %d new %d\n",markerSelector->markers.at(currentMarker).markerRadius,currentVal);
 	
 	markerSelector->markers.at(currentMarker).markerRadius =	currentVal;	/*Save the slider value as the new marker radius*/
 	markerSelector->markers.at(currentMarker).radiusCoordinates = markerSelector->getRelativeSamplingCoordinates((double) currentVal);
-	SetStatusText(wxString::Format(wxT("%s %d"),_("# of marker radius area coordinates"), markerSelector->markers.at(currentMarker).radiusCoordinates->size()));
+	//SetStatusText(wxString::Format(wxT("%s %d"),_("# of marker radius area coordinates"), markerSelector->markers.at(currentMarker).radiusCoordinates->size()));
 }
 
 /**Adjust region grow color tolerance*/
-void DigitizerFrame::AdjustColorTolerance(wxScrollEvent &event){
+void DigitizerFrame::AdjustColorTolerance(wxCommandEvent &event){
 	//Set the values for the current marker
 	int currentMarker = markerSelector->currentMarker;	/*Number of active marker*/
-	int currentVal = colorTolerance->GetValue();	/*Get the value from the slider*/
+	int currentVal = event.GetInt();//colorTolerance->GetValue();	/*Get the value from the slider*/
 	//printf("Adjust color tol old %d new %d\n",markerSelector->markers.at(currentMarker).colorTolerance,currentVal);
 	markerSelector->markers.at(currentMarker).colorTolerance =	currentVal;	/*Save the slider value as the new marker radius*/
 	SetStatusText(wxString::Format(wxT("%s %d"),_("Color tolerance set to"), markerSelector->markers.at(currentMarker).colorTolerance));
@@ -761,8 +761,8 @@ BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
     EVT_MENU(ID_Quit,  		DigitizerFrame::OnQuit)
     EVT_MENU(ID_About, 		DigitizerFrame::OnAbout)
 	EVT_COMMAND_SCROLL(ID_slider,	DigitizerFrame::ScrollVideo)
-	EVT_COMMAND_SCROLL(ID_searchRadius,	DigitizerFrame::AdjustSearchRadius)	
-	EVT_COMMAND_SCROLL(ID_markerRadius,	DigitizerFrame::AdjustMarkerRadius)
-	EVT_COMMAND_SCROLL(ID_colorTolerance,	DigitizerFrame::AdjustColorTolerance)
+	EVT_SLIDER(ID_searchRadius,	DigitizerFrame::AdjustSearchRadius)
+	EVT_SLIDER(ID_markerRadius,	DigitizerFrame::AdjustMarkerRadius)
+	EVT_SLIDER(ID_colorTolerance,	DigitizerFrame::AdjustColorTolerance)
 	EVT_TOGGLEBUTTON(ID_toggleTracking, DigitizerFrame::ToggleTracking)
 END_EVENT_TABLE()

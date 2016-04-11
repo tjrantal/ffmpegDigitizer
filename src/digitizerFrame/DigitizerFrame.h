@@ -100,9 +100,9 @@ private:
 	void OpenVideo(wxCommandEvent &event);		/**< Open a video for reading*/
 	void OpenSave(wxCommandEvent &event);		/**< Open a file for saving*/
 	void ScrollVideo(wxScrollEvent &event);		/**< */
-	void AdjustSearchRadius(wxScrollEvent &event);	/**< */
-	void AdjustMarkerRadius(wxScrollEvent &event);	/**< */
-	void AdjustColorTolerance(wxScrollEvent &event);	/**< */
+	void AdjustSearchRadius(wxCommandEvent &event);	/**< */
+	void AdjustMarkerRadius(wxCommandEvent &event);	/**< */
+	void AdjustColorTolerance(wxCommandEvent &event);	/**< */
 	void SelectMarker(wxCommandEvent &event);			/**< */
 	void ToggleTracking(wxCommandEvent &event);			/**< */
 	void ClearMarker(wxCommandEvent &event);			/**< Clear all coordinates*/
