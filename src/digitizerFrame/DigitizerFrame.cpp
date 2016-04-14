@@ -339,6 +339,8 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
+			printf("Add sliders\n");
+			printf("%d %d %d\n", markerSelector->markers.at(0).markerRadius, markerSelector->markers.at(0).searchRadius, markerSelector->markers.at(0).colorTolerance);
 			markerRadius	= new wxSlider(this,ID_markerRadius, markerSelector->markers.at(0).markerRadius,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			searchRadius	= new wxSlider(this,ID_searchRadius, markerSelector->markers.at(0).searchRadius,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			colorTolerance	= new wxSlider(this,ID_colorTolerance, markerSelector->markers.at(0).colorTolerance,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);

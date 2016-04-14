@@ -33,16 +33,17 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 	//markers = new std::vector<wxString>();
 	/*Read markers from the list and add them to the dropdown menu*/
 	int i = 0;
+	printf("Start reading markers\n");
 	if (markerFile->IsOpened()) {
-		while (!markerFile->Eof()) {
-			nextLine = markerFile->GetNextLine();
+		for (int i = 0; i < markerFile->GetLineCount();++i) {
+			nextLine = markerFile->GetLine(i);
 			std::vector<std::string> delimited;
 			std::string tempLine(nextLine);
 			std::stringstream sourceStringStream(tempLine);
 			std::string item;
 			while (std::getline(sourceStringStream, item, '\t')) {
 				delimited.push_back(item);
-				//cout<<item<<"\t";
+				printf("%s\t",item);
 			}
 			marker tempMarker(delimited.at(0));	/* Marker name*/
 			Append((const wxString) delimited.at(0));
@@ -55,7 +56,7 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 			tempMarker.radiusCoordinates = getRelativeSamplingCoordinates((double)tempMarker.markerRadius);
 			tempMarker.searchCoordinates = getRelativeSamplingCoordinates((double)tempMarker.searchRadius);
 			markers.push_back(tempMarker);
-			++i;
+			printf("\n");
 		}
 	}
 
@@ -73,10 +74,12 @@ void MarkerSelector::setMarkerList(wxString fileIn){
 	
 	}
 	*/
+	printf("Done reading markers\n");
 	currentMarker = 0;
 	SetSelection(0);	//Select the first item on the list
 	markerFile->Close();
 	delete markerFile;
+	printf("Done with reading markers\n");
 }
 
 /**< Assign a value to a marker at a specific frame*/
