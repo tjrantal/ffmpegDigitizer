@@ -17,6 +17,9 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef MARKERSELECTOR_H
 	#include "MarkerSelector.h"
 #endif
+#include <string>      
+#include <sstream>
+
 MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowID id,const wxPoint &pos,const wxSize &size) : wxComboBox((wxWindow *)parent,id,_(""),pos,size,0,NULL,wxCB_DROPDOWN){
 	setMarkerList(fileIn);	/*Set the marker list*/
 }
@@ -24,22 +27,52 @@ MarkerSelector::MarkerSelector(wxString fileIn, DigitizerFrame* parent,wxWindowI
 void MarkerSelector::setMarkerList(wxString fileIn){
 	wxTextFile* markerFile = new wxTextFile();
 	markerFile->Open(fileIn,wxConvUTF8); /*Open the file for reading*/
-	wxString temp;
+	wxString nextLine;
 	Clear();	/*Remove pre-existing items*/
 	markers.clear();
 	//markers = new std::vector<wxString>();
 	/*Read markers from the list and add them to the dropdown menu*/
+	int i = 0;
+	if (markerFile->IsOpened()) {
+		while (!markerFile->Eof()) {
+			nextLine = markerFile->GetNextLine();
+			std::vector<std::string> delimited;
+			std::string tempLine(nextLine);
+			std::stringstream sourceStringStream(tempLine);
+			std::string item;
+			while (std::getline(sourceStringStream, item, '\t')) {
+				delimited.push_back(item);
+				//cout<<item<<"\t";
+			}
+			marker tempMarker(delimited.at(0));	/* Marker name*/
+			Append((const wxString) delimited.at(0));
+			if (delimited.size()>1){
+				tempMarker.markerRadius = std::stoi(delimited.at(1), nullptr);
+				tempMarker.searchRadius = std::stoi(delimited.at(2), nullptr);
+				tempMarker.colorTolerance = std::stoi(delimited.at(3), nullptr);
+				
+			}
+			tempMarker.radiusCoordinates = getRelativeSamplingCoordinates((double)tempMarker.markerRadius);
+			tempMarker.searchCoordinates = getRelativeSamplingCoordinates((double)tempMarker.searchRadius);
+			markers.push_back(tempMarker);
+			++i;
+		}
+	}
+
+
+	/*
 	if (markerFile->IsOpened()){
 		for (temp = markerFile->GetFirstLine(); !markerFile ->Eof(); temp = markerFile->GetNextLine()){
-			marker tempMarker(temp);	/* Marker name*/
+			marker tempMarker(temp);	// Marker name
 			tempMarker.radiusCoordinates = getRelativeSamplingCoordinates((double) tempMarker.markerRadius);
 			tempMarker.searchCoordinates = getRelativeSamplingCoordinates((double) tempMarker.searchRadius);
-			//tempMarker.markerName 	= temp;					/* Marker name*/
+			//tempMarker.markerName 	= temp;					// Marker name
 			markers.push_back(tempMarker);			
 			Append((const wxString) temp);
 		}
 	
 	}
+	*/
 	currentMarker = 0;
 	SetSelection(0);	//Select the first item on the list
 	markerFile->Close();

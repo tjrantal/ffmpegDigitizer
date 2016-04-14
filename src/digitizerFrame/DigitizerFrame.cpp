@@ -161,7 +161,7 @@ void DigitizerFrame::LeftButtonUp(wxMouseEvent& WXUNUSED(event)){
 void DigitizerFrame::KeyDown(wxKeyEvent& event){
 	//Keyboard short cuts
 	int charCode = event.GetKeyCode();
-	printf("Got keycode %c\n",(char) charCode);
+	printf("Got keycode %c %d\n",(char) charCode,charCode);
 	wxCommandEvent emptyEvent = wxCommandEvent();
 	//m marker
 	if (charCode == 109 ||charCode == 77){
@@ -339,16 +339,18 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
-			markerRadius	= new wxSlider(this,ID_markerRadius,15,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			searchRadius	= new wxSlider(this,ID_searchRadius,40,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			colorTolerance	= new wxSlider(this,ID_colorTolerance,127,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			markerRadius	= new wxSlider(this,ID_markerRadius, markerSelector->markers.at(0).markerRadius,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			searchRadius	= new wxSlider(this,ID_searchRadius, markerSelector->markers.at(0).searchRadius,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			colorTolerance	= new wxSlider(this,ID_colorTolerance, markerSelector->markers.at(0).colorTolerance,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
 			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,350));
 			clearMarker		 = new wxButton(this,ID_clearMarker,_("&Clear Marker"),wxPoint(10,400));
 			clearOnwards	 = new wxButton(this,ID_clearOnwards,_("&Clear Onwards"),wxPoint(10,450));
 			//Connect callbacks
 			Connect(ID_clearMarker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::ClearMarker),NULL,this);
 			Connect(ID_clearOnwards,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::ClearOnwards),NULL,this);
-	
+			//markerRadius->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
+			//searchRadius->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
+			//colorTolerance->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
 			
 			trackOn = false;
 		} else {
@@ -474,6 +476,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			int width,height;
 			this->GetSize(&width,&height);
 			slider = new wxSlider(this,ID_slider,0,0,videoReader->getNumberOfIndices()-1,wxPoint((width-200)/2-200,height-120),wxSize(400,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			//slider->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
+			
 			currentFrame = 0;
 		}else{
 			SetStatusText(_("Could not open video!"));
