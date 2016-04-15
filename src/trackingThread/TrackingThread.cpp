@@ -17,6 +17,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef TRACKINGTHREAD_H
 	#include "TrackingThread.h"
 #endif
+#include "../markerSelector/CoordinateTracker.h"
 
 TrackingThread::TrackingThread(DigitizerFrame* mainThreadIn){
 	mainThread = mainThreadIn;
@@ -47,10 +48,13 @@ void TrackingThread::run(){
 		//Go through all of the markers in the image
 		markersFound = 0;
 		int keepTracking = 1;
+		std::vector<std::thread> threads;
+		std::vector<CoordinateTracker*> coordinateTrackers;
 		for (int i = 0; i<mainThread->markerSelector->markers.size();++i){
 			//Look for coordinate in the previous image/
 			//printf("Marker %d\n",i);
 			gotMarker = false;
+			
 			/*Check out whether the current or the previous frame has the marker digitized*/
 			try{	
 				initCoordinate = mainThread->markerSelector->getCoordinate(i, currentFrame);
@@ -82,7 +86,7 @@ void TrackingThread::run(){
 			if (gotMarker){
 				//printf("Found marker tracking thread\n");
 				//coordinate coordinatesReturned = getMarkerCoordinates(currentImage,i, initCoordinate, mainThread->markerSelector->markers[i].histogram);
-				int trackX, trackY;
+				//int trackX, trackY;
 				try{
 					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
@@ -98,21 +102,24 @@ void TrackingThread::run(){
 							meanCoord[1] += areaCoordinates[j].yCoordinate / meanSize;
 							//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
 						}
-						trackX = meanCoord[0];
-						trackY = meanCoord[1];
+						//trackX = meanCoord[0];
+						//trackY = meanCoord[1];
 						
 						//printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
 						//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
 						//sleep(1);
 						mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 					}else {
+						CoordinateTracker* coordinateTracker = new CoordinateTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates);
+						coordinateTrackers.push_back(coordinateTracker);
+						threads.push_back(std::thread(&CoordinateTracker::getCoordinates, coordinateTrackers.back()));
 						//Try histogram-based tracking
-						coordinate temp = getMarkerCoordinates(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram,mainThread->markerSelector->markers[i].colorTolerance);
-						trackX = temp.xCoordinate;
-						trackY = temp.yCoordinate;
+						//coordinate temp = getMarkerCoordinates(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram,mainThread->markerSelector->markers[i].colorTolerance);
+						//trackX = temp.xCoordinate;
+						//trackY = temp.yCoordinate;
 
 					}
-					mainThread->markerSelector->setCoordinate(i, trackX, trackY, currentFrame);
+					//mainThread->markerSelector->setCoordinate(i, trackX, trackY, currentFrame);
 					//printf("Set coordinate\n");
 					//Digitize the marker
 					
@@ -129,6 +136,17 @@ void TrackingThread::run(){
 					break;	//Stop the loop
 				}
 			}
+		}
+
+		//Collect the threads
+		//printf("Start collecting Threads\n");
+		for (int i = 0; i < threads.size(); ++i) {
+			threads.at(i).join();
+			if (coordinateTrackers.at(i)->foundCoord.xCoordinate > -1) {
+				//printf("Found coords %d marker\n", coordinateTrackers.at(i)->markerIndice);
+				mainThread->markerSelector->setCoordinate(coordinateTrackers.at(i)->markerIndice, coordinateTrackers.at(i)->foundCoord.xCoordinate, coordinateTrackers.at(i)->foundCoord.yCoordinate, currentFrame);
+			}
+			delete coordinateTrackers.at(i);
 		}
 		//printf("Frame done in tracking thread\n");
 		mainThread->redrawFrame();	//Re-draw the digitized markers
@@ -196,21 +214,19 @@ coordinate TrackingThread::getMarkerCoordinates(wxImage *currentImage,int marker
 }
 */
 /**Look for the marker in the image*/
-coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance) throw(int) {
+coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance, std::vector<coordinate> *samplingCoordinates, std::vector<coordinate> *searchCoordinates) throw(int) {
 	/*Go through the search area, check the closeness of each of the marker-sized histograms vs the marker histogram.
 	Digitize the closest match, provided that it is above the threshold.*/
 	std::vector<coordinateCloseness> checkClose;
-	std::vector<coordinate> samplingCoordinates = *(mainThread->markerSelector->markers[markerIndice].radiusCoordinates);
-	std::vector<coordinate> searchCoordinates = *(mainThread->markerSelector->markers[markerIndice].searchCoordinates);
 	double xx = round(coordinates.xCoordinate);
 	double yy = round(coordinates.yCoordinate);
-	for (int i = 0; i<searchCoordinates.size(); ++i) {
-		double x = xx + searchCoordinates[i].xCoordinate;
-		double y = yy + searchCoordinates[i].yCoordinate;
+	for (int i = 0; i<searchCoordinates->size(); ++i) {
+		double x = xx + (*searchCoordinates).at(i).xCoordinate;
+		double y = yy + (*searchCoordinates).at(i).yCoordinate;
 		coordinate check(x, y, -1);
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("searchCoordinate #"), i));
-		Histogram *temp = getHistogram16(currentImage, width, height, check, samplingCoordinates);
-		double closeness = mainThread->markerSelector->getCloseness16(histogram, temp);
+		Histogram *temp = getHistogram16(currentImage, width, height, check, *samplingCoordinates);
+		double closeness = MarkerSelector::getCloseness16(histogram, temp);
 		delete temp;
 		//printf("i %d x0 %f y0 %f x %f y %f close %f\n",i, coordinates.xCoordinate, coordinates.yCoordinate, x, y, closeness);
 		checkClose.push_back(coordinateCloseness(x, y, closeness));

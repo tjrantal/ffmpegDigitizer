@@ -23,6 +23,10 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <vector>
 #include <algorithm>
 
+//Declare struct marker
+struct marker;
+struct Histogram;
+
 /** CLASS FOR READING MARKERS FROM A FILE AND DISPLAYING A MARKER LIST*/
 class MarkerSelector : public wxComboBox{
 	private:
@@ -69,7 +73,7 @@ class MarkerSelector : public wxComboBox{
 		*/
 		double getCloseness(Histogram* histo1, Histogram* histo2);	/**compare a histogram to the histogram of the marker*/
 		
-		double getCloseness16(Histogram* histo1, Histogram* histo2);
+		static double getCloseness16(Histogram* histo1, Histogram* histo2);
 
 		/**
 		 * @brief Clear marker frameNo
@@ -82,9 +86,7 @@ class MarkerSelector : public wxComboBox{
 		 * @brief clear marker coordinates to 
 		 * @param markerIndice the marker to reset
 		 */		
-		void eraseMarker(int markerIndice){
-			markers[markerIndice].coordinates.clear();
-		}
+		void eraseMarker(int markerIndice);
 		
 		/**Consructor
 		@param fileIn file to open

@@ -188,6 +188,10 @@ double MarkerSelector::getCloseness16(Histogram* histo1, Histogram* histo2){
 	return closeness;
 }
 
+void MarkerSelector::eraseMarker(int markerIndice) {
+	markers[markerIndice].coordinates.clear();
+}
+
 void MarkerSelector::eraseCoordinate(int markerIndice, int frameNo){
 	/*Check that there is at least frameNo markers*/
 	if (markers.size() > markerIndice && frameNo>-1){
@@ -207,4 +211,5 @@ MarkerSelector::~MarkerSelector(){
 	}
 	markers.clear();
 }
+
 

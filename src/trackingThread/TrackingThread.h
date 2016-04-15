@@ -19,6 +19,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include "../digitizerFrame/DigitizerFrame.h"
 	#include "../markerSelector/MarkerCoordinates.h"
 	#include "../markerSelector/MarkerSelector.h"
+	//#include "../markerSelector/TrackinThread.h"
 	#include "../imagePanel/ImagePanel.h"
 	#include "../videoReader/VideoReader.h"
 	#include <vector>
@@ -32,6 +33,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include <thread>			//For sleeping
 	#include <chrono>			//For millisecodns sleep
 
+//Forward declare 
+struct Histogram;
 
 	/**Struct used to store coordinates for the closeness measure*/
 	struct coordinateCloseness{
@@ -66,7 +69,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 			void run();
 			/**Look for the marker in the image based on histograms*/
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
-			coordinate getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance) throw(int);
+			static coordinate getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance, std::vector<coordinate> *samplingCoordinates, std::vector<coordinate> *searchCoordinates) throw(int);
 			
 			/**Look for the marker in the image based on region growing*/
 			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int);
