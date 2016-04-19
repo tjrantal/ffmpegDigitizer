@@ -56,6 +56,7 @@ public:
 	wxSlider		*colorTolerance;			//Tolerance for marker region grow color
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
 	int currentFrame;						//index of currentFrame
+	int previousFrame;						//index of previousFrame
 	bool			trackOn;
 	/**Constructor
 		@param title the name for the window

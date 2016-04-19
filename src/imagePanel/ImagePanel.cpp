@@ -53,12 +53,27 @@ void ImagePanel::setImage(int width, int height, unsigned char* data,bool static
 	imageCopy =wxImage(width,height,data,static_data);//*(new wxImage(width,height,data,static_data));
 	//imageCopy =wxImage(imageOrig);//*(new wxImage(width,height,data,static_data));
 	imSize = wxSize(width,height);	/*Save the current image size*/
-	delete currentImageData;		/*Should be safe on a null pointer*/
-	currentImageData = new unsigned char[imSize.x*imSize.y*3];	/*Reserve memory to copy the data*/
+	//Copy current image to previous image
+	if (currentImageData != NULL) {
+		if (previousImageData == NULL) {
+			previousImageData = new  unsigned char[imSize.x*imSize.y * 3]; /*Reserve memory on the first copy*/
+		}
+		std::memcpy(previousImageData, currentImageData, sizeof(unsigned char)*imSize.x*imSize.y * 3);	//Copy the data
+	}
+	else {
+		currentImageData = new unsigned char[imSize.x*imSize.y * 3];	/*Reserve memory to copy the data*/
+	}
+
+	//delete currentImageData;		/*Should be safe on a null pointer*/
+	
 	/*Note, current image data is copied, so it will change when next frame is read! Image data is RGB*/
+	/*
 	for (int i = 0;i<width*height*3;++i){
 		currentImageData[i] = data[i];
-	}	
+	}
+	*/
+	std::memcpy(currentImageData, data, sizeof(unsigned char)*imSize.x*imSize.y * 3);	//Copy the data
+
 	double tempSF = (double)width/(double)size.GetWidth() > (double)height/(double)size.GetHeight() ? (double)width/(double)size.GetWidth() : (double)height/(double)size.GetHeight();
 	/*If image is larger than image panel (i.e. tempSF > 1), scale the image to fit on screen*/
 	scaleFactor = tempSF > scaleFactor ? tempSF : scaleFactor;

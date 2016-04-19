@@ -18,9 +18,13 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include "TrackingThread.h"
 #endif
 #include "../markerSelector/CoordinateTracker.h"
+#include <opencv2/opencv.hpp>	//OpenCV
+#include <opencv2/video/tracking.hpp>	//calcOpticalFlowSF
+#include <cmath>
 
 TrackingThread::TrackingThread(DigitizerFrame* mainThreadIn){
 	mainThread = mainThreadIn;
+	cv::namedWindow("Flow");
 }
 
 void TrackingThread::startThread(){
@@ -151,11 +155,39 @@ void TrackingThread::run(){
 		//printf("Frame done in tracking thread\n");
 		mainThread->redrawFrame();	//Re-draw the digitized markers
 		mainThread->imagePanel->reFreshImage();
+
+		//IMPLEMENT OPTICAL FLOW HERE
+		if (mainThread->previousFrame + 1 == mainThread->currentFrame) {
+			/*
+			mainThread->imagePanel->currentImageData;
+			mainThread->imagePanel->previousImageData;
+			mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y
+			*/
+			cv::Mat prev(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->currentImageData);	//Mat(rows,cols);
+			cv::Mat curr(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->previousImageData);	//Mat(rows,cols);
+			cv::Mat flow;
+			cv::calcOpticalFlowFarneback(prev, curr, flow, 0.5, 3, 7,3,5,1.2,0);
+			//Convert flow to image
+			cv::Mat visual(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC1);
+			//Set the values of visual
+			for (int r = 0; r < mainThread->imagePanel->imSize.y; ++r) {
+				for (int c = 0; c < mainThread->imagePanel->imSize.x; ++c) {
+					cv::Vec2f val = flow.at<cv::Vec2f>(r, c);
+					visual.at<unsigned char>(r, c) = (unsigned char) (std::sqrt(val[0]*val[0]+val[1]*val[1])/15.0*255.0);
+				}
+			}
+			
+			imshow("Flow", visual);
+
+		}
+
+
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0 && keepTracking == 1){
 			/*Proceed to the next frame, if this was not the last frame*/
 			if (currentFrame < mainThread->videoReader->getNumberOfIndices()){
 				//std::this_thread::sleep_for (std::chrono::milliseconds(20));
+				mainThread->previousFrame = currentFrame;
 				++currentFrame;
 				//printf("Get next frame in tracking thread\n");
 				mainThread->slider->SetValue(currentFrame);

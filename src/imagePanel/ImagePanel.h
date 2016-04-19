@@ -38,6 +38,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 		public:
 			wxImage currentClearImage;				/**To access the current image without overlaid color*/
 			unsigned char* currentImageData = NULL;	/**Original image from videoReader*/
+			unsigned char* previousImageData = NULL;	/**Previous Original image from videoReader*/
 			wxSize imSize;							/**Size of the original image*/
 			wxSize oldSize;							/**Size for double buffering*/
 			double		scaleFactor;				/**Scaling from original to screen, use to adjust digitized coordinates*/

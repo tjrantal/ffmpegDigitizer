@@ -473,6 +473,8 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			imagePanel->setImage(videoReader->width,videoReader->height,videoReader->decodedFrame,true);
 				SetStatusText(wxString::Format(wxT("%s ffmpeg packets %d, frameNo %d"),_("Video opened, frames:"), videoReader->getNumberOfIndices(),displayPictureNumber));
 
+			
+
 			if (slider != NULL){
 				delete slider;
 			}
@@ -482,9 +484,10 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//slider->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
 			
 			currentFrame = 0;
+			previousFrame = -2;
 			printf("w %d h %d\n", videoReader->width, videoReader->height);
 			//Visualise the first frame in OpenCV!
-			cv::Mat tempMat(videoReader->height,videoReader->width,  CV_8UC3, videoReader->decodedFrame);
+			cv::Mat tempMat(videoReader->height,videoReader->width,  CV_8UC3, videoReader->decodedFrame);	//Mat(rows,cols);
 			cv::namedWindow("test");
 			imshow("test", tempMat);
 
@@ -548,6 +551,7 @@ int DigitizerFrame::getPrintIndices(wxFileName videoFileName,wxString videoFileP
 }
 
 void DigitizerFrame::ScrollVideo(wxScrollEvent &event){
+	previousFrame = currentFrame;
 	currentFrame = slider->GetValue();
 	int displayPictureNumber = videoReader->readFrameFromDisk(currentFrame);
 	redrawFrame();
