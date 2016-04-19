@@ -20,11 +20,12 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include "../markerSelector/CoordinateTracker.h"
 #include <opencv2/opencv.hpp>	//OpenCV
 #include <opencv2/video/tracking.hpp>	//calcOpticalFlowSF
-#include <cmath>
+#include <cmath>		//sqrt
 
 TrackingThread::TrackingThread(DigitizerFrame* mainThreadIn){
 	mainThread = mainThreadIn;
 	cv::namedWindow("Flow");
+	vBuf = new unsigned char[mainThread->imagePanel->imSize.y*mainThread->imagePanel->imSize.x];
 }
 
 void TrackingThread::startThread(){
@@ -165,10 +166,15 @@ void TrackingThread::run(){
 			*/
 			cv::Mat prev(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->currentImageData);	//Mat(rows,cols);
 			cv::Mat curr(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->previousImageData);	//Mat(rows,cols);
+			//Convert to gray scale
+			cv::Mat prevGray;
+			cv::Mat currGray;
+			cv::cvtColor(prev, prevGray, CV_BGR2GRAY); 
+			cv::cvtColor(curr, currGray, CV_BGR2GRAY);
 			cv::Mat flow;
-			cv::calcOpticalFlowFarneback(prev, curr, flow, 0.5, 3, 7,3,5,1.2,0);
+			cv::calcOpticalFlowFarneback(prevGray, currGray, flow, 0.5, 3, 7,3,5,1.2,0);
 			//Convert flow to image
-			cv::Mat visual(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC1);
+			cv::Mat visual(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC1,vBuf);
 			//Set the values of visual
 			for (int r = 0; r < mainThread->imagePanel->imSize.y; ++r) {
 				for (int c = 0; c < mainThread->imagePanel->imSize.x; ++c) {

@@ -61,6 +61,7 @@ struct Histogram;
 	class TrackingThread{
 		private:
 			DigitizerFrame* mainThread;
+			unsigned char* vBuf;
 		public:
 			std::thread tThread;
 			/**Method to start the thread*/
@@ -93,5 +94,8 @@ struct Histogram;
 			
 			/**Constructor*/
 			TrackingThread(DigitizerFrame* mainThreadIn);
+			~TrackingThread(){
+				delete[] vBuf;
+			}
 	};
 #endif

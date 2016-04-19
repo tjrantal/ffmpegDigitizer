@@ -17,6 +17,8 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #ifndef IMAGEPANEL_H
 	#include "ImagePanel.h"
 #endif
+#include <cstring>	//memcpy
+
 ImagePanel::ImagePanel(wxFrame* parent,wxWindowID id, wxString file, wxBitmapType format, const wxPoint& pos, const wxSize& sizeIn) :
 wxPanel(parent,id,pos,sizeIn)
 {
