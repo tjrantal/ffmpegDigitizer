@@ -32,7 +32,7 @@ endif(UNIX)
 
 find_package(wxWidgets REQUIRED)	#Look for wxWidgets
 find_package(FFMPEG REQUIRED )	#Look for ffmpeg
-#find_package(OpenCV REQUIRED )	#Look for opencv
+find_package(OpenCV REQUIRED )	#Look for opencv
 #find_package(GSL REQUIRED )		#Look for GLS
 
 #I'm only interested in release config...

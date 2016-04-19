@@ -25,6 +25,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #include <string>      
 #include <sstream>
 #include <math.h>       /* isnan, sqrt */
+#include <opencv2/opencv.hpp>	//OpenCV
 
 DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
        : wxFrame(NULL, -1, title, pos, size)
@@ -481,6 +482,13 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			//slider->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(DigitizerFrame::KeyDown), NULL, this);
 			
 			currentFrame = 0;
+			printf("w %d h %d\n", videoReader->width, videoReader->height);
+			//Visualise the first frame in OpenCV!
+			cv::Mat tempMat(videoReader->height,videoReader->width,  CV_8UC3, videoReader->decodedFrame);
+			cv::namedWindow("test");
+			imshow("test", tempMat);
+
+
 		}else{
 			SetStatusText(_("Could not open video!"));
 			//resultsText->ChangeValue(_("Could not open video!"));

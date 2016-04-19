@@ -37,8 +37,7 @@ source_group("videoReader" FILES ${videoReader_FUNCTION_SOURCES})
 #ADD dependent libraries include and link directories
 INCLUDE_DIRECTORIES( ${wxWidgets_INCLUDE_DIRS} )
 INCLUDE_DIRECTORIES( ${FFMPEG_INCLUDE_DIRS} )
-
-#INCLUDE_DIRECTORIES( ${OpenCV_DIR}/install/include )
+INCLUDE_DIRECTORIES( ${OpenCV_DIR}/install/include )
 #INCLUDE_DIRECTORIES( ${GSL_INCLUDE_DIRS} )
 #link_directories(${OpenCV_LIB_DIR})
 
@@ -56,8 +55,8 @@ if(UNIX)
 	add_executable (digitizer ${SOURCE_FILES}  ${digitizerFrame_FUNCTION_SOURCES} ${imagePanel_FUNCTION_SOURCES} ${markerSelector_FUNCTION_SOURCES} ${trackingThread_FUNCTION_SOURCES} ${videoReader_FUNCTION_SOURCES})
 endif(UNIX)
 
-message("FFMPEG_LIBRARIES  " ${FFMPEG_LIBRARIES})
-message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
+#message("FFMPEG_LIBRARIES  " ${FFMPEG_LIBRARIES})
+#message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
 
 #Get the missing dependent libs for ffmpeg...
 #find_package(PkgConfig REQUIRED)
@@ -67,12 +66,12 @@ message("wxWidgets_LIBRARIES  " ${wxWidgets_LIBRARIES})
 
 # Properties->Linker->Input->Additional Dependencies
 if(UNIX)
-	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} -lX11)#${LIBAVFORMAT_LIBRARIES})#${OpenCV_LIBS} ${GSL_LIBRARIES})
+	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} ${OpenCV_LIBS} -lX11)#${LIBAVFORMAT_LIBRARIES})# ${GSL_LIBRARIES})
 endif(UNIX)
 if(WIN32)
-	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES})
+	target_link_libraries (digitizer ${FFMPEG_LIBRARIES} ${wxWidgets_LIBRARIES} ${OpenCV_LIBS})
 endif(WIN32)
- message("wxWidgets wxWidgets_LIBRARIES ${wxWidgets_LIBRARIES}")
+#message("wxWidgets wxWidgets_LIBRARIES ${wxWidgets_LIBRARIES}")
  
 # Creates a folder "executables" and adds target 
 # project (digitizer.vcproj) under it
