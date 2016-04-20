@@ -19,13 +19,13 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 #endif
 #include "../markerSelector/CoordinateTracker.h"
 #include <opencv2/opencv.hpp>	//OpenCV
-#include <opencv2/video/tracking.hpp>	//calcOpticalFlowSF
+//#include <opencv2/video/tracking.hpp>	//calcOpticalFlowSF
+#include <opencv2/optflow.hpp>	//calcOpticalFlowSF
 #include <cmath>		//sqrt
 
 TrackingThread::TrackingThread(DigitizerFrame* mainThreadIn){
 	mainThread = mainThreadIn;
 	cv::namedWindow("Flow");
-	vBuf = new unsigned char[mainThread->imagePanel->imSize.y*mainThread->imagePanel->imSize.x];
 }
 
 void TrackingThread::startThread(){
@@ -164,25 +164,35 @@ void TrackingThread::run(){
 			mainThread->imagePanel->previousImageData;
 			mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y
 			*/
-			cv::Mat prev(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->currentImageData);	//Mat(rows,cols);
-			cv::Mat curr(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->previousImageData);	//Mat(rows,cols);
+			cv::Mat curr(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->currentImageData);	//Mat(rows,cols);
+			cv::Mat prev(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->previousImageData);	//Mat(rows,cols);
 			//Convert to gray scale
-			cv::Mat prevGray;
-			cv::Mat currGray;
-			cv::cvtColor(prev, prevGray, CV_BGR2GRAY); 
-			cv::cvtColor(curr, currGray, CV_BGR2GRAY);
+			//cv::Mat prevGray;
+			//cv::Mat currGray;
+			//cv::cvtColor(prev, prevGray, cv::COLOR_BGR2GRAY);
+			//cv::cvtColor(curr, currGray, cv::COLOR_BGR2GRAY);
 			cv::Mat flow;
-			cv::calcOpticalFlowFarneback(prevGray, currGray, flow, 0.5, 3, 7,3,5,1.2,0);
+			//cv::calcOpticalFlowFarneback(prevGray, currGray, flow, 0.5, 3, 7,3,5,1.2,0);
+			cv::optflow::calcOpticalFlowSF(prev, curr,flow,3, 2, 4, 4.1, 25.5, 18, 55.0, 25.5, 0.35, 18, 55.0, 25.5, 10);
 			//Convert flow to image
-			cv::Mat visual(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC1,vBuf);
+			cv::Mat visual(curr.rows, curr.cols, CV_8UC1);
 			//Set the values of visual
-			for (int r = 0; r < mainThread->imagePanel->imSize.y; ++r) {
-				for (int c = 0; c < mainThread->imagePanel->imSize.x; ++c) {
-					cv::Vec2f val = flow.at<cv::Vec2f>(r, c);
-					visual.at<unsigned char>(r, c) = (unsigned char) (std::sqrt(val[0]*val[0]+val[1]*val[1])/15.0*255.0);
+			double maxVal=0;
+			double movementMagnitude;
+			unsigned char movementVal;
+			double denom = 30;
+			for (int r = 0; r < flow.rows; ++r) {
+				for (int c = 0; c < flow.cols; ++c) {
+					const cv::Point2f& val = flow.at<cv::Point2f>(r, c);
+					double movementMagnitude = std::sqrt(val.x * val.x + val.y * val.y);
+					movementVal = (movementMagnitude / denom)*255.0 > 255.0 ? (unsigned char)255 : (unsigned char)((movementMagnitude / denom)*255.0);
+					visual.at<unsigned char>(r, c) = movementVal;
+					if (movementMagnitude > maxVal) {
+						maxVal = movementMagnitude;
+					}
 				}
 			}
-			
+			printf("Max movement %f\n", maxVal);
 			imshow("Flow", visual);
 
 		}
