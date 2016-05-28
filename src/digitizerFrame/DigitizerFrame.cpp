@@ -385,7 +385,7 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 	
 	/*Open marker file*/
 		wxFileDialog openFileDialog(this, _("Open video file"), defaultVideoFolder, _(""),
-	_("Video files (*.mp4;*.avi;*.mkv)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+	_("Video files (*.mp4;*.avi;*.mkv;*.3gp;*.webm)|*.mp4;*.MP4;*.avi;*.AVI;*.mkv;*.MKV;*.3gp;*.3GP;*.webm;*.WEBM"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL){
 		SetStatusText(_("No video file opened"));
 		delete config;
