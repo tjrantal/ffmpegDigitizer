@@ -57,12 +57,15 @@ DigitizerFrame::DigitizerFrame(const wxString& title, const wxPoint& pos, const 
 				const wxString& name = wxGridNameStr)
 				*/
 	//resultsGrid->CreateGrid(4,4);
+	elementVerticalPos = 10;
 	/*Button for reading markers in*/
-	openMarkerFile 	= new wxButton(this,ID_picker,_("Open &marker file"),wxPoint(10,10));
+	openMarkerFile 	= new wxButton(this,ID_picker,_("&Marker file"),wxPoint(10,elementVerticalPos));
 	Connect(ID_picker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenFile),NULL,this);
-	openVideoFile 	= new wxButton(this,ID_video,_("Open &video file"),wxPoint(10,60));
+	openVideoFile 	= new wxButton(this,ID_video,_("&Video file"),wxPoint(100,elementVerticalPos));
 	Connect(ID_video,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenVideo),NULL,this);
-	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file"),wxPoint(10,100));
+	elementVerticalPos += 50;
+	openSaveFile 	= new wxButton(this,ID_save,_("Open &coordinate save file"),wxPoint(10,elementVerticalPos));
+	elementVerticalPos += 50;
 	Connect(ID_save,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::OpenSave),NULL,this);
 	openSave = NULL; /*Init the result file to null*/
 	/*Slider for browsing video*/
@@ -336,18 +339,19 @@ void DigitizerFrame::OpenFile(wxCommandEvent& event){
 		delete config;
 		//If marker list does not exist yet, create it, otherwise replace with the new list
 		if (markerSelector == NULL){
-			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,150));
+			markerSelector = new MarkerSelector( openFileDialog.GetPath(), this, (wxWindowID) ID_markers,wxPoint(10,elementVerticalPos));
 			/*Connect event listener to the drop down menu for when the selection is cahnged*/
 			Connect(wxEVT_COMMAND_COMBOBOX_SELECTED,wxCommandEventHandler(DigitizerFrame::SelectMarker), NULL,this);
 			/*Add sliders for markers*/
 			printf("Add sliders\n");
 			printf("%d %d %d\n", markerSelector->markers.at(0).markerRadius, markerSelector->markers.at(0).searchRadius, markerSelector->markers.at(0).colorTolerance);
-			markerRadius	= new wxSlider(this,ID_markerRadius, markerSelector->markers.at(0).markerRadius,1,50,wxPoint(10,200),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			searchRadius	= new wxSlider(this,ID_searchRadius, markerSelector->markers.at(0).searchRadius,1,100,wxPoint(10,250),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			colorTolerance	= new wxSlider(this,ID_colorTolerance, markerSelector->markers.at(0).colorTolerance,0,255,wxPoint(10,300),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-			toggleTrack = new wxToggleButton(this,ID_toggleTracking,_("&Toggle Tracking"),wxPoint(10,350));
-			clearMarker		 = new wxButton(this,ID_clearMarker,_("&Clear Marker"),wxPoint(10,400));
-			clearOnwards	 = new wxButton(this,ID_clearOnwards,_("&Clear Onwards"),wxPoint(10,450));
+			markerRadius	= new wxSlider(this,ID_markerRadius, markerSelector->markers.at(0).markerRadius,1,50,wxPoint(10,elementVerticalPos+50),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			searchRadius	= new wxSlider(this,ID_searchRadius, markerSelector->markers.at(0).searchRadius,1,100,wxPoint(10,elementVerticalPos+100),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			colorTolerance	= new wxSlider(this,ID_colorTolerance, markerSelector->markers.at(0).colorTolerance,0,255,wxPoint(10,elementVerticalPos+150),wxSize(100,40),wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
+			toggleMode = 	new wxToggleButton(this,ID_toggleMode,_("&Mode"),wxPoint(10,elementVerticalPos+200));
+			toggleTrack =	new wxToggleButton(this,ID_toggleTracking,_("Auto &Track"),wxPoint(100,elementVerticalPos+200));
+			clearMarker		 = new wxButton(this,ID_clearMarker,_("&Clear Marker"),wxPoint(10,elementVerticalPos+250));
+			clearOnwards	 = new wxButton(this,ID_clearOnwards,_("&Clear Onwards"),wxPoint(10,elementVerticalPos+300));
 			//Connect callbacks
 			Connect(ID_clearMarker,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::ClearMarker),NULL,this);
 			Connect(ID_clearOnwards,wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DigitizerFrame::ClearOnwards),NULL,this);
@@ -759,6 +763,11 @@ void DigitizerFrame::AdjustColorTolerance(wxCommandEvent &event){
 	SetStatusText(wxString::Format(wxT("%s %d"),_("Color tolerance set to"), markerSelector->markers.at(currentMarker).colorTolerance));
 }
 
+/**Tracking mode calibration/digitize*/
+void DigitizerFrame::ToggleMode(wxCommandEvent &event){
+	calibOn = toggleMode->GetValue();
+}
+
 /**Turn auto-tracking on and off*/
 void DigitizerFrame::ToggleTracking(wxCommandEvent &event){
 	trackOn = toggleTrack->GetValue();
@@ -783,5 +792,6 @@ BEGIN_EVENT_TABLE(DigitizerFrame, wxFrame)
 	EVT_SLIDER(ID_searchRadius,	DigitizerFrame::AdjustSearchRadius)
 	EVT_SLIDER(ID_markerRadius,	DigitizerFrame::AdjustMarkerRadius)
 	EVT_SLIDER(ID_colorTolerance,	DigitizerFrame::AdjustColorTolerance)
+	EVT_TOGGLEBUTTON(ID_toggleMode, DigitizerFrame::ToggleMode)
 	EVT_TOGGLEBUTTON(ID_toggleTracking, DigitizerFrame::ToggleTracking)
 END_EVENT_TABLE()

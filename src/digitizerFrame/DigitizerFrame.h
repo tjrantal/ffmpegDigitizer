@@ -50,13 +50,16 @@ public:
 	ImagePanel		*imagePanel;			//ImagePanel
 	VideoReader		*videoReader;			//videoReader
 	MarkerSelector	*markerSelector;		//Marker selector
+	
 	wxSlider		*slider;				//Slider
 	wxSlider		*searchRadius;				//Search radius from frame to next
 	wxSlider		*markerRadius;				//Radius of the marker
 	wxSlider		*colorTolerance;			//Tolerance for marker region grow color
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
+	wxToggleButton	*toggleMode;				//Digitizing mode calib/manual/assisted
 	int currentFrame;						//index of currentFrame
 	int previousFrame;						//index of previousFrame
+	bool			calibOn;			//Used to store tracking mode
 	bool			trackOn;
 	/**Constructor
 		@param title the name for the window
@@ -67,6 +70,7 @@ public:
 	void printCoordinates();	/**<Write the coordinates to resultsText*/
 	void redrawFrame();							/**< Refresh the frame*/
 private:
+	int elementVerticalPos;
 	//DEBUG
 	FILE *debug;
 	//Variables
@@ -105,6 +109,7 @@ private:
 	void AdjustMarkerRadius(wxCommandEvent &event);	/**< */
 	void AdjustColorTolerance(wxCommandEvent &event);	/**< */
 	void SelectMarker(wxCommandEvent &event);			/**< */
+	void ToggleMode(wxCommandEvent &event);			/**< */
 	void ToggleTracking(wxCommandEvent &event);			/**< */
 	void ClearMarker(wxCommandEvent &event);			/**< Clear all coordinates*/
 	void ClearOnwards(wxCommandEvent &event);			/**< Clear coordinates from current frame onwards*/
@@ -131,6 +136,7 @@ enum
 	ID_colorTolerance,
 	ID_panel,
 	ID_markers,
+	ID_toggleMode,
 	ID_toggleTracking,
 	ID_clearMarker,
 	ID_clearOnwards,
