@@ -95,7 +95,7 @@ void TrackingThread::run(){
 				try{
 					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
-					//Deactivate color-based tracking for now
+					//Implement optical flow-assisted tracking pop each marker to its own thread 
 					if (false) {
 						std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData, i, initCoordinate);
 						//printf("Got marker coordinates region grow in tracking thread %d\n",(int) areaCoordinates.size());
