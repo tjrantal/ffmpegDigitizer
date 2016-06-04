@@ -56,10 +56,10 @@ public:
 	wxSlider		*markerRadius;				//Radius of the marker
 	wxSlider		*colorTolerance;			//Tolerance for marker region grow color
 	wxToggleButton	*toggleTrack;				//Begin/stop tracking
-	wxToggleButton	*toggleMode;				//Digitizing mode calib/manual/assisted
+	wxToggleButton	*toggleMode;				//Digitizing mode one/all markers
 	int currentFrame;						//index of currentFrame
 	int previousFrame;						//index of previousFrame
-	bool			calibOn;			//Used to store tracking mode
+	bool			allOn;			//Used to store tracking mode
 	bool			trackOn;
 	/**Constructor
 		@param title the name for the window

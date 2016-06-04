@@ -765,7 +765,7 @@ void DigitizerFrame::AdjustColorTolerance(wxCommandEvent &event){
 
 /**Tracking mode calibration/digitize*/
 void DigitizerFrame::ToggleMode(wxCommandEvent &event){
-	calibOn = toggleMode->GetValue();
+	allOn = toggleMode->GetValue();
 }
 
 /**Turn auto-tracking on and off*/
