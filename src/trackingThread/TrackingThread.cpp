@@ -292,7 +292,7 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
 	printf("Started getting flow\n");
 	
-	if (prevImage == NULL){
+	if (true || prevImage == NULL){
 		printf("Previmage null\n");
 		return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
 	}

@@ -22,6 +22,7 @@ public:
 		markerRadius = _markerRadius;
 	}
 
+	/*override the parent class getCoordinates..*/
 	void getCoordinates() {
 		try {
 			//Calculate optical flow to get an initial guess
