@@ -104,7 +104,7 @@ void TrackingThread::run(){
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
 					//Implement optical flow-assisted tracking pop each marker to its own thread 
 					if (true) {
-					
+						printf("CoordinateFlowTracker\n");
 						CoordinateFlowTracker* coordinateTracker = new CoordinateFlowTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates,previousImageData,mainThread->markerSelector->markers[i].fourBitColors,mainThread->markerSelector->markers[i].markerRadius);
 						coordinateTrackers.push_back(coordinateTracker);
 						threads.push_back(std::thread(&CoordinateTracker::getCoordinates, coordinateTrackers.back()));							
@@ -290,7 +290,43 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 
 /*Calculate marker optical flow*/
 coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
-	return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
+	if (prevImage == NULL){
+		return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
+	}
+	//Calculate flow
+	cv::TermCriteria termcrit(cv::TermCriteria::COUNT|cv::TermCriteria::EPS,20,0.03);
+	std::vector<uchar> status;
+   std::vector<float> err;
+   cv::Size winSize(31,31);
+	cv::Mat curr(height, width, CV_8UC3, currentImage);	//Mat(rows,cols);
+	cv::Mat prev(height, width, CV_8UC3, prevImage);	//Mat(rows,cols);
+	//Convert to gray scale
+	cv::Mat prevGray;
+	cv::Mat currGray;
+	cv::cvtColor(prev, prevGray, cv::COLOR_BGR2GRAY);
+	cv::cvtColor(curr, currGray, cv::COLOR_BGR2GRAY);
+	cv::Mat flow;
+	//Prep points to track
+	std::vector<cv::Point2f> points[2];
+	//push back searchCoordinates
+	for (int i = 0; i<searchCoordinates->size();++i){
+		points[0].push_back(cv::Point2f((float) (coordinates.xCoordinate+(*searchCoordinates)[i].xCoordinate),(float)(coordinates.yCoordinate+(*searchCoordinates)[i].yCoordinate)));
+	}
+	
+	cv::calcOpticalFlowPyrLK(prevGray, currGray, points[0], points[1], status, err, winSize,
+                                 3, termcrit, 0, 0.001);
+
+	//Calc the mean flows
+	double move[2]{0,0};
+	for (int p = 0; p < points[1].size(); ++p) {
+		move[0]+=points[1][p].x;
+		move[1]+=points[1][p].y;
+	}
+	move[0]/=((double)points[1].size());
+	move[1]/=((double)points[1].size());
+	
+	printf("Flow x %.1f y %.1f\n", move[0],move[1]);
+	return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy return...
 }
 
 
