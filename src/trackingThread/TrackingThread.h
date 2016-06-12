@@ -70,6 +70,9 @@ struct Histogram;
 			/**Look for the marker in the image based on histograms*/
 			coordinate getMarkerCoordinates(wxImage *currentImage,int markerIndice, coordinate coordinates, double** histogram);
 			static coordinate getMarkerCoordinates(unsigned char *currentImage, int width, int height, int markerIndice, coordinate coordinates, Histogram* histogram,int colorTolerance, std::vector<coordinate> *samplingCoordinates, std::vector<coordinate> *searchCoordinates) throw(int);
+			/**Optical flow assisted marker search*/
+			static coordinate getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates);
+			static std::vector<coordinate> getMarkerCoordinatesRegionGrow(unsigned char *currentImage, int width, int height, coordinate startSearch,unsigned char *markerColor, int colorTolerance,std::vector<coordinate> *searchCoordinates,double markerRadius) throw(int);
 			
 			/**Look for the marker in the image based on region growing*/
 			std::vector<coordinate> getMarkerCoordinatesRegionGrow(wxImage *currentImage,int markerIndice, coordinate coordinates) throw(int);

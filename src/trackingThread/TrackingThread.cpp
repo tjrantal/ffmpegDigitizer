@@ -97,22 +97,10 @@ void TrackingThread::run(){
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
 					//Implement optical flow-assisted tracking pop each marker to its own thread 
 					if (false) {
-						std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImageData, i, initCoordinate);
-						//printf("Got marker coordinates region grow in tracking thread %d\n",(int) areaCoordinates.size());
-						//Calculate the mean of the area coordinates..
-						double meanCoord[2] = { 0,0 };	//init to zero
-						double meanSize = areaCoordinates.size();
-						for (int j = 0; j < areaCoordinates.size(); ++j) {
-							meanCoord[0] += areaCoordinates[j].xCoordinate / meanSize;
-							meanCoord[1] += areaCoordinates[j].yCoordinate / meanSize;
-							//printf("aC %f %f %f %f\n",areaCoordinates[j].xCoordinate,areaCoordinates[j].yCoordinate,meanCoord[0],meanCoord[1]);
-						}
-						//trackX = meanCoord[0];
-						//trackY = meanCoord[1];
-						
-						//printf("Marker %d Got coordinate %f %f\n",i,coordinatesReturned.xCoordinate,coordinatesReturned.yCoordinate);
-						//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("Returned current "), i));
-						//sleep(1);
+					
+						CoordinateFlowTracker* coordinateTracker = new CoordinateFlowTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates);
+						coordinateTrackers.push_back(coordinateTracker);
+						threads.push_back(std::thread(&CoordinateTracker::getCoordinates, coordinateTrackers.back()));							
 						mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 					}else {
 						CoordinateTracker* coordinateTracker = new CoordinateTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates);
@@ -291,6 +279,45 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 		throw 4;
 	}
 }
+
+/*Calculate marker optical flow*/
+coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
+	return coordinate(coordinates.x,coordinates.y,-1);	//Dummy function
+}
+
+
+/*Calculate region grow*/
+std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage, int width, int height, coordinate startSearch,unsigned char *markerColor, int colorTolerance,std::vector<coordinate> *searchCoordinates,double markerRadius) throw(int){
+//printf("getMCoords getWidth\n");
+	int imageWidth =width;
+	int imageHeight =height;
+	//printf("getMCoords goThroughSearchCoordinates %d\n",(int) searchCoordinates.size());
+	for (int i = 0;i<(*searchCoordinates).size();++i){
+		double x = coordinates.xCoordinate+(*searchCoordinates)[i].xCoordinate;
+		double y = coordinates.yCoordinate+(*searchCoordinates)[i].yCoordinate;
+		/*Check whether color matches, if it does, grow region to confirm that the marker is big enough*/
+		unsigned char* pixelColor = getColor(currentImage,imageWidth,imageHeight,(int) x, (int) y);
+		//printf("getMCoords gotColor %d %d\n",(int) x, (int) y);
+		if(	/*If color match is close enough, do region growing*/
+			(((int)pixelColor[0])-((int)markerColor[0])) < colorTolerance && (((int)pixelColor[0])-((int)markerColor[0])) > -colorTolerance &&
+			(((int)pixelColor[1])-((int)markerColor[1])) < colorTolerance && (((int)pixelColor[1])-((int)markerColor[1])) > -colorTolerance &&
+			(((int)pixelColor[2])-((int)markerColor[2])) < colorTolerance && (((int)pixelColor[2])-((int)markerColor[2])) > -colorTolerance			
+			)
+		{
+			std::vector<coordinate> areaCoordinates = growRegion(currentImage,imageWidth,imageHeight,x,y,markerColor, colorTolerance);
+			//printf("getMCoords grewArea %d %d\n",(int) x, (int) y);
+			if (areaCoordinates.size() >= 5){// M_PI*(markerRadius)*(markerRadius)/4){	//At least the size of a circle of 1/2 radius of the marker
+				return areaCoordinates;								/*First sufficiently large marker returned... */
+				
+			}
+		}
+	}
+	//printf("getMCoords All done\n");
+	throw 2;	/*No marker found, throw error. Implement missing marker at some point...*/
+	//return coordinates;	/*No marker found, shouldn't get here*/
+}
+
+
 
 /**Look for the marker in the image based on region growing*/
 std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned char *currentImage,int markerIndice, coordinate coordinates) throw(int){
