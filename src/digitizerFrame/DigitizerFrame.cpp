@@ -490,11 +490,12 @@ void DigitizerFrame::OpenVideo(wxCommandEvent& event){
 			currentFrame = 0;
 			previousFrame = -2;
 			printf("w %d h %d\n", videoReader->width, videoReader->height);
+			/*
 			//Visualise the first frame in OpenCV!
 			cv::Mat tempMat(videoReader->height,videoReader->width,  CV_8UC3, videoReader->decodedFrame);	//Mat(rows,cols);
 			cv::namedWindow("test");
 			imshow("test", tempMat);
-
+			*/
 
 		}else{
 			SetStatusText(_("Could not open video!"));

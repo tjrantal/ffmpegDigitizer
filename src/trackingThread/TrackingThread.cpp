@@ -26,7 +26,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 
 TrackingThread::TrackingThread(DigitizerFrame* mainThreadIn){
 	mainThread = mainThreadIn;
-	cv::namedWindow("Flow");
+	//cv::namedWindow("Flow");
 }
 
 void TrackingThread::startThread(){
@@ -51,8 +51,9 @@ void TrackingThread::run(){
 		//printf("Track Started\n");
 		 //currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
 		 currentImageData = mainThread->imagePanel->currentImageData;
-		 previousImageData = mainThread->imagePanel->previousImageData;
-		 if (previousImageData == NULL){
+		 if (mainThread->previousFrame + 1 == mainThread->currentFrame) {
+		 	previousImageData = mainThread->imagePanel->previousImageData;
+		 }else{
 		 	previousImageData = currentImageData; 
 		 }
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
@@ -152,12 +153,13 @@ void TrackingThread::run(){
 		mainThread->imagePanel->reFreshImage();
 
 		//IMPLEMENT OPTICAL FLOW HERE
+		/*
 		if (mainThread->previousFrame + 1 == mainThread->currentFrame) {
-			/*
-			mainThread->imagePanel->currentImageData;
-			mainThread->imagePanel->previousImageData;
-			mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y
-			*/
+			
+			//mainThread->imagePanel->currentImageData;
+			//mainThread->imagePanel->previousImageData;
+			//mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y
+			
 			cv::Mat curr(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->currentImageData);	//Mat(rows,cols);
 			cv::Mat prev(mainThread->imagePanel->imSize.y, mainThread->imagePanel->imSize.x, CV_8UC3, mainThread->imagePanel->previousImageData);	//Mat(rows,cols);
 			//Convert to gray scale
@@ -190,7 +192,7 @@ void TrackingThread::run(){
 			imshow("Flow", visual);
 
 		}
-
+		*/
 
 		//Advance frame if at least one marker was digitized
 		if (markersFound > 0 && keepTracking == 1){
