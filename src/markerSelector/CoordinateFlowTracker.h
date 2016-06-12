@@ -1,6 +1,6 @@
 
-#ifndef COORDINATETRACKER_H
-#define COORDINATETRACKER_H
+#ifndef COORDINATEFLOWTRACKER_H
+#define COORDINATEFLOWTRACKER_H
 #include <vector>
 #include "MarkerCoordinates.h"
 #include "../trackingThread/TrackingThread.h"
