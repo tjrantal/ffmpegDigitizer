@@ -38,6 +38,7 @@ public:
 			
 			
 			foundCoord = coordinate(meanCoord[0],meanCoord[1],-1);
+			printf("found x %.1f y %.1f\n", meanCoord[0],meanCoord[1]);
 		}catch (...) {
 			foundCoord = coordinate();
 		}

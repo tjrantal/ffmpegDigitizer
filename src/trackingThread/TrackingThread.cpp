@@ -290,9 +290,8 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 
 /*Calculate marker optical flow*/
 coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
-	printf("Started getting flow\n");
-	
-	if (true || prevImage == NULL){
+	//printf("Started getting flow\n");
+	if (prevImage == NULL){
 		printf("Previmage null\n");
 		return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
 	}
@@ -324,6 +323,7 @@ coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *curre
 	for (int p = 0; p < points[1].size(); ++p) {
 		move[0]+=points[1][p].x;
 		move[1]+=points[1][p].y;
+		//printf("Point %d dx %.1f dy %.1f\n",points[1][p].x.points[1][p].y);
 	}
 	move[0]/=((double)points[1].size());
 	move[1]/=((double)points[1].size());
