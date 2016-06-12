@@ -18,6 +18,7 @@ For a copy of the GNU General Public License, see <http://www.gnu.org/licenses/>
 	#include "TrackingThread.h"
 #endif
 #include "../markerSelector/CoordinateTracker.h"
+#include "../markerSelector/CoordinateFlowTracker.h"
 #include <opencv2/opencv.hpp>	//OpenCV
 //#include <opencv2/video/tracking.hpp>	//calcOpticalFlowSF
 #include <opencv2/optflow.hpp>	//calcOpticalFlowSF
@@ -43,12 +44,17 @@ void TrackingThread::run(){
 	coordinate initCoordinate;
 	//wxImage *currentImage;
 	unsigned char* currentImageData;
+	unsigned char* previousImageData;
 	//printf("Started tracking thread\n");
 	while (mainThread->trackOn == true && currentFrame <= mainThread->videoReader->getNumberOfIndices()){
 		/*Make a copy of the current image*/
 		//printf("Track Started\n");
 		 //currentImage = new wxImage(mainThread->imagePanel->currentClearImage);
 		 currentImageData = mainThread->imagePanel->currentImageData;
+		 previousImageData = mainThread->imagePanel->previousImageData;
+		 if (previousImageData == NULL){
+		 	previousImageData = currentImageData; 
+		 }
 		//mainThread->SetStatusText(wxString::Format(wxT("%s %d"),_("In loop, frame #"), currentFrame));
 		//Go through all of the markers in the image
 		markersFound = 0;
@@ -96,12 +102,12 @@ void TrackingThread::run(){
 					//std::vector<coordinate> areaCoordinates = getMarkerCoordinatesRegionGrow(currentImage,i, initCoordinate);
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
 					//Implement optical flow-assisted tracking pop each marker to its own thread 
-					if (false) {
+					if (true) {
 					
-						CoordinateFlowTracker* coordinateTracker = new CoordinateFlowTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates);
+						CoordinateFlowTracker* coordinateTracker = new CoordinateFlowTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates,previousImageData,mainThread->markerSelector->markers[i].fourBitColors,mainThread->markerSelector->markers[i].markerRadius);
 						coordinateTrackers.push_back(coordinateTracker);
 						threads.push_back(std::thread(&CoordinateTracker::getCoordinates, coordinateTrackers.back()));							
-						mainThread->imagePanel->digitizeXYArea(areaCoordinates);
+						//mainThread->imagePanel->digitizeXYArea(areaCoordinates);
 					}else {
 						CoordinateTracker* coordinateTracker = new CoordinateTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates);
 						coordinateTrackers.push_back(coordinateTracker);
@@ -282,7 +288,7 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 
 /*Calculate marker optical flow*/
 coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
-	return coordinate(coordinates.x,coordinates.y,-1);	//Dummy function
+	return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
 }
 
 
@@ -293,8 +299,8 @@ std::vector<coordinate> TrackingThread::getMarkerCoordinatesRegionGrow(unsigned 
 	int imageHeight =height;
 	//printf("getMCoords goThroughSearchCoordinates %d\n",(int) searchCoordinates.size());
 	for (int i = 0;i<(*searchCoordinates).size();++i){
-		double x = coordinates.xCoordinate+(*searchCoordinates)[i].xCoordinate;
-		double y = coordinates.yCoordinate+(*searchCoordinates)[i].yCoordinate;
+		double x = startSearch.xCoordinate+(*searchCoordinates)[i].xCoordinate;
+		double y = startSearch.yCoordinate+(*searchCoordinates)[i].yCoordinate;
 		/*Check whether color matches, if it does, grow region to confirm that the marker is big enough*/
 		unsigned char* pixelColor = getColor(currentImage,imageWidth,imageHeight,(int) x, (int) y);
 		//printf("getMCoords gotColor %d %d\n",(int) x, (int) y);
