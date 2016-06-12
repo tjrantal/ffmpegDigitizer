@@ -104,7 +104,7 @@ void TrackingThread::run(){
 					//printf("Try to get marker coordinates region grow in tracking thread\n");
 					//Implement optical flow-assisted tracking pop each marker to its own thread 
 					if (true) {
-						printf("CoordinateFlowTracker\n");
+						//printf("CoordinateFlowTracker\n");
 						CoordinateFlowTracker* coordinateTracker = new CoordinateFlowTracker(currentImageData, mainThread->imagePanel->imSize.x, mainThread->imagePanel->imSize.y, i, initCoordinate, mainThread->markerSelector->markers[i].histogram, mainThread->markerSelector->markers[i].colorTolerance, mainThread->markerSelector->markers[i].radiusCoordinates,	mainThread->markerSelector->markers[i].searchCoordinates,previousImageData,mainThread->markerSelector->markers[i].fourBitColors,mainThread->markerSelector->markers[i].markerRadius);
 						coordinateTrackers.push_back(coordinateTracker);
 						threads.push_back(std::thread(&CoordinateTracker::getCoordinates, coordinateTrackers.back()));							
@@ -290,7 +290,10 @@ coordinate TrackingThread::getMarkerCoordinates(unsigned char *currentImage, int
 
 /*Calculate marker optical flow*/
 coordinate TrackingThread::getFlow(unsigned char *prevImage,unsigned char *currentImage, int width, int height,coordinate coordinates,std::vector<coordinate> *searchCoordinates){
+	printf("Started getting flow\n");
+	
 	if (prevImage == NULL){
+		printf("Previmage null\n");
 		return coordinate(coordinates.xCoordinate,coordinates.yCoordinate,-1);	//Dummy function
 	}
 	//Calculate flow
